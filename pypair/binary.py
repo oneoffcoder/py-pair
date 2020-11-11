@@ -3,6 +3,14 @@ from math import sqrt, log2
 
 
 class CategoricalTable(object):
+    """
+    https://en.wikipedia.org/wiki/Rand_index
+    https://en.wikipedia.org/wiki/Fowlkes%E2%80%93Mallows_index
+    https://en.wikipedia.org/wiki/Polychoric_correlation
+    https://en.wikipedia.org/wiki/Matthews_correlation_coefficient
+    https://en.wikipedia.org/wiki/Contingency_table
+    https://en.wikipedia.org/wiki/Chi-squared_test#:~:text=Pearson's%20chi%2Dsquared%20test%20is,categories%20of%20a%20contingency%20table.
+    """
     def __init__(self, a, b, a_vals=None, b_vals=None):
         if a_vals is None:
             a_vals = sorted(list({v for v in a}))
@@ -54,6 +62,30 @@ class CategoricalTable(object):
         :return: Phi.
         """
         return sqrt(self.chisq / self._n)
+
+    @property
+    def uncertainty_coefficient(self):
+        """
+        https://en.wikipedia.org/wiki/Uncertainty_coefficient
+        :return:
+        """
+        pass
+
+    @property
+    def mutual_information(self):
+        """
+        https://en.wikipedia.org/wiki/Mutual_information
+        :return:
+        """
+        pass
+
+    @property
+    def goodman_kruskal_lambda(self):
+        """
+        https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda
+        :return:
+        """
+        pass
 
 
 class BinaryTable(CategoricalTable):
