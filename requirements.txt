@@ -1,0 +1,14 @@
+# TEST
+nose
+coverage
+# LINT OR DIE
+flake8
+pep8
+pyflakes
+# LIBS
+numpy
+# DOCUMENTATION
+sphinx
+sphinx_rtd_theme
+# PUBLISHING
+twine
