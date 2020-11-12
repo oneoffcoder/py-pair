@@ -1,5 +1,5 @@
-from itertools import chain
-from math import sqrt, log2, pi
+from itertools import chain, product
+from math import sqrt, log2, pi, log
 
 import pandas as pd
 from scipy import stats
@@ -96,6 +96,15 @@ class CategoricalTable(object):
         """
         return sqrt(self.chisq / self._n)
 
+    def __get_cond_entropy(self, a, b, n, reversed=False):
+        p_ab = self._df.query(f'a=="{a}" and b=="{b}"').shape[0] / n
+        if not reversed:
+            p_a = self._df.query(f'a=="{a}"').shape[0] / n
+        else:
+            p_a = self._df.query(f'b=="{b}"').shape[0] / n
+        c_ba = p_ab / p_a
+        return p_ab * log(c_ba)
+
     @property
     def uncertainty_coefficient(self):
         """
@@ -103,7 +112,40 @@ class CategoricalTable(object):
 
         :return: Uncertainty coefficient.
         """
-        pass
+        a_keys = list(self._a_map.keys())
+        b_keys = list(self._b_map.keys())
+
+        n = self._df[self._df.b.isin(b_keys)].shape[0]
+        n_b = {b: self._df.query(f'b=="{b}"').shape[0] for b in self._b_map}
+        p_b = {b: c / n for b, c in n_b.items()}
+        h_b = -sum([p * log(p) for _, p in p_b.items()])
+
+        n = self._df[self._df.a.isin(a_keys) & self._df.b.isin(b_keys)].shape[0]
+        h_ba = -sum([self.__get_cond_entropy(a, b, n) for a, b in product(*[a_keys, b_keys])])
+
+        e = (h_b - h_ba) / h_b
+        return e
+
+    @property
+    def uncertainty_coefficient_reversed(self):
+        """
+        `Uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_.
+
+        :return: Uncertainty coefficient.
+        """
+        a_keys = list(self._a_map.keys())
+        b_keys = list(self._b_map.keys())
+
+        n = self._df[self._df.b.isin(b_keys)].shape[0]
+        n_a = {a: self._df.query(f'a=="{a}"').shape[0] for a in self._a_map}
+        p_a = {a: c / n for a, c in n_a.items()}
+        h_a = -sum([p * log(p) for _, p in p_a.items()])
+
+        n = self._df[self._df.a.isin(a_keys) & self._df.b.isin(b_keys)].shape[0]
+        h_ab = -sum([self.__get_cond_entropy(a, b, n) for a, b in product(*[a_keys, b_keys])])
+
+        e = (h_a - h_ab) / h_a
+        return e
 
     @property
     def mutual_information(self):

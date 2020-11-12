@@ -55,6 +55,8 @@ def test_binary_table_creation():
     print(table.goodman_kruskal_lambda)
     print(table.goodman_kruskal_lambda_reversed)
     print(table.tschuprow_t)
+    print(table.uncertainty_coefficient)
+    print(table.uncertainty_coefficient_reversed)
     assert 1 == 1
 
 
