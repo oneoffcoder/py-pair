@@ -9,10 +9,13 @@ from scipy.special import binom
 
 class CategoricalTable(object):
     """
-    Categorical table.
+    Represents a contingency table for categorical variables.
 
-    https://en.wikipedia.org/wiki/Contingency_table
-    https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA
+    References
+    ^^^^^^^^^^
+
+    - `Contingency table <https://en.wikipedia.org/wiki/Contingency_table>`_
+    - `More Correlation Coefficients <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_
     """
 
     def __init__(self, a, b, a_vals=None, b_vals=None):
@@ -302,7 +305,7 @@ class CategoricalTable(object):
 
 class BinaryTable(CategoricalTable):
     """
-    Binary table.
+    Represents a contingency table for binary variables.
     """
 
     def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
