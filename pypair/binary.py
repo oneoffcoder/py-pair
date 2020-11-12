@@ -42,12 +42,12 @@ class CategoricalTable(object):
         n_rows = len(a_vals)
         n_cols = len(b_vals)
 
-        rows = [sum(r) for r in observed]
-        cols = [sum([observed[r][c] for r in range(n_rows)]) for c in range(n_cols)]
+        row_marginals = [sum(r) for r in observed]
+        col_marginals = [sum([observed[r][c] for r in range(n_rows)]) for c in range(n_cols)]
 
         n = sum([sum(o) for o in observed])
         get_expected = lambda r, c: r * c / n
-        expected = [[get_expected(rows[i], cols[j]) for j, _ in enumerate(b_vals)] for i, _ in enumerate(a_vals)]
+        expected = [[get_expected(row_marginals[i], col_marginals[j]) for j, _ in enumerate(b_vals)] for i, _ in enumerate(a_vals)]
 
         chisq = sum([(o - e) ** 2 / e for o, e in zip(chain(*observed), chain(*expected))])
 
@@ -58,10 +58,10 @@ class CategoricalTable(object):
         self._n = n
         self._a_map = {v: i for i, v in enumerate(a_vals)}
         self._b_map = {v: i for i, v in enumerate(b_vals)}
-        self._k = n_cols
-        self._r = n_rows
-        self._row_marginals = rows
-        self._col_marginals = cols
+        self._n_cols = n_cols
+        self._n_rows = n_rows
+        self._row_marginals = row_marginals
+        self._col_marginals = col_marginals
 
     @property
     def chisq(self):
@@ -128,7 +128,7 @@ class CategoricalTable(object):
         :return: Goodman-Kruskal's lambda.
         """
         n = self._n
-        x = sum([max(self.observed[r]) for r in range(self._r)])
+        x = sum([max(self.observed[r]) for r in range(self._n_rows)])
         y = max(self._col_marginals)
         gkl = (x - y) / (n - y)
         return gkl
@@ -141,7 +141,7 @@ class CategoricalTable(object):
         :return: Goodman-Kruskal's lambda.
         """
         n = self._n
-        x = sum([max([self.observed[r][c] for r in range(self._r)]) for c in range(self._k)])
+        x = sum([max([self.observed[r][c] for r in range(self._n_rows)]) for c in range(self._n_cols)])
         y = max(self._row_marginals)
         gkl = (x - y) / (n - y)
         return gkl
@@ -254,7 +254,7 @@ class BinaryTable(CategoricalTable):
 
         :return: Cramer's V.
         """
-        s = sqrt(self.chisq / self._n / min(self._k - 1, self._r - 1))
+        s = sqrt(self.chisq / self._n / min(self._n_cols - 1, self._n_rows - 1))
         return s
 
     @property
@@ -274,7 +274,7 @@ class BinaryTable(CategoricalTable):
 
         :return: Tschuprow's T.
         """
-        s = sqrt(self.chisq / sqrt((self._k - 1) * (self._r - 1)))
+        s = sqrt(self.chisq / sqrt((self._n_cols - 1) * (self._n_rows - 1)))
         return s
 
     @property
