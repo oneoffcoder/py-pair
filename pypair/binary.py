@@ -11,8 +11,6 @@ class CategoricalTable(object):
     """
     Categorical table.
 
-    https://en.wikipedia.org/wiki/Polychoric_correlation
-    https://en.wikipedia.org/wiki/Matthews_correlation_coefficient
     https://en.wikipedia.org/wiki/Contingency_table
     https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA
     """
@@ -96,6 +94,9 @@ class CategoricalTable(object):
         Where :math:`N_{i*}` is the i-th row marginal, :math:`N_{*j}` is the j-th column marginal and
         :math:`N` is the sum of all the values in the contingency cells (or the total size of the data).
 
+        References
+        ^^^^^^^^^^
+
         - `Chi-Square (χ2) Statistic Definition <https://www.investopedia.com/terms/c/chi-square-statistic.asp>`_
 
         :return: Chi-square statistic.
@@ -121,6 +122,11 @@ class CategoricalTable(object):
         Pearson :math:`[-1, 1]`, where -1 indicates perfect disagreement, 1 indicates perfect agreement and
         0 indicates no relationship. When at least one variable is not binary (has more than 2 values possible),
         then the upper-bound of :math:`\\phi`` is determined by the distribution of the two variables.
+
+        References
+        ^^^^^^^^^^
+
+        - `Matthews correlation coefficient <https://en.wikipedia.org/wiki/Matthews_correlation_coefficient>`_
 
         :return: Phi.
         """
@@ -237,6 +243,9 @@ class CategoricalTable(object):
         :math:`\\lambda_{A|B}`. By default, :math:`\\lambda_{B|A}` is computed, but
         if you desire the reverse, use `goodman_kruskal_lambda_reversed()`.
 
+        References
+        ^^^^^^^^^^
+
         - `Goodman-Kruskal's lambda <https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda>`_.
         - `Correlation <http://cda.psych.uiuc.edu/web_407_spring_2014/correlation_week4.pdf>`_.
 
@@ -271,6 +280,9 @@ class CategoricalTable(object):
         large and may cause overflow.
 
         TODO: use a different way to compute binomial coefficient
+
+        References
+        ^^^^^^^^^^
 
         - `Adjusted Rand Index <https://en.wikipedia.org/wiki/Rand_index#Adjusted_Rand_index>`_.
         - `Python binomial coefficient <https://stackoverflow.com/questions/26560726/python-binomial-coefficient>`_.
@@ -452,6 +464,12 @@ class BinaryTable(CategoricalTable):
     @property
     def tetrachoric_correlation(self):
         """
+        Tetrachoric correlation ranges from :math:`[0, 1]`, where 0 indicates no agreement and
+        1 indicates perfect agreement.
+
+        References
+        ^^^^^^^^^^
+
         - `Tetrachoric correlation <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_.
         - `Tetrachoric Correlation: Definition, Examples, Formula <https://www.statisticshowto.com/tetrachoric-correlation/>`_.
         - `Tetrachoric Correlation Estimation <https://www.real-statistics.com/correlation/polychoric-correlation/tetrachoric-correlation-estimation/>`_.
