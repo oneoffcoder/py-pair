@@ -1,6 +1,7 @@
 from itertools import chain
 from math import sqrt, log2, pi
 
+import pandas as pd
 from scipy import stats
 from scipy.special import binom
 
@@ -26,18 +27,19 @@ class CategoricalTable(object):
         :param a_vals: All possible values in a. Defaults to `None`.
         :param b_vals: All possible values in b. Defaults to `None`.
         """
+        df = pd.DataFrame([(x, y) for x, y in zip(a, b)], columns=['a', 'b'])
+
         if a_vals is None:
             a_vals = sorted(list(set(a)))
         else:
-            a_vals = sorted(list(set(a_vals)))
+            a_vals = sorted(list(df.a.unique()))
 
         if b_vals is None:
             b_vals = sorted(list(set(b)))
         else:
-            b_vals = sorted(list(set(b_vals)))
+            b_vals = sorted(list(df.b.unique()))
 
-        data = [(x, y) for x, y in zip(a, b)]
-        observed = [[data.count((x, y)) for y in b_vals] for x in a_vals]
+        observed = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] for y in b_vals] for x in a_vals]
 
         n_rows = len(a_vals)
         n_cols = len(b_vals)
@@ -47,13 +49,14 @@ class CategoricalTable(object):
 
         n = sum([sum(o) for o in observed])
         get_expected = lambda r, c: r * c / n
-        expected = [[get_expected(row_marginals[i], col_marginals[j]) for j, _ in enumerate(b_vals)] for i, _ in enumerate(a_vals)]
+        expected = [[get_expected(row_marginals[i], col_marginals[j]) for j, _ in enumerate(b_vals)] for i, _ in
+                    enumerate(a_vals)]
 
         chisq = sum([(o - e) ** 2 / e for o, e in zip(chain(*observed), chain(*expected))])
 
         self.observed = observed
         self.expected = expected
-        self._data = data
+        self._df = df
         self._chisq = chisq
         self._n = n
         self._a_map = {v: i for i, v in enumerate(a_vals)}
@@ -62,6 +65,18 @@ class CategoricalTable(object):
         self._n_rows = n_rows
         self._row_marginals = row_marginals
         self._col_marginals = col_marginals
+
+    def _count(self, a=None, b=None):
+        if a is not None and b is not None:
+            q = f'a=="{a}" and b=="{b}"'
+        elif a is not None and b is None:
+            q = f'a=="{a}"'
+        elif a is None and b is not None:
+            q = f'b=="{b}"'
+        else:
+            return self._df.shape[0]
+
+        return self._df.query(q).shape[0]
 
     @property
     def chisq(self):
@@ -231,9 +246,9 @@ class BinaryTable(CategoricalTable):
 
         :return: Tanimoto similarity.
         """
-        count_11 = self._data.count((self._a_1, self._b_1))
-        count_01 = self._data.count((self._a_0, self._b_1))
-        count_10 = self._data.count((self._a_1, self._b_0))
+        count_11 = self._count(self._a_1, self._b_1)
+        count_01 = self._count(self._a_0, self._b_1)
+        count_10 = self._count(self._a_1, self._b_0)
         s = count_11 / (count_01 + count_10)
         return s
 
@@ -284,10 +299,10 @@ class BinaryTable(CategoricalTable):
 
         :return: Rand index.
         """
-        tp = self._data.count((self._a_1, self._b_1))
-        fp = self._data.count((self._a_0, self._b_1))
-        fn = self._data.count((self._a_1, self._b_0))
-        tn = self._data.count((self._a_0, self._b_0))
+        tp = self._count(self._a_1, self._b_1)
+        fp = self._count(self._a_0, self._b_1)
+        fn = self._count(self._a_1, self._b_0)
+        tn = self._count(self._a_0, self._b_0)
         s = (tp + tn) / (tp + fp + fn + tn)
         return s
 
@@ -298,8 +313,8 @@ class BinaryTable(CategoricalTable):
 
         :return: A tuple. First element is chi-square test statistics. Second element is p-value.
         """
-        c = self._data.count((self._a_0, self._b_1))
-        b = self._data.count((self._a_1, self._b_0))
+        c = self._count(self._a_0, self._b_1)
+        b = self._count(self._a_1, self._b_0)
         chisq = (b - c) ** 2 / (b + c)
         p = 1 - stats.chi2.cdf(chisq, 1)
         return chisq, p
@@ -311,10 +326,10 @@ class BinaryTable(CategoricalTable):
 
         :return: Odds ratio.
         """
-        p_00 = self._data.count((self._a_0, self._b_0)) / self._n
-        p_01 = self._data.count((self._a_0, self._b_1)) / self._n
-        p_10 = self._data.count((self._a_1, self._b_0)) / self._n
-        p_11 = self._data.count((self._a_1, self._b_1)) / self._n
+        p_00 = self._count(self._a_0, self._b_0) / self._n
+        p_01 = self._count(self._a_0, self._b_1) / self._n
+        p_10 = self._count(self._a_1, self._b_0) / self._n
+        p_11 = self._count(self._a_1, self._b_1) / self._n
 
         ratio = (p_11 * p_00) / (p_10 * p_01)
         return ratio
@@ -328,10 +343,10 @@ class BinaryTable(CategoricalTable):
 
         :return: Tetrachoric correlation.
         """
-        n_00 = self._data.count((self._a_0, self._b_0))
-        n_01 = self._data.count((self._a_0, self._b_1))
-        n_10 = self._data.count((self._a_1, self._b_0))
-        n_11 = self._data.count((self._a_1, self._b_1))
+        n_00 = self._count(self._a_0, self._b_0)
+        n_01 = self._count(self._a_0, self._b_1)
+        n_10 = self._count(self._a_1, self._b_0)
+        n_11 = self._count(self._a_1, self._b_1)
 
         if n_10 == 0 or n_01 == 0:
             return 1.0

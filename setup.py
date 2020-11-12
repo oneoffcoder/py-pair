@@ -14,7 +14,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/vangj/py-bbn',
     keywords=' '.join(['statistics', 'pairwise', 'association', 'correlation', 'measurement', 'strength']),
-    install_requires=[],
+    install_requires=['scipy', 'numpy', 'pandas'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: Apache Software License',

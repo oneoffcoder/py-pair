@@ -7,8 +7,11 @@ pep8
 pyflakes
 # LIBS
 numpy
+scipy
+pandas
 # DOCUMENTATION
 sphinx
 sphinx_rtd_theme
 # PUBLISHING
 twine
+setuptools
