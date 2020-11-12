@@ -1,7 +1,8 @@
 from itertools import chain
-from math import sqrt, log2, cos, pi
-from scipy.special import binom
+from math import sqrt, log2, pi
+
 from scipy import stats
+from scipy.special import binom
 
 
 class CategoricalTable(object):
@@ -102,23 +103,23 @@ class CategoricalTable(object):
     def goodman_kruskal_lambda(self):
         """
         Goodman-Kruskal's lambda is the `proportional reduction in error`
-        of predicting one variable `b` given another `a`: :math:`\lambda_{B|A}`.
+        of predicting one variable `b` given another `a`: :math:`\\lambda_{B|A}`.
 
-        - The probability of an error in predicting the column category: :math:`P_{e|r} = 1 - \frac{\sum_r \max_{c} N_{r c}}{N}`
-        - The probability of an error in predicting the column category given the row category: :math:`P_e = 1 - \frac{\max_{c} N_{* c}}{N}`
+        - The probability of an error in predicting the column category: :math:`P_{e|r} = 1 - \\frac{\\sum_r \\max_{c} N_{r c}}{N}`
+        - The probability of an error in predicting the column category given the row category: :math:`P_e = 1 - \\frac{\\max_{c} N_{* c}}{N}`
 
         Where,
 
-        - :math:`\max_{c} N_{* c}` is the maximum of the column marginals
-        - :math:`\sum_r \max_{c} N_{r c}` is the sum over the maximum values per row
+        - :math:`\\max_{c} N_{* c}` is the maximum of the column marginals
+        - :math:`\\sum_r \\max_{c} N_{r c}` is the sum over the maximum values per row
         - :math:`N` is the total
 
-        Thus, :math:`\lambda_{B|A} = \frac{P_e - P_{e|r}}{P_e}`.
+        Thus, :math:`\\lambda_{B|A} = \\frac{P_e - P_{e|r}}{P_e}`.
 
         The way the contingency table is setup by default is that `a` is on
         the rows and `b` is on the columns. Note that Goodman-Kruskal's lambda
-        is not symmetric: :math:`\lambda_{B|A}` does not necessarily equal
-        :math:`\lambda_{A|B}`. By default, :math:`\lambda_{B|A}` is computed, but
+        is not symmetric: :math:`\\lambda_{B|A}` does not necessarily equal
+        :math:`\\lambda_{A|B}`. By default, :math:`\\lambda_{B|A}` is computed, but
         if you desire the reverse, use `goodman_kruskal_lambda_reversed()`.
 
         - `Goodman-Kruskal's lambda <https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda>`_.
@@ -135,7 +136,7 @@ class CategoricalTable(object):
     @property
     def goodman_kruskal_lambda_reversed(self):
         """
-        Computes :math:`\lambda_{A|B}`.
+        Computes :math:`\\lambda_{A|B}`.
 
         :return: Goodman-Kruskal's lambda.
         """
