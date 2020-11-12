@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import lru_cache, reduce
 from itertools import chain, product
 from math import sqrt, log2, pi, log
 
@@ -110,22 +110,35 @@ class CategoricalTable(object):
     @property
     def uncertainty_coefficient(self):
         """
-        `Uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_.
+        The `uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_ :math:`U(X|Y)`
+        for two variables :math:`X` and :math:`Y` is defined as follows.
+
+        :math:`\\frac{I(X;Y)}{H(X)}`
+
+        Where,
+
+        - :math:`H(X) = -\\sum_x P(x) \\log P(x)`
+        - :math:`I(X;Y) = \\sum_y \\sum_x P(x, y) \\log \\frac{P(x, y)}{P(x) P(y)}`
+
+        :math:`H(X)` is called the entropy of :math:`X` and :math:`I(X;Y)` is the mutual information
+        between :math:`X` and :math:`Y`. Note that :math:`I(X;Y) < H(X)` and both values are positive.
+        As such, the uncertainty coefficient may be viewed as the normalized mutual information
+        between :math:`X` and :math:`Y` and in the range :math:`[0, 1]`.
 
         :return: Uncertainty coefficient.
         """
-        a_keys = list(self._a_map.keys())
         b_keys = list(self._b_map.keys())
+        df = self._df[self._df.b.isin(b_keys)]
+        n = df.shape[0]
 
-        n = self._df[self._df.b.isin(b_keys)].shape[0]
-        n_b = {b: self._df.query(f'b=="{b}"').shape[0] for b in self._b_map}
-        p_b = {b: c / n for b, c in n_b.items()}
-        h_b = -sum([p * log(p) for _, p in p_b.items()])
+        h_b = map(lambda b: df.query(f'b=="{b}"').shape[0] / n, b_keys)
+        h_b = map(lambda p: p * log(p), h_b)
+        h_b = -reduce(lambda x, y: x + y, h_b)
 
-        n = self._df[self._df.a.isin(a_keys) & self._df.b.isin(b_keys)].shape[0]
-        h_ba = -sum([self.__get_cond_entropy(a, b, n) for a, b in product(*[a_keys, b_keys])])
+        i_ab = self.mutual_information
 
-        e = (h_b - h_ba) / h_b
+        e = i_ab / h_b
+
         return e
 
     @property
@@ -136,17 +149,17 @@ class CategoricalTable(object):
         :return: Uncertainty coefficient.
         """
         a_keys = list(self._a_map.keys())
-        b_keys = list(self._b_map.keys())
+        df = self._df[self._df.a.isin(a_keys)]
+        n = df.shape[0]
 
-        n = self._df[self._df.b.isin(b_keys)].shape[0]
-        n_a = {a: self._df.query(f'a=="{a}"').shape[0] for a in self._a_map}
-        p_a = {a: c / n for a, c in n_a.items()}
-        h_a = -sum([p * log(p) for _, p in p_a.items()])
+        h_a = map(lambda a: df.query(f'a=="{a}"').shape[0] / n, a_keys)
+        h_a = map(lambda p: p * log(p), h_a)
+        h_a = -reduce(lambda x, y: x + y, h_a)
 
-        n = self._df[self._df.a.isin(a_keys) & self._df.b.isin(b_keys)].shape[0]
-        h_ab = -sum([self.__get_cond_entropy(a, b, n) for a, b in product(*[a_keys, b_keys])])
+        i_ab = self.mutual_information
 
-        e = (h_a - h_ab) / h_a
+        e = i_ab / h_a
+
         return e
 
     @property
@@ -166,7 +179,7 @@ class CategoricalTable(object):
         get_p_a = lambda a: df.query(f'a=="{a}"').shape[0] / n
         get_p_b = lambda b: df.query(f'b=="{b}"').shape[0] / n
         get_p_ab = lambda a, b: df.query(f'a=="{a}" and b=="{b}"').shape[0] / n
-        get_sub_i = lambda a, b: get_p_ab(a, b) / log(get_p_ab(a, b) / get_p_a(a) / get_p_b(b))
+        get_sub_i = lambda a, b: get_p_ab(a, b) * log(get_p_ab(a, b) / get_p_a(a) / get_p_b(b))
         mi = sum((get_sub_i(a, b) for a, b in product(*[a_keys, b_keys])))
         return mi
 
