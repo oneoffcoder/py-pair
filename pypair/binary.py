@@ -83,16 +83,45 @@ class CategoricalTable(object):
     @property
     def chisq(self):
         """
-        `Chi-square <https://en.wikipedia.org/wiki/Chi-square_distribution>`_.
+        The `chi-square statistic <https://en.wikipedia.org/wiki/Chi-square_distribution>`_ :math:`\\chi^2`,
+        is defined as follows.
 
-        :return: Chi-squared.
+        :math:`\\sum_i \\sum_j \\frac{(O_{ij} - E_{ij})^2}{E_{ij}}`
+
+        In a contingency table, :math:`O_ij` is the observed cell count corresponding to the :math:`i` row
+        and :math:`j` column. :math:`E_ij` is the expected cell count corresponding to the :math:`i` row and
+        :math:`j` column.
+
+        :math:`E_i = \\frac{N_{i*} N_{*j}}{N}`
+
+        Where :math:`N_{i*}` is the i-th row marginal, :math:`N_{*j}` is the j-th column marginal and
+        :math:`N` is the sum of all the values in the contingency cells (or the total size of the data).
+
+        - `Chi-Square (χ2) Statistic Definition <https://www.investopedia.com/terms/c/chi-square-statistic.asp>`_
+
+        :return: Chi-square statistic.
         """
         return self._chisq
 
     @property
+    def chisq_dof(self):
+        """
+        Returns the degrees of freedom form :math:`\\chi^2`, which is defined as :math:`(R - 1)(C - 1)`,
+        where :math:`R` is the number of rows and :math:`C` is the number of columns in a contingency
+        table induced by two categorical variables.
+
+        :return: Degrees of freedom.
+        """
+        return (self._n_rows - 1) * (self._n_cols - 1)
+
+    @property
     def phi(self):
         """
-        `Phi coefficient <https://en.wikipedia.org/wiki/Phi_coefficient>`_.
+        The `phi coefficient <https://en.wikipedia.org/wiki/Phi_coefficient>`_ :math:`\\phi` is defined
+        as :math:`\\sqrt \\frac{\\chi^2}{N}`. For two binary variables, the range will be like canonical
+        Pearson :math:`[-1, 1]`, where -1 indicates perfect disagreement, 1 indicates perfect agreement and
+        0 indicates no relationship. When at least one variable is not binary (has more than 2 values possible),
+        then the upper-bound of :math:`\\phi`` is determined by the distribution of the two variables.
 
         :return: Phi.
         """
@@ -165,9 +194,12 @@ class CategoricalTable(object):
     @property
     def mutual_information(self):
         """
-        `Mutual information <https://en.wikipedia.org/wiki/Mutual_information>`_ is
+        The `mutual information <https://en.wikipedia.org/wiki/Mutual_information>`_ between
+        two variables :math:`X` and :math:`Y` is denoted as :math:`I(X;Y)`.  :math:`I(X;Y)` is
         unbounded and in the range :math:`[0, \\infty]`. A higher mutual information
-        value implies strong association.
+        value implies strong association. The formula for :math:`I(X;Y)` is defined as follows.
+
+        :math:`I(X;Y) = \\sum_y \\sum_x P(x, y) \\log \\frac{P(x, y)}{P(x) P(y)}`
 
         :return: Mutual information.
         """
@@ -342,7 +374,7 @@ class BinaryTable(CategoricalTable):
         return s
 
     @property
-    def contigency_coefficient(self):
+    def contingency_coefficient(self):
         """
         `Contingency coefficient <https://en.wikipedia.org/wiki/Contingency_table#Cram%C3%A9r's_V_and_the_contingency_coefficient_C>`_.
 
