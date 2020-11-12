@@ -48,6 +48,11 @@ def test_binary_table_creation():
     assert_almost_equal(table.rand_index, 0.6, decimal=5)
     print(table.adjusted_rand_index)
     print(table.mcnemar_test)
+    print(table.odds_ratio)
+    print(table.contigency_coefficient)
+    print(table.tetrachoric_correlation)
+    print(table.goodman_kruskal_lambda)
+    print(table.goodman_kruskal_lambda_reversed)
     assert 1 == 1
 
 

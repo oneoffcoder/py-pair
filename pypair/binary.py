@@ -1,7 +1,8 @@
 from itertools import chain
-from math import sqrt, log2
+from math import sqrt, log2, cos, pi
 from scipy.special import binom
 from scipy import stats
+
 
 class CategoricalTable(object):
     """
@@ -11,7 +12,7 @@ class CategoricalTable(object):
     https://en.wikipedia.org/wiki/Polychoric_correlation
     https://en.wikipedia.org/wiki/Matthews_correlation_coefficient
     https://en.wikipedia.org/wiki/Contingency_table
-    https://en.wikipedia.org/wiki/McNemar%27s_test
+    https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA
     """
 
     def __init__(self, a, b, a_vals=None, b_vals=None):
@@ -100,11 +101,49 @@ class CategoricalTable(object):
     @property
     def goodman_kruskal_lambda(self):
         """
-        `Goodman-Kruskal's lambda <https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda>`_.
+        Goodman-Kruskal's lambda is the `proportional reduction in error`
+        of predicting one variable `b` given another `a`: :math:`\lambda_{B|A}`.
+
+        - The probability of an error in predicting the column category: :math:`P_{e|r} = 1 - \frac{\sum_r \max_{c} N_{r c}}{N}`
+        - The probability of an error in predicting the column category given the row category: :math:`P_e = 1 - \frac{\max_{c} N_{* c}}{N}`
+
+        Where,
+
+        - :math:`\max_{c} N_{* c}` is the maximum of the column marginals
+        - :math:`\sum_r \max_{c} N_{r c}` is the sum over the maximum values per row
+        - :math:`N` is the total
+
+        Thus, :math:`\lambda_{B|A} = \frac{P_e - P_{e|r}}{P_e}`.
+
+        The way the contingency table is setup by default is that `a` is on
+        the rows and `b` is on the columns. Note that Goodman-Kruskal's lambda
+        is not symmetric: :math:`\lambda_{B|A}` does not necessarily equal
+        :math:`\lambda_{A|B}`. By default, :math:`\lambda_{B|A}` is computed, but
+        if you desire the reverse, use `goodman_kruskal_lambda_reversed()`.
+
+        - `Goodman-Kruskal's lambda <https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda>`_.
+        - `Correlation <http://cda.psych.uiuc.edu/web_407_spring_2014/correlation_week4.pdf>`_.
 
         :return: Goodman-Kruskal's lambda.
         """
-        pass
+        n = self._n
+        x = sum([max(self.observed[r]) for r in range(self._r)])
+        y = max(self._col_marginals)
+        gkl = (x - y) / (n - y)
+        return gkl
+
+    @property
+    def goodman_kruskal_lambda_reversed(self):
+        """
+        Computes :math:`\lambda_{A|B}`.
+
+        :return: Goodman-Kruskal's lambda.
+        """
+        n = self._n
+        x = sum([max([self.observed[r][c] for r in range(self._r)]) for c in range(self._k)])
+        y = max(self._row_marginals)
+        gkl = (x - y) / (n - y)
+        return gkl
 
     @property
     def adjusted_rand_index(self):
@@ -137,6 +176,7 @@ class BinaryTable(CategoricalTable):
     """
     Binary table.
     """
+
     def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
         """
         ctor.
@@ -217,6 +257,16 @@ class BinaryTable(CategoricalTable):
         return s
 
     @property
+    def contigency_coefficient(self):
+        """
+        `Contingency coefficient <https://en.wikipedia.org/wiki/Contingency_table#Cram%C3%A9r's_V_and_the_contingency_coefficient_C>`_.
+
+        :return: Contingency coefficient.
+        """
+        s = sqrt(self.chisq / (self._n + self.chisq))
+        return s
+
+    @property
     def tschuprow_t(self):
         """
         `Tschuprow's T <https://en.wikipedia.org/wiki/Tschuprow%27s_T>`_.
@@ -252,3 +302,41 @@ class BinaryTable(CategoricalTable):
         chisq = (b - c) ** 2 / (b + c)
         p = 1 - stats.chi2.cdf(chisq, 1)
         return chisq, p
+
+    @property
+    def odds_ratio(self):
+        """
+        `Odds ratio <https://en.wikipedia.org/wiki/Contingency_table#Odds_ratio>`_.
+
+        :return: Odds ratio.
+        """
+        p_00 = self._data.count((self._a_0, self._b_0)) / self._n
+        p_01 = self._data.count((self._a_0, self._b_1)) / self._n
+        p_10 = self._data.count((self._a_1, self._b_0)) / self._n
+        p_11 = self._data.count((self._a_1, self._b_1)) / self._n
+
+        ratio = (p_11 * p_00) / (p_10 * p_01)
+        return ratio
+
+    @property
+    def tetrachoric_correlation(self):
+        """
+        - `Tetrachoric correlation <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_.
+        - `Tetrachoric Correlation: Definition, Examples, Formula <https://www.statisticshowto.com/tetrachoric-correlation/>`_.
+        - `Tetrachoric Correlation Estimation <https://www.real-statistics.com/correlation/polychoric-correlation/tetrachoric-correlation-estimation/>`_.
+
+        :return: Tetrachoric correlation.
+        """
+        n_00 = self._data.count((self._a_0, self._b_0))
+        n_01 = self._data.count((self._a_0, self._b_1))
+        n_10 = self._data.count((self._a_1, self._b_0))
+        n_11 = self._data.count((self._a_1, self._b_1))
+
+        if n_10 == 0 or n_01 == 0:
+            return 1.0
+        if n_00 == 0 or n_11 == 0:
+            return -1.0
+
+        y = pow((n_00 * n_11) / (n_10 * n_01), pi / 4.0)
+        p = (y - 1) / (y + 1)
+        return p
