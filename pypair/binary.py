@@ -1,7 +1,7 @@
+from abc import ABC
 from functools import lru_cache, reduce
 from itertools import chain, product
 from math import sqrt, log2, pi, log
-from abc import ABC
 
 import pandas as pd
 from scipy import stats
@@ -12,6 +12,7 @@ class ContingencyTable(ABC):
     """
     Contigency table.
     """
+
     def __init__(self):
         pass
 
@@ -502,6 +503,7 @@ class ConfusionMatrix(BinaryTable):
     Represents a `confusion matrix <https://en.wikipedia.org/wiki/Confusion_matrix>`_.
 
     """
+
     def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
         """
         ctor. Note that `a` is the ground truth and `b` is the prediction.
