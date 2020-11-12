@@ -59,6 +59,10 @@ def test_confusion_matrix_creation():
     print(table.specificity)
     print(table.precision)
     print(table.recall)
+    print(table.prevalence)
+    print(table.plr)
+    print(table.nlr)
+    print(table.dor)
 
 
 @with_setup(setup, teardown)

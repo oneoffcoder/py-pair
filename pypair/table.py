@@ -571,6 +571,8 @@ class ConfusionMatrix(BinaryTable):
         - sensitivity
         - recall
         - hit rate
+        - power
+        - probability of detection
 
         :return: TPR.
         """
@@ -625,6 +627,7 @@ class ConfusionMatrix(BinaryTable):
         False positive rate.
 
         - fall-out
+        - probability of false alarm
 
         :return: FPR.
         """
@@ -767,3 +770,45 @@ class ConfusionMatrix(BinaryTable):
         :return: TPR.
         """
         return self.tpr
+
+    @property
+    def prevalence(self):
+        """
+        Prevalence.
+
+        :return: Prevalence.
+        """
+        return (self.tp + self.fn) / self.n
+
+    @property
+    def plr(self):
+        """
+        Positive likelihood ratio.
+
+        - LR+
+
+        :return: PLR.
+        """
+        return self.tpr / self.fpr
+
+    @property
+    def nlr(self):
+        """
+        Negative likelihood ratio.
+
+        - LR-
+
+        :return: NLR.
+        """
+        return self.fnr / self.tnr
+
+    @property
+    def dor(self):
+        """
+        Diagnostic odds ratio.
+
+        :return: DOR.
+        """
+        return self.plr / self.nlr
+
+
