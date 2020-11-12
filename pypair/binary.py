@@ -27,12 +27,12 @@ class CategoricalTable(object):
         :param b_vals: All possible values in b. Defaults to `None`.
         """
         if a_vals is None:
-            a_vals = sorted(list({v for v in a}))
+            a_vals = sorted(list(set(a)))
         else:
             a_vals = sorted(list(set(a_vals)))
 
         if b_vals is None:
-            b_vals = sorted(list({v for v in b}))
+            b_vals = sorted(list(set(b)))
         else:
             b_vals = sorted(list(set(b_vals)))
 
