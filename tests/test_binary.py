@@ -47,6 +47,7 @@ def test_binary_table_creation():
     assert_almost_equal(table.cramer_v, 0.2, decimal=5)
     assert_almost_equal(table.rand_index, 0.6, decimal=5)
     print(table.adjusted_rand_index)
+    print(table.mcnemar_test)
     assert 1 == 1
 
 

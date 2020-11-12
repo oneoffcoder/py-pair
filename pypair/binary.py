@@ -1,19 +1,29 @@
 from itertools import chain
 from math import sqrt, log2
 from scipy.special import binom
-
+from scipy import stats
 
 class CategoricalTable(object):
     """
+    Categorical table.
+
     https://en.wikipedia.org/wiki/Fowlkes%E2%80%93Mallows_index
     https://en.wikipedia.org/wiki/Polychoric_correlation
     https://en.wikipedia.org/wiki/Matthews_correlation_coefficient
     https://en.wikipedia.org/wiki/Contingency_table
-    https://en.wikipedia.org/wiki/Chi-squared_test#:~:text=Pearson's%20chi%2Dsquared%20test%20is,categories%20of%20a%20contingency%20table.
     https://en.wikipedia.org/wiki/McNemar%27s_test
     """
 
     def __init__(self, a, b, a_vals=None, b_vals=None):
+        """
+        ctor. If `a_vals` or `b_vals` are `None`, then the possible
+        values will be determined empirically from the data.
+
+        :param a: Iterable list.
+        :param b: Iterable list.
+        :param a_vals: All possible values in a. Defaults to `None`.
+        :param b_vals: All possible values in b. Defaults to `None`.
+        """
         if a_vals is None:
             a_vals = sorted(list({v for v in a}))
         else:
@@ -54,7 +64,8 @@ class CategoricalTable(object):
     @property
     def chisq(self):
         """
-        https://en.wikipedia.org/wiki/Chi-square_distribution
+        `Chi-square <https://en.wikipedia.org/wiki/Chi-square_distribution>`_.
+
         :return: Chi-squared.
         """
         return self._chisq
@@ -62,7 +73,8 @@ class CategoricalTable(object):
     @property
     def phi(self):
         """
-        https://en.wikipedia.org/wiki/Phi_coefficient
+        `Phi coefficient <https://en.wikipedia.org/wiki/Phi_coefficient>`_.
+
         :return: Phi.
         """
         return sqrt(self.chisq / self._n)
@@ -70,24 +82,27 @@ class CategoricalTable(object):
     @property
     def uncertainty_coefficient(self):
         """
-        https://en.wikipedia.org/wiki/Uncertainty_coefficient
-        :return:
+        `Uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_.
+
+        :return: Uncertainty coefficient.
         """
         pass
 
     @property
     def mutual_information(self):
         """
-        https://en.wikipedia.org/wiki/Mutual_information
-        :return:
+        `Mutual information <https://en.wikipedia.org/wiki/Mutual_information>`_.
+
+        :return: Mutual information.
         """
         pass
 
     @property
     def goodman_kruskal_lambda(self):
         """
-        https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda
-        :return:
+        `Goodman-Kruskal's lambda <https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda>`_.
+
+        :return: Goodman-Kruskal's lambda.
         """
         pass
 
@@ -101,8 +116,10 @@ class CategoricalTable(object):
         large and may cause overflow.
 
         TODO: use a different way to compute binomial coefficient
-        https://en.wikipedia.org/wiki/Rand_index#Adjusted_Rand_index
-        https://stackoverflow.com/questions/26560726/python-binomial-coefficient
+
+        - `Adjusted Rand Index <https://en.wikipedia.org/wiki/Rand_index#Adjusted_Rand_index>`_.
+        - `Python binomial coefficient <https://stackoverflow.com/questions/26560726/python-binomial-coefficient>`_.
+
         :return: Adjusted Rand Index.
         """
         a_i = sum([int(binom(a, 2)) for a in self._row_marginals])
@@ -117,7 +134,20 @@ class CategoricalTable(object):
 
 
 class BinaryTable(CategoricalTable):
+    """
+    Binary table.
+    """
     def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
+        """
+        ctor.
+
+        :param a: Iterable list.
+        :param b: Iterable list.
+        :param a_0: The zero value for a. Defaults to 0.
+        :param a_1: The one value for a. Defaults to 1.
+        :param b_0: The zero value for b. Defaults to 0.
+        :param b_1: The zero value for b. Defaults to 1.
+        """
         super().__init__(a, b, a_vals=[a_0, a_1], b_vals=[b_0, b_1])
         self._a_0 = a_0
         self._a_1 = a_1
@@ -127,7 +157,8 @@ class BinaryTable(CategoricalTable):
     @property
     def jaccard_similarity(self):
         """
-        https://en.wikipedia.org/wiki/Jaccard_index
+        `Jaccard Index <https://en.wikipedia.org/wiki/Jaccard_index>`_.
+
         :return: Jaccard similarity.
         """
         a_0 = self._a_map[self._a_0]
@@ -145,7 +176,8 @@ class BinaryTable(CategoricalTable):
     @property
     def jaccard_distance(self):
         """
-        https://en.wikipedia.org/wiki/Jaccard_index
+        `Jaccard Index <https://en.wikipedia.org/wiki/Jaccard_index>`_.
+
         :return: Jaccard distance.
         """
         d = 1.0 - self.jaccard_similarity
@@ -154,7 +186,8 @@ class BinaryTable(CategoricalTable):
     @property
     def tanimoto_similarity(self):
         """
-        https://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_similarity_and_distance
+        `Tanimoto similarity and distance <https://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_similarity_and_distance>`_.
+
         :return: Tanimoto similarity.
         """
         count_11 = self._data.count((self._a_1, self._b_1))
@@ -166,7 +199,8 @@ class BinaryTable(CategoricalTable):
     @property
     def tanimoto_distance(self):
         """
-        https://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_similarity_and_distance
+        `Tanimoto similarity and distance <https://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_similarity_and_distance>`_.
+
         :return: Tanimoto distance.
         """
         d = -log2(self.tanimoto_similarity)
@@ -175,7 +209,8 @@ class BinaryTable(CategoricalTable):
     @property
     def cramer_v(self):
         """
-        https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
+        `Cramer's V <https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V>`_.
+
         :return: Cramer's V.
         """
         s = sqrt(self.chisq / self._n / min(self._k - 1, self._r - 1))
@@ -184,7 +219,8 @@ class BinaryTable(CategoricalTable):
     @property
     def tschuprow_t(self):
         """
-        https://en.wikipedia.org/wiki/Tschuprow%27s_T
+        `Tschuprow's T <https://en.wikipedia.org/wiki/Tschuprow%27s_T>`_.
+
         :return: Tschuprow's T.
         """
         s = sqrt(self.chisq / sqrt((self._k - 1) * (self._r - 1)))
@@ -193,7 +229,8 @@ class BinaryTable(CategoricalTable):
     @property
     def rand_index(self):
         """
-        https://en.wikipedia.org/wiki/Rand_index
+        `Rand Index <https://en.wikipedia.org/wiki/Rand_index>`_.
+
         :return: Rand index.
         """
         tp = self._data.count((self._a_1, self._b_1))
@@ -202,3 +239,16 @@ class BinaryTable(CategoricalTable):
         tn = self._data.count((self._a_0, self._b_0))
         s = (tp + tn) / (tp + fp + fn + tn)
         return s
+
+    @property
+    def mcnemar_test(self):
+        """
+        `McNemar's test <https://en.wikipedia.org/wiki/McNemar%27s_test>`_.
+
+        :return: A tuple. First element is chi-square test statistics. Second element is p-value.
+        """
+        c = self._data.count((self._a_0, self._b_1))
+        b = self._data.count((self._a_1, self._b_0))
+        chisq = (b - c) ** 2 / (b + c)
+        p = 1 - stats.chi2.cdf(chisq, 1)
+        return chisq, p
