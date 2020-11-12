@@ -1,7 +1,7 @@
 PyPair
 ======
 
-.. automodule:: pypair.binary
+.. automodule:: pypair.table
     :members:
     :undoc-members:
     :show-inheritance:
