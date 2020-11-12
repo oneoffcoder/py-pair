@@ -1,7 +1,8 @@
-import numpy as np
-from numpy.testing import assert_array_equal, assert_almost_equal
-from nose import with_setup
 import random
+
+import numpy as np
+from nose import with_setup
+from numpy.testing import assert_array_equal, assert_almost_equal
 
 from pypair.binary import BinaryTable, CategoricalTable
 
