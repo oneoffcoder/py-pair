@@ -142,7 +142,7 @@ class CategoricalTable(object):
         The `uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_ :math:`U(X|Y)`
         for two variables :math:`X` and :math:`Y` is defined as follows.
 
-        :math:`\\frac{I(X;Y)}{H(X)}`
+        :math:`U(X|Y) = \\frac{I(X;Y)}{H(X)}`
 
         Where,
 
