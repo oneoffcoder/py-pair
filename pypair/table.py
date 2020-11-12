@@ -810,5 +810,3 @@ class ConfusionMatrix(BinaryTable):
         :return: DOR.
         """
         return self.plr / self.nlr
-
-
