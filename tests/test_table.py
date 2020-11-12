@@ -4,7 +4,7 @@ import numpy as np
 from nose import with_setup
 from numpy.testing import assert_array_equal, assert_almost_equal
 
-from pypair.table import BinaryTable, CategoricalTable
+from pypair.table import BinaryTable, CategoricalTable, ConfusionMatrix
 
 
 def setup():
@@ -22,6 +22,43 @@ def teardown():
     :return: None.
     """
     pass
+
+
+@with_setup(setup, teardown)
+def test_confusion_matrix_creation():
+    """
+    Tests creating BinaryTable.
+    :return: None.
+    """
+    a = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+    b = [0, 0, 0, 1, 1, 0, 0, 1, 1, 1]
+
+    table = ConfusionMatrix(a, b)
+    print(table.tp)
+    print(table.fp)
+    print(table.fn)
+    print(table.tn)
+    print(table.n)
+    print(table.tpr)
+    print(table.tnr)
+    print(table.ppv)
+    print(table.npv)
+    print(table.fnr)
+    print(table.fpr)
+    print(table.fdr)
+    print(table.fomr)
+    print(table.pt)
+    print(table.ts)
+    print(table.acc)
+    print(table.ba)
+    print(table.f1)
+    print(table.mcc)
+    print(table.bm)
+    print(table.mk)
+    print(table.sensitivity)
+    print(table.specificity)
+    print(table.precision)
+    print(table.recall)
 
 
 @with_setup(setup, teardown)
