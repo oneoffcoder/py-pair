@@ -10,6 +10,8 @@ PyPair
    :maxdepth: 2
    :caption: Contents
 
+   intro
+
 .. toctree::
    :maxdepth: 2
    :caption: API Documentation
