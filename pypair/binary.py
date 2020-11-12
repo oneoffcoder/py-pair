@@ -105,13 +105,13 @@ class CategoricalTable(object):
         Goodman-Kruskal's lambda is the `proportional reduction in error`
         of predicting one variable `b` given another `a`: :math:`\\lambda_{B|A}`.
 
-        - The probability of an error in predicting the column category: :math:`P_{e|r} = 1 - \\frac{\\sum_r \\max_{c} N_{r c}}{N}`
-        - The probability of an error in predicting the column category given the row category: :math:`P_e = 1 - \\frac{\\max_{c} N_{* c}}{N}`
+        - The probability of an error in predicting the column category: :math:`P_e = 1 - \\frac{\\max_{c} N_{* c}}{N}`
+        - The probability of an error in predicting the column category given the row category: :math:`P_{e|r} = 1 - \\frac{\\sum_r \\max_{c} N_{r c}}{N}`
 
         Where,
 
         - :math:`\\max_{c} N_{* c}` is the maximum of the column marginals
-        - :math:`\\sum_r \\max_{c} N_{r c}` is the sum over the maximum values per row
+        - :math:`\\sum_r \\max_{c} N_{r c}` is the sum over the maximum value per row
         - :math:`N` is the total
 
         Thus, :math:`\\lambda_{B|A} = \\frac{P_e - P_{e|r}}{P_e}`.
