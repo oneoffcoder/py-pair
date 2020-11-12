@@ -54,6 +54,7 @@ def test_binary_table_creation():
     print(table.tetrachoric_correlation)
     print(table.goodman_kruskal_lambda)
     print(table.goodman_kruskal_lambda_reversed)
+    print(table.tschuprow_t)
     assert 1 == 1
 
 
