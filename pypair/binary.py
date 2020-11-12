@@ -152,11 +152,23 @@ class CategoricalTable(object):
     @property
     def mutual_information(self):
         """
-        `Mutual information <https://en.wikipedia.org/wiki/Mutual_information>`_.
+        `Mutual information <https://en.wikipedia.org/wiki/Mutual_information>`_ is
+        unbounded and in the range :math:`[0, \\infty]`. A higher mutual information
+        value implies strong association.
 
         :return: Mutual information.
         """
-        pass
+        a_keys = list(self._a_map.keys())
+        b_keys = list(self._b_map.keys())
+        df = self._df[self._df.a.isin(a_keys) & self._df.b.isin(b_keys)]
+        n = df.shape[0]
+
+        get_p_a = lambda a: df.query(f'a=="{a}"').shape[0] / n
+        get_p_b = lambda b: df.query(f'b=="{b}"').shape[0] / n
+        get_p_ab = lambda a, b: df.query(f'a=="{a}" and b=="{b}"').shape[0] / n
+        get_sub_i = lambda a, b: get_p_ab(a, b) / log(get_p_ab(a, b) / get_p_a(a) / get_p_b(b))
+        mi = sum((get_sub_i(a, b) for a, b in product(*[a_keys, b_keys])))
+        return mi
 
     @property
     def goodman_kruskal_lambda(self):

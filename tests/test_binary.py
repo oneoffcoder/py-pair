@@ -57,6 +57,7 @@ def test_binary_table_creation():
     print(table.tschuprow_t)
     print(table.uncertainty_coefficient)
     print(table.uncertainty_coefficient_reversed)
+    print(table.mutual_information)
     assert 1 == 1
 
 
