@@ -1,3 +1,4 @@
+from functools import lru_cache
 from itertools import chain, product
 from math import sqrt, log2, pi, log
 
@@ -66,6 +67,7 @@ class CategoricalTable(object):
         self._row_marginals = row_marginals
         self._col_marginals = col_marginals
 
+    @lru_cache(maxsize=None)
     def _count(self, a=None, b=None):
         if a is not None and b is not None:
             q = f'a=="{a}" and b=="{b}"'
