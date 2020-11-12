@@ -41,10 +41,12 @@ def test_binary_table_creation():
     assert_almost_equal(table.jaccard_similarity, 0.42857142857142855, decimal=5)
     assert_almost_equal(table.jaccard_distance, 0.5714285714285714, decimal=5)
 
-    assert_almost_equal(table.tanimoto_similarity, 0.75, decimal=2)
+    assert_almost_equal(table.tanimoto_similarity, 0.75, decimal=5)
     assert_almost_equal(table.tanimoto_distance, 0.4150374992788438, decimal=5)
 
-    assert_almost_equal(table.cramer_v, 0.2, decimal=2)
+    assert_almost_equal(table.cramer_v, 0.2, decimal=5)
+    assert_almost_equal(table.rand_index, 0.6, decimal=5)
+    print(table.adjusted_rand_index)
     assert 1 == 1
 
 
