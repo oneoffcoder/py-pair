@@ -2,6 +2,7 @@ from itertools import chain
 from math import sqrt, log2
 from scipy.special import binom
 
+
 class CategoricalTable(object):
     """
     https://en.wikipedia.org/wiki/Fowlkes%E2%80%93Mallows_index
@@ -9,6 +10,7 @@ class CategoricalTable(object):
     https://en.wikipedia.org/wiki/Matthews_correlation_coefficient
     https://en.wikipedia.org/wiki/Contingency_table
     https://en.wikipedia.org/wiki/Chi-squared_test#:~:text=Pearson's%20chi%2Dsquared%20test%20is,categories%20of%20a%20contingency%20table.
+    https://en.wikipedia.org/wiki/McNemar%27s_test
     """
 
     def __init__(self, a, b, a_vals=None, b_vals=None):
@@ -92,7 +94,15 @@ class CategoricalTable(object):
     @property
     def adjusted_rand_index(self):
         """
+        The Adjusted Rand Index (ARI) should yield a value between
+        [0, 1], however, negative values can also arise when the index
+        is less than the expected value. This function uses `binom()`
+        from `scipy.special`, and when n >= 300, the results are too
+        large and may cause overflow.
+
+        TODO: use a different way to compute binomial coefficient
         https://en.wikipedia.org/wiki/Rand_index#Adjusted_Rand_index
+        https://stackoverflow.com/questions/26560726/python-binomial-coefficient
         :return: Adjusted Rand Index.
         """
         a_i = sum([int(binom(a, 2)) for a in self._row_marginals])
