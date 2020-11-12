@@ -36,8 +36,9 @@ def test_binary_table_creation():
     table = BinaryTable(a, b)
     assert_array_equal(table.observed, [[3, 2], [2, 3]])
     assert_array_equal(table.expected, [[2.5, 2.5], [2.5, 2.5]])
-    assert 0.4 == table.chisq
-    assert 0.2 == table.phi
+
+    assert_almost_equal(table.chisq, 0.4, decimal=5)
+    assert_almost_equal(table.phi, 0.2, decimal=5)
 
     assert_almost_equal(table.jaccard_similarity, 0.42857142857142855, decimal=5)
     assert_almost_equal(table.jaccard_distance, 0.5714285714285714, decimal=5)
@@ -48,6 +49,7 @@ def test_binary_table_creation():
     assert_almost_equal(table.cramer_v, 0.2, decimal=5)
     assert_almost_equal(table.rand_index, 0.6, decimal=5)
     print(table.adjusted_rand_index)
+    print(table.fowlkes_mallows_index)
     print(table.mcnemar_test)
     print(table.odds_ratio)
     print(table.contingency_coefficient)

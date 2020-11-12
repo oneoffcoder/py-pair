@@ -11,7 +11,6 @@ class CategoricalTable(object):
     """
     Categorical table.
 
-    https://en.wikipedia.org/wiki/Fowlkes%E2%80%93Mallows_index
     https://en.wikipedia.org/wiki/Polychoric_correlation
     https://en.wikipedia.org/wiki/Matthews_correlation_coefficient
     https://en.wikipedia.org/wiki/Contingency_table
@@ -398,13 +397,28 @@ class BinaryTable(CategoricalTable):
         """
         `Rand Index <https://en.wikipedia.org/wiki/Rand_index>`_.
 
-        :return: Rand index.
+        :return: Rand Index.
         """
         tp = self._count(self._a_1, self._b_1)
         fp = self._count(self._a_0, self._b_1)
         fn = self._count(self._a_1, self._b_0)
         tn = self._count(self._a_0, self._b_0)
         s = (tp + tn) / (tp + fp + fn + tn)
+        return s
+
+    @property
+    def fowlkes_mallows_index(self):
+        """
+        `Fowlkes-Mallows Index <https://en.wikipedia.org/wiki/Fowlkes%E2%80%93Mallows_index>`_ is
+        typically used to judge the similarity between two clusters. A larger value indicates
+        that the clusters are more similar.
+
+        :return: Fowlkes-Mallows Index.
+        """
+        tp = self._count(self._a_1, self._b_1)
+        fp = self._count(self._a_0, self._b_1)
+        fn = self._count(self._a_1, self._b_0)
+        s = sqrt((tp / (tp + fp)) * (tp / (tp + fn)))
         return s
 
     @property
