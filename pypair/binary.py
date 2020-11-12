@@ -1,18 +1,26 @@
 from functools import lru_cache, reduce
 from itertools import chain, product
 from math import sqrt, log2, pi, log
+from abc import ABC
 
 import pandas as pd
 from scipy import stats
 from scipy.special import binom
 
 
-class CategoricalTable(object):
+class ContingencyTable(ABC):
+    """
+    Contigency table.
+    """
+    def __init__(self):
+        pass
+
+
+class CategoricalTable(ContingencyTable):
     """
     Represents a contingency table for categorical variables.
 
     References
-    ^^^^^^^^^^
 
     - `Contingency table <https://en.wikipedia.org/wiki/Contingency_table>`_
     - `More Correlation Coefficients <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_
@@ -98,7 +106,6 @@ class CategoricalTable(object):
         :math:`N` is the sum of all the values in the contingency cells (or the total size of the data).
 
         References
-        ^^^^^^^^^^
 
         - `Chi-Square (χ2) Statistic Definition <https://www.investopedia.com/terms/c/chi-square-statistic.asp>`_
 
@@ -127,7 +134,6 @@ class CategoricalTable(object):
         then the upper-bound of :math:`\\phi`` is determined by the distribution of the two variables.
 
         References
-        ^^^^^^^^^^
 
         - `Matthews correlation coefficient <https://en.wikipedia.org/wiki/Matthews_correlation_coefficient>`_
 
@@ -247,7 +253,6 @@ class CategoricalTable(object):
         if you desire the reverse, use `goodman_kruskal_lambda_reversed()`.
 
         References
-        ^^^^^^^^^^
 
         - `Goodman-Kruskal's lambda <https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda>`_.
         - `Correlation <http://cda.psych.uiuc.edu/web_407_spring_2014/correlation_week4.pdf>`_.
@@ -285,7 +290,6 @@ class CategoricalTable(object):
         TODO: use a different way to compute binomial coefficient
 
         References
-        ^^^^^^^^^^
 
         - `Adjusted Rand Index <https://en.wikipedia.org/wiki/Rand_index#Adjusted_Rand_index>`_.
         - `Python binomial coefficient <https://stackoverflow.com/questions/26560726/python-binomial-coefficient>`_.
@@ -471,7 +475,6 @@ class BinaryTable(CategoricalTable):
         1 indicates perfect agreement.
 
         References
-        ^^^^^^^^^^
 
         - `Tetrachoric correlation <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_.
         - `Tetrachoric Correlation: Definition, Examples, Formula <https://www.statisticshowto.com/tetrachoric-correlation/>`_.
@@ -492,3 +495,273 @@ class BinaryTable(CategoricalTable):
         y = pow((n_00 * n_11) / (n_10 * n_01), pi / 4.0)
         p = (y - 1) / (y + 1)
         return p
+
+
+class ConfusionMatrix(BinaryTable):
+    """
+    Represents a `confusion matrix <https://en.wikipedia.org/wiki/Confusion_matrix>`_.
+
+    """
+    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
+        """
+        ctor. Note that `a` is the ground truth and `b` is the prediction.
+
+        :param a: Iterable list.
+        :param b: Iterable list.
+        :param a_0: The zero value for a. Defaults to 0.
+        :param a_1: The one value for a. Defaults to 1.
+        :param b_0: The zero value for b. Defaults to 0.
+        :param b_1: The zero value for b. Defaults to 1.
+        """
+        super().__init__(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1)
+
+    @property
+    def tp(self):
+        """
+        True positive.
+
+        :return: TP.
+        """
+        return self._count(self._a_1, self._b_1)
+
+    @property
+    def fp(self):
+        """
+        False positive.
+
+        :return: FP.
+        """
+        return self._count(self._a_0, self._b_1)
+
+    @property
+    def fn(self):
+        """
+        False negative.
+
+        :return: FN.
+        """
+        return self._count(self._a_1, self._b_0)
+
+    @property
+    def tn(self):
+        """
+        True negative.
+
+        :return: TN.
+        """
+        return self._count(self._a_0, self._b_0)
+
+    @property
+    @lru_cache(maxsize=None)
+    def n(self):
+        """
+        Total number of data.
+
+        :return: N.
+        """
+        return self.tp + self.fp + self.fn + self.tn
+
+    @property
+    def tpr(self):
+        """
+        True positive rate.
+
+        - sensitivity
+        - recall
+        - hit rate
+
+        :return: TPR.
+        """
+        return self.tp / (self.tp + self.fn)
+
+    @property
+    def tnr(self):
+        """
+        True negative rate.
+
+        - specificity
+        - selectivity
+
+        :return: TNR.
+        """
+        return self.tn / (self.tn + self.fp)
+
+    @property
+    def ppv(self):
+        """
+        Positive predictive value.
+
+        - precision
+
+        :return: PPV.
+        """
+        return self.tp / (self.tp + self.fp)
+
+    @property
+    def npv(self):
+        """
+        Negative predictive value.
+
+        :return: NPV.
+        """
+        return self.tn / (self.tn + self.fn)
+
+    @property
+    def fnr(self):
+        """
+        False negative rate.
+
+        - miss rate
+
+        :return: FNR.
+        """
+        return self.fn / (self.fn + self.tp)
+
+    @property
+    def fpr(self):
+        """
+        False positive rate.
+
+        - fall-out
+
+        :return: FPR.
+        """
+        return self.fp / (self.fp + self.tn)
+
+    @property
+    def fdr(self):
+        """
+        False discovery rate.
+
+        :return: FDR.
+        """
+        return self.fp / (self.fp + self.tp)
+
+    @property
+    def fomr(self):
+        """
+        False omission rate.
+
+        :return: FOR.
+        """
+        return self.fn / (self.fn + self.tn)
+
+    @property
+    def pt(self):
+        """
+        Prevalence treshold.
+
+        :return:
+        """
+        tpr = self.tpr
+        tnr = self.tnr
+
+        return (sqrt(tpr * (-tnr + 1)) + tnr - 1) / (tpr + tnr - 1)
+
+    @property
+    def ts(self):
+        """
+        Threat score.
+
+        - critical success index (CSI).
+
+        :return: TS.
+        """
+        return self.tp / (self.tp + self.fn + self.fp)
+
+    @property
+    def acc(self):
+        """
+        Accuracy.
+
+        :return: Accuracy.
+        """
+        return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
+
+    @property
+    def ba(self):
+        """
+        Balanced accuracy.
+
+        :return: Balanced accuracy.
+        """
+        return (self.tpr + self.tnr) / 2
+
+    @property
+    def f1(self):
+        """
+        F1 score: harmonic mean of precision and sensitivity.
+
+        :return: F1.
+        """
+        return 2 * (self.ppv * self.tpr) / (self.ppv + self.tpr)
+
+    @property
+    def mcc(self):
+        """
+        Matthew's correlation coefficient.
+
+        :return: MCC.
+        """
+        tp = self.tp
+        tn = self.tn
+        fp = self.fp
+        fn = self.fn
+
+        return (tp + tn - fp * fn) / sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+
+    @property
+    def bm(self):
+        """
+        Bookmaker informedneess.
+
+        :return: BM.
+        """
+        return self.tpr + self.tnr - 1
+
+    @property
+    def mk(self):
+        """
+        Markedness.
+
+        - deltaP
+
+        :return: Markedness.
+        """
+        return self.ppv + self.npv - 1
+
+    @property
+    def sensitivity(self):
+        """
+        Alias to TPR.
+
+        :return: Sensitivity.
+        """
+        return self.tpr
+
+    @property
+    def specificity(self):
+        """
+        Alias to TNR.
+
+        :return: Specificity.
+        """
+        return self.tnr
+
+    @property
+    def precision(self):
+        """
+        Alias to PPV.
+
+        :return: PPV.
+        """
+        return self.ppv
+
+    @property
+    def recall(self):
+        """
+        Alias to TPR.
+
+        :return: TPR.
+        """
+        return self.tpr
