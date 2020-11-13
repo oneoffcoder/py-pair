@@ -42,7 +42,7 @@ def point_biserial(b, c, b_0=0, b_1=1):
     Computes the `point-biserial correlation coefficient <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm>`_
     between a binary variable :math:`X` and a continuous variable :math:`Y`.
 
-    :math:`r_{\\mathrm{pb}} = \\frac{(Y_1 - Y_0) \\sqrt pq}{\\sigma_Y}`
+    :math:`r_{\\mathrm{pb}} = \\frac{(Y_1 - Y_0) \\sqrt{pq}}{\\sigma_Y}`
 
     Where
 
@@ -77,7 +77,7 @@ def biserial(b, c, b_0=0, b_1=1):
     Computes the biserial correlation between a binary and continuous variable. The biserial correlation
     :math:`r_b` can be computed from the point-biserial correlation :math:`r_{\\mathrm{pb}}` as follows.
 
-    :math:`r_b = \\frac{r_{\\mathrm{pb}}}{h} \\sqrt pq`
+    :math:`r_b = \\frac{r_{\\mathrm{pb}}}{h} \\sqrt{pq}`
 
     The tricky thing to explain is the :math:`h` parameter. :math:`h` is defined as the
     height of the standard normal distribution at z, where :math:`P(z'<z) = q` and :math:`P(z’>z) = p`.

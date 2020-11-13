@@ -10,7 +10,7 @@ from scipy.special import binom
 
 class ContingencyTable(ABC):
     """
-    Contigency table.
+    Abstract contingency table. All other tables inherit from this one.
     """
 
     def __init__(self):
@@ -500,16 +500,32 @@ class BinaryTable(CategoricalTable):
 
 class ConfusionMatrix(BinaryTable):
     """
-    Represents a `confusion matrix <https://en.wikipedia.org/wiki/Confusion_matrix>`_.
+    Represents a `confusion matrix <https://en.wikipedia.org/wiki/Confusion_matrix>`_. The confusion
+    matrix looks like what is shown below for two binary variables `a` and `b`;
+    `a` is in the rows and `b` in the columns. Most of the statistics around performance comes
+    from the counts of `TN`, `FN`, `FP` and `TP`.
 
+    .. list-table:: Confusion Matrix
+       :widths: 25 25 25
+       :header-rows: 1
+
+       * -
+         - b=0
+         - b=1
+       * - a=0
+         - TN
+         - FP
+       * - a=1
+         - FN
+         - TP
     """
 
     def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
         """
         ctor. Note that `a` is the ground truth and `b` is the prediction.
 
-        :param a: Iterable list.
-        :param b: Iterable list.
+        :param a: Binary variable (iterable). Ground truth.
+        :param b: Binary variable (iterable). Prediction.
         :param a_0: The zero value for a. Defaults to 0.
         :param a_1: The one value for a. Defaults to 1.
         :param b_0: The zero value for b. Defaults to 0.
@@ -520,7 +536,7 @@ class ConfusionMatrix(BinaryTable):
     @property
     def tp(self):
         """
-        True positive.
+        True positive. Count of when `a=1` and `b=1`.
 
         :return: TP.
         """
@@ -529,7 +545,7 @@ class ConfusionMatrix(BinaryTable):
     @property
     def fp(self):
         """
-        False positive.
+        False positive. Count of when `a=0` and `b=1`.
 
         :return: FP.
         """
@@ -538,7 +554,7 @@ class ConfusionMatrix(BinaryTable):
     @property
     def fn(self):
         """
-        False negative.
+        False negative. Count of when `a=1` and `b=0`.
 
         :return: FN.
         """
@@ -547,7 +563,7 @@ class ConfusionMatrix(BinaryTable):
     @property
     def tn(self):
         """
-        True negative.
+        True negative. Count of when `a=0` and `b=0`.
 
         :return: TN.
         """
@@ -557,7 +573,7 @@ class ConfusionMatrix(BinaryTable):
     @lru_cache(maxsize=None)
     def n(self):
         """
-        Total number of data.
+        Total number of data. Count of `TP + FP + FN + TN`.
 
         :return: N.
         """
@@ -567,6 +583,10 @@ class ConfusionMatrix(BinaryTable):
     def tpr(self):
         """
         True positive rate.
+
+        :math:`TPR = \\frac{TP}{TP + FN}`
+
+        Aliases
 
         - sensitivity
         - recall
@@ -583,6 +603,10 @@ class ConfusionMatrix(BinaryTable):
         """
         True negative rate.
 
+        :math:`TNR = \\frac{TN}{TN + FP}`
+
+        Aliases
+
         - specificity
         - selectivity
 
@@ -595,6 +619,10 @@ class ConfusionMatrix(BinaryTable):
         """
         Positive predictive value.
 
+        :math:`PPV = \\frac{TP}{TP + FP}`
+
+        Aliases
+
         - precision
 
         :return: PPV.
@@ -606,6 +634,8 @@ class ConfusionMatrix(BinaryTable):
         """
         Negative predictive value.
 
+        :math:`NPV = \\frac{TN}{TN + FN}`
+
         :return: NPV.
         """
         return self.tn / (self.tn + self.fn)
@@ -614,6 +644,10 @@ class ConfusionMatrix(BinaryTable):
     def fnr(self):
         """
         False negative rate.
+
+        :math:`FNR = \\frac{FN}{FN + TP}`
+
+        Aliases
 
         - miss rate
 
@@ -625,6 +659,10 @@ class ConfusionMatrix(BinaryTable):
     def fpr(self):
         """
         False positive rate.
+
+        :math:`FPR = \\frac{FP}{FP + TN}`
+
+        Aliases
 
         - fall-out
         - probability of false alarm
@@ -638,6 +676,8 @@ class ConfusionMatrix(BinaryTable):
         """
         False discovery rate.
 
+        :math:`FDR = \\frac{FP}{FP + TP}`
+
         :return: FDR.
         """
         return self.fp / (self.fp + self.tp)
@@ -647,6 +687,8 @@ class ConfusionMatrix(BinaryTable):
         """
         False omission rate.
 
+        :math:`FOR = \\frac{FN}{FN + TN}`
+
         :return: FOR.
         """
         return self.fn / (self.fn + self.tn)
@@ -654,9 +696,11 @@ class ConfusionMatrix(BinaryTable):
     @property
     def pt(self):
         """
-        Prevalence treshold.
+        Prevalence threshold.
 
-        :return:
+        :math:`PT = \\frac{\\sqrt{TPR(-TNR + 1)} + TNR - 1}{TPR + TNR - 1}`
+
+        :return: Prevalence threshold.
         """
         tpr = self.tpr
         tnr = self.tnr
@@ -667,6 +711,10 @@ class ConfusionMatrix(BinaryTable):
     def ts(self):
         """
         Threat score.
+
+        :math:`TS = \\frac{TP}{TP + FN + FP}`
+
+        Aliases
 
         - critical success index (CSI).
 
@@ -679,6 +727,8 @@ class ConfusionMatrix(BinaryTable):
         """
         Accuracy.
 
+        :math:`ACC = \\frac{TP + TN}{TP + TN + FP + FN}`
+
         :return: Accuracy.
         """
         return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
@@ -687,6 +737,8 @@ class ConfusionMatrix(BinaryTable):
     def ba(self):
         """
         Balanced accuracy.
+
+        :math:`BA = \\frac{TPR + TNR}{2}`
 
         :return: Balanced accuracy.
         """
@@ -697,6 +749,8 @@ class ConfusionMatrix(BinaryTable):
         """
         F1 score: harmonic mean of precision and sensitivity.
 
+        :math:`F1 = \\frac{PPV \\times TPR}{PPV + TPR}`
+
         :return: F1.
         """
         return 2 * (self.ppv * self.tpr) / (self.ppv + self.tpr)
@@ -705,6 +759,8 @@ class ConfusionMatrix(BinaryTable):
     def mcc(self):
         """
         Matthew's correlation coefficient.
+
+        :math:`MCC = \\frac{TP + TN - FP \\times FN}{\\sqrt{(TP + FP)(TP + FN)(TN + FP)(TN + FN)}}`
 
         :return: MCC.
         """
@@ -718,7 +774,9 @@ class ConfusionMatrix(BinaryTable):
     @property
     def bm(self):
         """
-        Bookmaker informedneess.
+        Bookmaker informedness.
+
+        :math:`BI = TPR + TNR - 1`
 
         :return: BM.
         """
@@ -728,6 +786,10 @@ class ConfusionMatrix(BinaryTable):
     def mk(self):
         """
         Markedness.
+
+        :math:`MK = PPV + NPV - 1`
+
+        Aliases
 
         - deltaP
 
@@ -776,6 +838,8 @@ class ConfusionMatrix(BinaryTable):
         """
         Prevalence.
 
+        :math:`\\frac{TP + FN}{N}`
+
         :return: Prevalence.
         """
         return (self.tp + self.fn) / self.n
@@ -784,6 +848,10 @@ class ConfusionMatrix(BinaryTable):
     def plr(self):
         """
         Positive likelihood ratio.
+
+        :math:`PLR = \\frac{TPR}{FPR}`
+
+        Aliases
 
         - LR+
 
@@ -796,6 +864,10 @@ class ConfusionMatrix(BinaryTable):
         """
         Negative likelihood ratio.
 
+        :math:`NLR = \\frac{FNR}{TNR}`
+
+        Aliases
+
         - LR-
 
         :return: NLR.
@@ -806,6 +878,8 @@ class ConfusionMatrix(BinaryTable):
     def dor(self):
         """
         Diagnostic odds ratio.
+
+        :math:`\\frac{PLR}{NLR}`
 
         :return: DOR.
         """
