@@ -146,7 +146,10 @@ def cramer_v(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
 
 def goodman_kruskal_lambda(a, b):
     """
-    Computes Goodman-Kruskal's :math:`\\lambda`. Requires two categorical variables.
+    Computes Goodman-Kruskal's :math:`\\lambda_{A|B}`. Requires two categorical variables `A` and `B`.
+    :math:`\\lambda_{A|B}` is the proportional reduction in error (PRE) of `A` knowing (given) `B`.
+    In general, :math:`\\lambda_{A|B} \\neq \\lambda_{B|A}`, and so this association measure
+    is `asymmetric`.
 
     :param a: Categorical data (iterable).
     :param b: Categorical data (iterable).
