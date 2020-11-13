@@ -25,7 +25,7 @@ PyPair is a statistical library to compute pairwise association between any two 
 
 Assuming we have data and we know the variable types in this data using the taxonomy above, we might want to make a progression of analyses from univariate, bivariate and to multivariate analyses. Along the way, for bivariate analysis, we are often curious about the association between any two pairs of variables. We want to know both the magnitude (the strength, is it small or big?) and direction (the sign, is it positive or negative?) of the association. When the variables are all of the same type, association measures may be abound to conduct pairwise association; if all the variables are continuous, we might just want to apply canonical Pearson correlation.
 
-The tough situation is when we have a mixed variable type of dataset; and this tough situation is quite often the normal situation. How do we find the association between a continuous and categorical variable? We can create a table as below to map the available association measures for any two types of variables :cite:`2020:calkins`.
+The tough situation is when we have a mixed variable type of dataset; and this tough situation is quite often the normal situation. How do we find the association between a continuous and categorical variable? We can create a table as below to map the available association measures for any two types of variables :cite:`2020:calkins`. (In the table below, we collapse all continuous variable types into one).
 
 .. raw:: html
 
@@ -65,9 +65,14 @@ The tough situation is when we have a mixed variable type of dataset; and this t
             <td class="rc-headers">Point-biserial</td>
             <td class="rc-headers">Point-biserial</td>
             <td class="rc-headers">Biserial</td>
-            <td class="rc-headers">Pearson, Kendal, Spearman, Cosine</td>
+            <td class="rc-headers">Pearson, Kendall, Spearman, Cosine</td>
         </tr>
     </table>
+
+The ultimate goal of this project is to identify as many measures of associations for these unique pairs of variable types and to implement these association measures in a unified application programming interface (API).
+
+.. note::
+    We use the term `association` over `correlation` since the latter typically connotes canonical Pearson correlation or association between two continuous variables. The term `association` is more general and can cover specific types of association, such as `agreement` measures, along side with those dealing with continuous variables :cite:`1983:liebetrau`.
 
 
 .. bibliography:: refs.bib
