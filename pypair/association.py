@@ -4,6 +4,8 @@ import pandas as pd
 from scipy.stats import norm
 
 from pypair.table import BinaryTable, CategoricalTable
+from itertools import chain
+from functools import reduce
 
 
 def rank_biserial(b, c, b_0=0, b_1=1):
@@ -166,3 +168,40 @@ def tetrachoric(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
     :return: Tetrachoric correlation.
     """
     return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).tetrachoric_correlation
+
+
+def somers_d(x, y):
+    """
+    Compute `Somer's D <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
+    variables.
+
+    :param x: Continuous data (iterable).
+    :param y: Continuous data (iterable).
+    :return: Somer's D.
+    """
+    def get_concordance(p1, p2):
+        x_i, y_i = p1
+        x_j, y_j = p2
+        if x_i > x_j and y_i > y_j:
+            return 0, 0, 1
+
+        if x_i > x_j and y_i < y_j:
+            return 1, 0, 0
+
+        if x_i < x_j and y_i > y_j:
+            return 1, 0, 0
+
+        return 0, 1, 0
+
+    is_valid = lambda a, b: a is not None and b is not None
+    data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
+    results = ([get_concordance(p1, p2) for j, p2 in enumerate(data) if j > i] for i, p1 in enumerate(data))
+    results = chain(*results)
+    add_tup = lambda tup1, tup2: (tup1[0] + tup2[0], tup1[1] + tup2[1], tup1[2] + tup2[2])
+    results = reduce(lambda tup1, tup2: add_tup(tup1, tup2), results)
+    n_d, n_n, n_c = results
+    n = len(data)
+
+    t = (n_c - n_d) / (n * (n - 1) / 2)
+    return t
+
