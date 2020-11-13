@@ -6,6 +6,35 @@ from scipy.stats import norm
 from pypair.table import BinaryTable, CategoricalTable
 
 
+def rank_biserial(b, c, b_0=0, b_1=1):
+    """
+    Computes the rank-biserial correlation between a binary variable :math:`X` and a continuous variable :math:`Y`.
+
+    :math:`r_r = \\frac{2 \\times (Y_1 - Y_0)}{n}`
+
+    Where
+
+    - :math:`Y_0` is the average of :math:`Y` when :math:`X=0`
+    - :math:`Y_1` is the average of :math:`Y` when :math:`X=1`
+    - :math:`n` is the total number of data
+
+    :param b: Binary data (iterable).
+    :param c: Continuous data (iterable).
+    :param b_0: The zero value for the binary data. Default is 0.
+    :param b_1: The one value for the binary data. Default is 1.
+    :return: Rank-biserial correlation.
+    """
+    df = pd.DataFrame([(x, y) for x, y in zip(b, c) if pd.notna(x)], columns=['b', 'c'])
+
+    n = df.shape[0]
+
+    y_0 = df[df.b == b_0].c.mean()
+    y_1 = df[df.b == b_1].c.mean()
+
+    r = 2 * (y_1 - y_0) / n
+    return r
+
+
 def point_biserial(b, c, b_0=0, b_1=1):
     """
     Computes the `point-biserial correlation coefficient <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm>`_
@@ -43,23 +72,31 @@ def point_biserial(b, c, b_0=0, b_1=1):
 
 def biserial(b, c, b_0=0, b_1=1):
     """
-    Computes the biserial correlation between a binary and continuous variable.
+    Computes the biserial correlation between a binary and continuous variable. The biserial correlation
+    :math:`r_b` can be computed from the point-biserial correlation :math:`r_{\\mathrm{pb}}` as follows.
+
+    :math:`r_b = \\frac{r_{\\mathrm{pb}}}{h} \\sqrt pq`
+
+    The tricky thing to explain is the :math:`h` parameter. :math:`h` is defined as the
+    height of the standard normal distribution at z, where :math:`P(z'<z) = q` and :math:`P(z’>z) = p`.
+    The way to get :math:`h` in practice is take the inverse standard normal of :math:`q`, and
+    then take the standard normal probability of that result. Using Scipy `norm.pdf(norm.ppf(q))`.
 
     References
 
-    - https://www.statisticshowto.com/point-biserial-correlation/
-    - https://ncss-wpengine.netdna-ssl.com/wp-content/themes/ncss/pdf/Procedures/NCSS/Point-Biserial_and_Biserial_Correlations.pdf
-    - https://www.real-statistics.com/correlation/biserial-correlation/
-    - https://support.microsoft.com/en-us/office/norm-s-dist-function-1e787282-3832-4520-a9ae-bd2a8d99ba88
-    - https://support.microsoft.com/en-us/office/norm-s-inv-function-d6d556b4-ab7f-49cd-b526-5a20918452b1
-    - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
-    - https://stackoverflow.com/questions/20626994/how-to-calculate-the-inverse-of-the-normal-cumulative-distribution-function-in-p
+    - `Point-Biserial Correlation & Biserial Correlation: Definition, Examples <https://www.statisticshowto.com/point-biserial-correlation/>`_
+    - `Point-Biserial and Biserial Correlations <https://ncss-wpengine.netdna-ssl.com/wp-content/themes/ncss/pdf/Procedures/NCSS/Point-Biserial_and_Biserial_Correlations.pdf>`_
+    - `Real Statistics Using Excel <https://www.real-statistics.com/correlation/biserial-correlation/>`_
+    - `NORM.S.DIST function <https://support.microsoft.com/en-us/office/norm-s-dist-function-1e787282-3832-4520-a9ae-bd2a8d99ba88>`_
+    - `NORM.S.INV function <https://support.microsoft.com/en-us/office/norm-s-inv-function-d6d556b4-ab7f-49cd-b526-5a20918452b1>`_
+    - `scipy.stats.norm <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html>`_
+    - `How to calculate the inverse of the normal cumulative distribution function in python? <https://stackoverflow.com/questions/20626994/how-to-calculate-the-inverse-of-the-normal-cumulative-distribution-function-in-p>`_
 
     :param b: Binary data (iterable).
     :param c: Continuous data (iterable).
     :param b_0: The zero value for the binary data. Default is 0.
     :param b_1: The one value for the binary data. Default is 1.
-    :return: Point-biserial correlation coefficient.
+    :return: Biserial correlation coefficient.
     """
     df = pd.DataFrame([(x, y) for x, y in zip(b, c) if pd.notna(x)], columns=['b', 'c'])
 
@@ -102,7 +139,7 @@ def cramer_v(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
     :param b_1: One value for b. Default is 1.
     :return: Cramer's V.
     """
-    return BinaryTable(a, b).cramer_v
+    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).cramer_v
 
 
 def goodman_kruskal_lambda(a, b):
@@ -114,3 +151,18 @@ def goodman_kruskal_lambda(a, b):
     :return: :math:`\\lambda`.
     """
     return CategoricalTable(a, b).goodman_kruskal_lambda
+
+
+def tetrachoric(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
+    """
+    Computes the tetrachoric correlation. Only for two binary variables.
+
+    :param a: Binary data (iterable).
+    :param b: Binary data (iterable).
+    :param a_0: Zero value for a. Default is 0.
+    :param a_1: One value for a. Default is 1.
+    :param b_0: Zero value for b. Default is 0.
+    :param b_1: One value for b. Default is 1.
+    :return: Tetrachoric correlation.
+    """
+    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).tetrachoric_correlation
