@@ -457,7 +457,8 @@ class BinaryTable(CategoricalTable):
     @property
     def odds_ratio(self):
         """
-        `Odds ratio <https://en.wikipedia.org/wiki/Contingency_table#Odds_ratio>`_.
+        `Odds ratio <https://en.wikipedia.org/wiki/Contingency_table#Odds_ratio>`_. The odds
+        ratio is also referred to as the `cross-product ratio`.
 
         :return: Odds ratio.
         """
