@@ -204,4 +204,3 @@ def somers_d(x, y):
 
     t = (n_c - n_d) / (n * (n - 1) / 2)
     return t
-
