@@ -11,6 +11,8 @@ PyPair
    :caption: Contents
 
    intro
+   deepdives
+   bib
 
 .. toctree::
    :maxdepth: 2

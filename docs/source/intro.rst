@@ -73,6 +73,3 @@ The ultimate goal of this project is to identify as many measures of association
 
 .. note::
     We use the term `association` over `correlation` since the latter typically connotes canonical Pearson correlation or association between two continuous variables. The term `association` is more general and can cover specific types of association, such as `agreement` measures, along side with those dealing with continuous variables :cite:`1983:liebetrau`.
-
-
-.. bibliography:: refs.bib
