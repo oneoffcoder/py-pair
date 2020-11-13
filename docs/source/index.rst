@@ -12,7 +12,7 @@ PyPair
 
    intro
    deepdives
-   bib
+   zzz-bib
 
 .. toctree::
    :maxdepth: 2
