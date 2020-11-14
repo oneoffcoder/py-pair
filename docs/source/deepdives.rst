@@ -3,6 +3,68 @@ Selected Deep Dives
 
 Let's go into some association measures in more details.
 
+Binary association
+------------------
+
+.. list-table:: Contingency table for two binary variables
+
+   * -
+     - 1
+     - 0
+     - Total
+   * - 1
+     - a
+     - b
+     - a + b
+   * - 0
+     - c
+     - d
+     - c + d
+   * - Total
+     - a + c
+     - b + d
+     - p = a + b + c + d
+
+.. list-table:: Contingency table for two binary variables :cite:`2010:choi,2020:psu-binary`
+   :header-rows: 1
+
+   * - Name
+     - Coefficient
+     - Emphasis
+   * - Sokal-Michener :cite:`2010:choi`
+     - :math:`\frac{a + d}{p}`
+     - Equal weights for 11 and 00 matches
+   * - Sørensen–Dice coefficient :cite:`2020:wiki-dice`
+     - :math:`\frac{2(a + d)}{2(a + d) + b + c}`
+     - Double weights for 11 and 00 matches
+   * - Roger-Tanimoto :cite:`2010:choi`
+     - :math:`\frac{a + d}{a + d + 2(b + c)}`
+     - Double weights for mismatches
+   * - Russell-Rao coefficient :cite:`2010:choi`
+     - :math:`\frac{a}{p}`
+     - Proportion of 11 matches
+   * - Jaccard similarity coefficent :cite:`2020:wiki-jaccard`
+     - :math:`\frac{a}{a + b + c}`
+     - Ignores 00 matches
+   * - Jaccard distance :cite:`2020:wiki-jaccard`
+     - :math:`\frac{b + c}{a + b + c}`
+     -
+   * - Czekanowski :cite:`2010:choi`
+     - :math:`\frac{2a}{2a + b + c}`
+     - Ignores 00 matches and double weights for 11 matches
+   * - Soka-Sneath-I :cite:`2010:choi`
+     - :math:`\frac{a}{a + 2(b + c)}`
+     - Ignores 00 matches and double weights for mismatches
+   * - Tanimoto similarity :cite:`2020:wiki-jaccard`
+     - :math:`\frac{a}{b + c}`
+     - Ratio of 11 matches to mismatches ignoring 00
+   * - Ochiai :cite:`2020:stack-sim`
+     - :math:`\sqrt{\frac{a}{a + b}\frac{a}{a + c}}`
+     -
+   * - Kulczynski-2 :cite:`2020:stack-sim`
+     - :math:`\frac{1}{2}\left(\frac{a}{a + b} + \frac{a}{a + c}\right)`
+     -
+
 Concordant, discordant, tie
 ---------------------------
 
