@@ -345,9 +345,9 @@ class AgreementTable(CategoricalTable):
 
         :return: :math:`\\kappa`.
         """
-        I = len(self._a_map.keys())
-        theta_1 = sum([self._p_observed[i][i] for i in range(I)])
-        theta_2 = sum([self._p_r_marginals[i] * self._p_c_marginals[i] for i in range(I)])
+        n = len(self._a_map.keys())
+        theta_1 = sum([self._p_observed[i][i] for i in range(n)])
+        theta_2 = sum([self._p_r_marginals[i] * self._p_c_marginals[i] for i in range(n)])
         k = (theta_1 - theta_2) / (1 - theta_2)
         return k
 
@@ -367,8 +367,8 @@ class AgreementTable(CategoricalTable):
         theta_2 = lambda i: self._p_c_marginals[i]
         kappa = lambda t_1, t_2: (t_1 - t_2) / (1 - t_2)
 
-        I = len(self._a_map.keys())
-        kappas = [kappa(theta_1(i), theta_2(i)) for i in range(I)]
+        n = len(self._a_map.keys())
+        kappas = [kappa(theta_1(i), theta_2(i)) for i in range(n)]
         return kappas
 
 
