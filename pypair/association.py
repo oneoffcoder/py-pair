@@ -297,7 +297,6 @@ def somers_d(x, y):
     c, n = __get_concordance(x, y)
 
     p_d = c.d / n
-    p_t = c.t / n
     p_tx = c.t_x / n
     p_ty = c.t_y / n
     p_c = c.c / n
