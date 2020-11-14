@@ -3,6 +3,105 @@ Selected Deep Dives
 
 Let's go into some association measures in more details.
 
+Concordant, discordant, tie
+---------------------------
+
+Let's try to understand how to determine if a pair of observations are concordant, discordant or tied. We have made up an example dataset below having two variables :math:`X` and :math:`Y`. Note that there are 6 observations, and as such, each observation is associated with an index from 1 to 6. An observation has a pair of values, one for :math:`X` and one for :math:`Y`.
+
+.. warning::
+    Do **not** get the `pair of values of an observation` confused with a `pair of observations`.
+
+.. list-table:: Raw Data for :math:`X` and :math:`Y`
+   :header-rows: 1
+
+   * - Index
+     - :math:`X`
+     - :math:`Y`
+   * - 1
+     - 1
+     - 3
+   * - 2
+     - 1
+     - 3
+   * - 3
+     - 2
+     - 4
+   * - 4
+     - 0
+     - 2
+   * - 5
+     - 0
+     - 4
+   * - 6
+     - 2
+     - 2
+
+Because there are 6 observations, there are :math:`{{6}\choose{2}} = 15` possible pairs of observations. If we denote an observation by its corresponding index as :math:`O_i`, then the observations are then as follows.
+
+- :math:`O_1 = (1, 3)`
+- :math:`O_2 = (1, 3)`
+- :math:`O_3 = (2, 4)`
+- :math:`O_4 = (0, 2)`
+- :math:`O_5 = (0, 4)`
+- :math:`O_6 = (2, 2)`
+
+The 15 possible `combinations` of observation pairings are as follows.
+
+- :math:`O_1, O_2`
+- :math:`O_1, O_3`
+- :math:`O_1, O_4`
+- :math:`O_1, O_5`
+- :math:`O_1, O_6`
+- :math:`O_2, O_3`
+- :math:`O_2, O_4`
+- :math:`O_2, O_5`
+- :math:`O_2, O_6`
+- :math:`O_3, O_4`
+- :math:`O_3, O_5`
+- :math:`O_3, O_6`
+- :math:`O_4, O_5`
+- :math:`O_4, O_6`
+- :math:`O_5, O_6`
+
+For each one of these observation pairs, we can determine if such a pair is concordant, discordant or tied. There's a couple ways to determine concordant, discordant or tie status. The easiest way to determine so is mathematically. Another way is to use rules. Both are equivalent. Because we will use abstract notation to describe these math and rules used to determine concordant, discordant or tie for each pair, and because we are striving for clarity, let's expand these observation pairs into their component pairs of values and also their corresponding :math:`X` and :math:`Y` indexed notation.
+
+- :math:`O_1, O_2 = (1, 3), (1, 3) = (X_1, Y_1), (X_2, Y_2)`
+- :math:`O_1, O_3 = (1, 3), (2, 4) = (X_1, Y_1), (X_3, Y_3)`
+- :math:`O_1, O_4 = (1, 3), (0, 2) = (X_1, Y_1), (X_4, Y_4)`
+- :math:`O_1, O_5 = (1, 3), (0, 4) = (X_1, Y_1), (X_5, Y_5)`
+- :math:`O_1, O_6 = (1, 3), (2, 2) = (X_1, Y_1), (X_6, Y_6)`
+- :math:`O_2, O_3 = (1, 3), (2, 4) = (X_2, Y_2), (X_3, Y_3)`
+- :math:`O_2, O_4 = (1, 3), (0, 2) = (X_2, Y_2), (X_4, Y_4)`
+- :math:`O_2, O_5 = (1, 3), (0, 4) = (X_2, Y_2), (X_5, Y_5)`
+- :math:`O_2, O_6 = (1, 3), (2, 2) = (X_2, Y_2), (X_6, Y_6)`
+- :math:`O_3, O_4 = (2, 4), (0, 2) = (X_3, Y_3), (X_4, Y_4)`
+- :math:`O_3, O_5 = (2, 4), (0, 4) = (X_3, Y_3), (X_5, Y_5)`
+- :math:`O_3, O_6 = (2, 4), (2, 2) = (X_3, Y_3), (X_6, Y_6)`
+- :math:`O_4, O_5 = (0, 2), (0, 4) = (X_4, Y_4), (X_5, Y_5)`
+- :math:`O_4, O_6 = (0, 2), (2, 2) = (X_4, Y_4), (X_6, Y_6)`
+- :math:`O_5, O_6 = (0, 4), (2, 2) = (X_5, Y_5), (X_6, Y_6)`
+
+Now we can finally attempt to describe how to determine if any pair of observations is concordant, discordant or tied. If we want to use math to determine so, then, for any two pairs of observations :math:`(X_i, Y_i)` and :math:`(X_j, Y_j)`, the following determines the status.
+
+- concordant if :math:`(X_j - X_i)(Y_j - Y_i) > 0`
+- discordant if :math:`(X_j - X_i)(Y_j - Y_i) < 0`
+- tied if :math:`(X_j - X_i)(Y_j - Y_i) = 0`
+
+If we like rules, then the following determines the status.
+
+- concordant if :math:`X_i < X_j` and :math:`Y_i < Y_j` **or** :math:`X_i > X_j` and :math:`Y_i > Y_j`
+- discordant if :math:`X_i < X_j` and :math:`Y_i > Y_j` **or** :math:`X_i > X_j` and :math:`Y_i < Y_j`
+- tied if :math:`X_i = X_j` and :math:`Y_i = Y_j`
+
+All pairs of observations will evaluate categorically to one of these statuses. Continuing with our dummy data above, the concordancy status of the 15 pairs of observations are as follows.
+
+.. list-table:: Raw Data for :math:`X` and :math:`Y`
+   :header-rows: 1
+
+   * - :math:`(X_i, Y_i)`
+     - :math:`(X_j, Y_j)`
+     - status
+
 Goodman-Kruskal's :math:`\lambda`
 ---------------------------------
 
