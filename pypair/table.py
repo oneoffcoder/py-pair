@@ -321,6 +321,7 @@ class AgreementTable(CategoricalTable):
     a rating variable (e.g. dislike, neutral, like), and the data is a pairing of ratings over
     the same set of items.
     """
+
     def __init__(self, a, b, a_vals=None, b_vals=None):
         super().__init__(a, b, a_vals=a_vals, b_vals=b_vals)
         if self._n_cols != self._n_rows:

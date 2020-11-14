@@ -1,11 +1,28 @@
+from functools import reduce
+from itertools import chain
 from math import sqrt
 
 import pandas as pd
 from scipy.stats import norm
 
 from pypair.table import BinaryTable, CategoricalTable
-from itertools import chain
-from functools import reduce
+
+
+class Concordance(object):
+    def __init__(self, d, t, t_x, t_y, c):
+        self.d = d
+        self.t = t
+        self.t_x = t_x
+        self.t_y = t_y
+        self.c = c
+
+    def __add__(self, other):
+        d = self.d + other.d
+        t = self.t + other.t
+        t_x = self.t_x + other.t_x
+        t_y = self.t_y + other.t_y
+        c = self.c + other.c
+        return Concordance(d, t, t_x, t_y, c)
 
 
 def rank_biserial(b, c, b_0=0, b_1=1):
@@ -192,29 +209,43 @@ def __get_concordance(x, y):
 
     :param x: Continuous variable (iterable).
     :param y: Continuous variable (iterable).
-    :return: Tuple (D, T, C, n).
+    :return: Concordance(D, T, T_X, T_Y, C), n.
     """
+
     def get_concordance(p1, p2):
         x_i, y_i = p1
         x_j, y_j = p2
 
+        d = 0
+        t = 0
+        t_x = 0
+        t_y = 0
+        c = 0
+
         r = (x_j - x_i) * (y_j - y_i)
 
         if r > 0:
-            return 0, 0, 1
-        if r < 0:
-            return 1, 0, 0
-        return 0, 1, 0
+            c = 1
+        elif r < 0:
+            d = 1
+        else:
+            t = 1
+
+        if x_i == x_j:
+            t_x = 1
+
+        if y_i == y_j:
+            t_y = 1
+
+        return Concordance(d, t, t_x, t_y, c)
 
     is_valid = lambda a, b: a is not None and b is not None
     data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
     results = ((get_concordance(p1, p2) for j, p2 in enumerate(data) if j > i) for i, p1 in enumerate(data))
     results = chain(*results)
-    add_tup = lambda tup1, tup2: (tup1[0] + tup2[0], tup1[1] + tup2[1], tup1[2] + tup2[2])
-    results = reduce(lambda tup1, tup2: add_tup(tup1, tup2), results)
-    n_d, n_t, n_c = results
+    concordance = reduce(lambda c1, c2: c1 + c2, results)
     n = len(data)
-    return n_d, n_t, n_c, n
+    return concordance, n
 
 
 def kendall_tau(x, y):
@@ -233,21 +264,48 @@ def kendall_tau(x, y):
     :param y: Continuous data (iterable).
     :return: :math:`\\tau`.
     """
-    n_d, _, n_c, n = __get_concordance(x, y)
-    t = (n_c - n_d) / (n * (n - 1) / 2)
+    c, n = __get_concordance(x, y)
+    t = (c.c - c.d) / (n * (n - 1) / 2)
     return t
 
 
 def somers_d(x, y):
     """
-    Computes `Somer's D <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
-    variables. The computation of Somer's D is as follows.
+    Computes `Somers' d <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
+    variables. Note that Somers' d is defined for :math:`d_{X\\cdotY}` and :math:`d_{Y\\cdotX}`
+    and in general :math:`d_{X\\cdotY} \\neq d_{Y\\cdotX}`.
+
+    - :math:`d_{Y\\cdotX} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^Y}`
+    - :math:`d_{X\\cdotY} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^X}`
+
+    Where
+
+    - :math:`\\pi_c = \\frac{C}{n}`
+    - :math:`\\pi_d = \\frac{D}{n}`
+    - :math:`\\pi_t^X = \\frac{T^X}{n}`
+    - :math:`\\pi_t^Y = \\frac{T^Y}{n}`
+    - :math:`C` is the number of concordant pairs
+    - :math:`D` is the number of discordant pairs
+    - :math:`T^X` is the number of ties on :math:`X`
+    - :math:`T^Y` is the number of ties on :math:`Y`
+    - :math:`n` is the sample size
 
     :param x: Continuous data (iterable).
     :param y: Continuous data (iterable).
-    :return: Somer's d.
+    :return: :math:`d_{X\\cdotY}`, :math:`d_{Y\\cdotX}`.
     """
-    pass
+    c, n = __get_concordance(x, y)
+
+    p_d = c.d / n
+    p_t = c.t / n
+    p_tx = c.t_x / n
+    p_ty = c.t_y / n
+    p_c = c.c / n
+
+    d_yx = (p_c - p_d) / (p_c + p_d + p_ty)
+    d_xy = (p_c - p_d) / (p_c + p_d + p_tx)
+
+    return d_yx, d_xy
 
 
 def goodman_kruskal_gamma(x, y):
@@ -270,7 +328,7 @@ def goodman_kruskal_gamma(x, y):
     :param y: Continuous data (iterable).
     :return: :math:`\\gamma`.
     """
-    n_d, n_t, n_c, n = __get_concordance(x, y)
-    p_d, p_t, p_c = n_d / n, n_t / n, n_c / n
+    c, n = __get_concordance(x, y)
+    p_d, p_t, p_c = c.d / n, c.t / n, c.c / n
     gamma = (p_c - p_d) / (1 - p_t)
     return gamma
