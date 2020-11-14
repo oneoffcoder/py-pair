@@ -41,7 +41,7 @@ In :cite:`2010:choi`, there are 76 similarity and distance measures identified. 
 - If :math:`s` is the similarity, then :math:`d = 1 - s` is the distance.
 - If :math:`d` is the distance, then :math:`s = 1 - d` is the similarity.
 
-If we use a contingency table to summarize a bivariate binary data, the following similarity and distance measures may be derived entirely from a, b, c and/or d. The general pattern is that similarity and distance is always a ratio. The numerator in the ratio defines what we are interested in measuring. When we have a and/or d in the numerator, it is likely we are measuring similarity; when we have c and/or d in the numerator, it is likely we are measuring distance. The denominator considers what is important in considering; is it the matches, mismatches or both?
+If we use a contingency table to summarize a bivariate binary data, the following similarity and distance measures may be derived entirely from a, b, c and/or d. The general pattern is that similarity and distance is always a ratio. The numerator in the ratio defines what we are interested in measuring. When we have a and/or d in the numerator, it is likely we are measuring similarity; when we have c and/or d in the numerator, it is likely we are measuring distance. The denominator considers what is important in considering; is it the matches, mismatches or both? The following tables list some identified similarity and distance measures based off of 2 x 2 contingency tables.
 
 .. list-table:: Similarity measures for 2 x 2 contingency table :cite:`2010:choi,2020:psu-binary`
    :header-rows: 1
