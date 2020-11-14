@@ -9,7 +9,19 @@ from pypair.table import BinaryTable, CategoricalTable
 
 
 class Concordance(object):
+    """
+    Stores the concordance, discordant and tie counts.
+    """
     def __init__(self, d, t, t_x, t_y, c):
+        """
+        ctor.
+
+        :param d: Discordant.
+        :param t: Tie.
+        :param t_x: Tie on X.
+        :param t_y: Tie on Y.
+        :param c: Concordant.
+        """
         self.d = d
         self.t = t
         self.t_x = t_x
@@ -29,7 +41,7 @@ def rank_biserial(b, c, b_0=0, b_1=1):
     """
     Computes the rank-biserial correlation between a binary variable :math:`X` and a continuous variable :math:`Y`.
 
-    :math:`r_r = \\frac{2 \\times (Y_1 - Y_0)}{n}`
+    :math:`r_r = \\frac{2 (Y_1 - Y_0)}{n}`
 
     Where
 
@@ -272,11 +284,11 @@ def kendall_tau(x, y):
 def somers_d(x, y):
     """
     Computes `Somers' d <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
-    variables. Note that Somers' d is defined for :math:`d_{X\\cdotY}` and :math:`d_{Y\\cdotX}`
-    and in general :math:`d_{X\\cdotY} \\neq d_{Y\\cdotX}`.
+    variables. Note that Somers' d is defined for :math:`d_{X \\cdot Y}` and :math:`d_{Y \\cdot X}`
+    and in general :math:`d_{X \\cdot Y} \\neq d_{Y \\cdot X}`.
 
-    - :math:`d_{Y\\cdotX} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^Y}`
-    - :math:`d_{X\\cdotY} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^X}`
+    - :math:`d_{Y \\cdot X} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^Y}`
+    - :math:`d_{X \\cdot Y} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^X}`
 
     Where
 
@@ -292,7 +304,7 @@ def somers_d(x, y):
 
     :param x: Continuous data (iterable).
     :param y: Continuous data (iterable).
-    :return: :math:`d_{X\\cdotY}`, :math:`d_{Y\\cdotX}`.
+    :return: :math:`d_{X \\cdot Y}`, :math:`d_{Y \\cdot X}`.
     """
     c, n = __get_concordance(x, y)
 

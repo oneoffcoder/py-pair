@@ -601,7 +601,6 @@ class ConfusionMatrix(BinaryTable):
 
     .. list-table:: Confusion Matrix
        :widths: 25 25 25
-       :header-rows: 1
 
        * -
          - b=0
