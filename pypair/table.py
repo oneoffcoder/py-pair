@@ -64,6 +64,10 @@ class CategoricalTable(ContingencyTable):
 
         chisq = sum([(o - e) ** 2 / e for o, e in zip(chain(*observed), chain(*expected))])
 
+        p_observed = [[c / n for c in r] for r in observed]
+        p_r_marginals = [sum(r) for r in p_observed]
+        p_c_marginals = [sum([p_observed[r][c] for r in range(n_rows)]) for c in range(n_cols)]
+
         self.observed = observed
         self.expected = expected
         self._df = df
@@ -75,6 +79,9 @@ class CategoricalTable(ContingencyTable):
         self._n_rows = n_rows
         self._row_marginals = row_marginals
         self._col_marginals = col_marginals
+        self._p_observed = p_observed
+        self._p_r_marginals = p_r_marginals
+        self._p_c_marginals = p_c_marginals
 
     @lru_cache(maxsize=None)
     def _count(self, a=None, b=None):
@@ -308,6 +315,62 @@ class CategoricalTable(ContingencyTable):
         return s
 
 
+class AgreementTable(CategoricalTable):
+    """
+    Represents a contingency table for agreement data against one variable. The variable is typically
+    a rating variable (e.g. dislike, neutral, like), and the data is a pairing of ratings over
+    the same set of items.
+    """
+    def __init__(self, a, b, a_vals=None, b_vals=None):
+        super().__init__(a, b, a_vals=a_vals, b_vals=b_vals)
+        if self._n_cols != self._n_rows:
+            raise ValueError(f'Table not symmetric: rows={self._n_rows}, cols={self._n_cols}')
+
+        a_set = set(self._a_map.keys())
+        b_set = set(self._b_map.keys())
+        if len(a_set) != len(b_set):
+            raise ValueError(f'Table not symmetric: rows={len(a_set)}, cols={len(b_set)}')
+        if len(a_set & b_set) != len(a_set):
+            raise ValueError(f'Rating value mismatches: {a_set ^ b_set}')
+
+    @property
+    def chohen_k(self):
+        """
+        Computes Cohen's :math:`\\kappa`.
+
+        - :math:`\\kappa = \\frac{\\theta_1 - \\theta_2}{1 - \\theta_2}`
+        - :math:`\\theta_1 = \\sum_i p_{ii}`
+        - :math:`\\theta_2 = \\sum_i p_{i+}p_{+i}`
+
+        :return: :math:`\\kappa`.
+        """
+        I = len(self._a_map.keys())
+        theta_1 = sum([self._p_observed[i][i] for i in range(I)])
+        theta_2 = sum([self._p_r_marginals[i] * self._p_c_marginals[i] for i in range(I)])
+        k = (theta_1 - theta_2) / (1 - theta_2)
+        return k
+
+    @property
+    def cohen_light_k(self):
+        """
+        Computes Cohen-Light :math:`\\kappa` is a measure of conditional agreement. Several :math:`\\kappa`,
+        one for each unique value, will be computed and returned.
+
+        - :math:`\\kappa = \\frac{\\theta_1 - \\theta_2}{1 - \\theta_2}`
+        - :math:`\\theta_1 = \\frac{p_{ii}}{p_{i+}}`
+        - :math:`\\theta_2 = p_{+i}`
+
+        :return: A list of :math:`\\kappa`.
+        """
+        theta_1 = lambda i: self._p_observed[i][i] / self._p_r_marginals[i]
+        theta_2 = lambda i: self._p_c_marginals[i]
+        kappa = lambda t_1, t_2: (t_1 - t_2) / (1 - t_2)
+
+        I = len(self._a_map.keys())
+        kappas = [kappa(theta_1(i), theta_2(i)) for i in range(I)]
+        return kappas
+
+
 class BinaryTable(CategoricalTable):
     """
     Represents a contingency table for binary variables.
@@ -469,6 +532,35 @@ class BinaryTable(CategoricalTable):
 
         ratio = (p_11 * p_00) / (p_10 * p_01)
         return ratio
+
+    @property
+    def yule_q(self):
+        """
+        Yule's Q is based off of the odds ratio or cross-product ratio, :math:`\\alpha`.
+
+        :math:`Q = \\frac{\\alpha - 1}{\\alpha + 1}`
+
+        Yule's Q is the same as Goodman-Kruskal's :math:`\\lambda` for 2 x 2 contingency tables and is also
+        a measure of proportional reduction in error (PRE).
+
+        :return: Yule's Q.
+        """
+        alpha = self.odds_ratio
+        q = (alpha - 1) / (alpha + 1)
+        return q
+
+    @property
+    def yule_y(self):
+        """
+        Yule's Y is based off of the odds ratio or cross-product ratio, :math:`\\alpha`.
+
+        :math:`Y = \\frac{\\sqrt\\alpha - 1}{\\sqrt\\alpha + 1}`
+
+        :return: Yule's Y.
+        """
+        alpha = sqrt(self.odds_ratio)
+        q = (alpha - 1) / (alpha + 1)
+        return q
 
     @property
     def tetrachoric_correlation(self):

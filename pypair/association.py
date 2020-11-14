@@ -173,37 +173,104 @@ def tetrachoric(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
     return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).tetrachoric_correlation
 
 
-def somers_d(x, y):
+def __get_concordance(x, y):
     """
-    Compute `Somer's D <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
-    variables.
+    Gets the count of concordance, discordance or tie. Two pairs of variables :math:`(X_i, Y_i)`
+    and :math:`(X_j, Y_j)` are
 
-    :param x: Continuous data (iterable).
-    :param y: Continuous data (iterable).
-    :return: Somer's D.
+    - concordant if :math:`X_i < X_j` and :math:`Y_i < Y_j` **or** :math:`X_i > X_j` and :math:`Y_i > Y_j`,
+    - discordant if :math:`X_i < X_j` and :math:`Y_i > Y_j` **or** :math:`X_i > X_j` and :math:`Y_i < Y_j`, and
+    - tied if :math:`X_i = X_j` and :math:`Y_i = Y_j`.
+
+    Equivalently.
+
+    - concordant if :math:`(X_j - X_i)(Y_j - Y_i) > 0`
+    - discordant if :math:`(X_j - X_i)(Y_j - Y_i) < 0`
+    - tied if :math:`(X_j - X_i)(Y_j - Y_i) = 0`
+
+    Any two pairs of observations are necessarily concordant, discordant or tied.
+
+    :param x: Continuous variable (iterable).
+    :param y: Continuous variable (iterable).
+    :return: Tuple (D, T, C, n).
     """
     def get_concordance(p1, p2):
         x_i, y_i = p1
         x_j, y_j = p2
-        if x_i > x_j and y_i > y_j:
+
+        r = (x_j - x_i) * (y_j - y_i)
+
+        if r > 0:
             return 0, 0, 1
-
-        if x_i > x_j and y_i < y_j:
+        if r < 0:
             return 1, 0, 0
-
-        if x_i < x_j and y_i > y_j:
-            return 1, 0, 0
-
         return 0, 1, 0
 
     is_valid = lambda a, b: a is not None and b is not None
     data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
-    results = ([get_concordance(p1, p2) for j, p2 in enumerate(data) if j > i] for i, p1 in enumerate(data))
+    results = ((get_concordance(p1, p2) for j, p2 in enumerate(data) if j > i) for i, p1 in enumerate(data))
     results = chain(*results)
     add_tup = lambda tup1, tup2: (tup1[0] + tup2[0], tup1[1] + tup2[1], tup1[2] + tup2[2])
     results = reduce(lambda tup1, tup2: add_tup(tup1, tup2), results)
-    n_d, n_n, n_c = results
+    n_d, n_t, n_c = results
     n = len(data)
+    return n_d, n_t, n_c, n
 
+
+def kendall_tau(x, y):
+    """
+    Kendall's :math:`\\tau` is defined as follows.
+
+    :math:`\\tau = \\frac{C - D}{{{n}\\choose{2}}}`
+
+    Where
+
+    - :math:`C` is the number of concordant pairs
+    - :math:`D` is the number of discordant pairs
+    - :math:`n` is the sample size
+
+    :param x: Continuous data (iterable).
+    :param y: Continuous data (iterable).
+    :return: :math:`\\tau`.
+    """
+    n_d, _, n_c, n = __get_concordance(x, y)
     t = (n_c - n_d) / (n * (n - 1) / 2)
     return t
+
+
+def somers_d(x, y):
+    """
+    Computes `Somer's D <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
+    variables. The computation of Somer's D is as follows.
+
+    :param x: Continuous data (iterable).
+    :param y: Continuous data (iterable).
+    :return: Somer's d.
+    """
+    pass
+
+
+def goodman_kruskal_gamma(x, y):
+    """
+    Goodman-Kruskal :math:`\\gamma` is like Somer's D. It is defined as follows.
+
+    :math:`\\gamma = \\frac{\\pi_c - \\pi_d}{1 - \\pi_t}`
+
+    Where
+
+    - :math:`\\pi_c = \\frac{C}{n}`
+    - :math:`\\pi_d = \\frac{D}{n}`
+    - :math:`\\pi_t = \\frac{T}{n}`
+    - :math:`C` is the number of concordant pairs
+    - :math:`D` is the number of discordant pairs
+    - :math:`T` is the number of ties
+    - :math:`n` is the sample size
+
+    :param x: Continuous data (iterable).
+    :param y: Continuous data (iterable).
+    :return: :math:`\\gamma`.
+    """
+    n_d, n_t, n_c, n = __get_concordance(x, y)
+    p_d, p_t, p_c = n_d / n, n_t / n, n_c / n
+    gamma = (p_c - p_d) / (1 - p_t)
+    return gamma
