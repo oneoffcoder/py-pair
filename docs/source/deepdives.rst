@@ -6,6 +6,15 @@ Let's go into some association measures in more details.
 Binary association
 ------------------
 
+The association between binary variables have been studied prolifically in the last 100 years :cite:`2010:choi`. A binary variable has only two values. It is typical to re-encode these values into 0 or 1. How and why each of these two values are mapped to 0 or 1 is subjective, arbitrary and/or context-specific. For example, if we have a variable that captures the handedness, favoring left or right hand, of a person, we could map left to 0 and right to 1, or, left to 1 and right to 0. The 0-1 value representation of a binary variable's values is the common foundation for understanding association. Below is a contingency table created from two binary variables. Notice the main values of the tables are a, b, c, d.
+
+- :math:`a = N_{11}` is the count of when the two variables have a value of 1
+- :math:`b = N_{10}` is the count of when the row variable has a value of 1 and the column variable has a value of 0
+- :math:`c = N_{01}` is the count of when the row variable has a value of 0 and the column variable has a value of 1
+- :math:`d = N_{00}` is the count of when the two variables have a value of 0
+
+Also, look at how the table is structured with the value 1 coming before the value 0 in both the rows and columns.
+
 .. list-table:: Contingency table for two binary variables
 
    * -
@@ -25,45 +34,178 @@ Binary association
      - b + d
      - p = a + b + c + d
 
-.. list-table:: Contingency table for two binary variables :cite:`2010:choi,2020:psu-binary`
+Note that a and d are `matches` and b and c are `mismatches`. Sometimes, depending on the context, matching on 0 is not considered a match; for example, if 1 is the presence of something and 0 is the absence, then an observation of absence and absence does not really look like a match (you cannot say two things match on what is not there).
+
+In :cite:`2010:choi`, there are 76 similarity and distance measures identified. Similarity is how `alike` are two things, and distance is how `different` are two things; or, in other words, similarity is how close are two things and distance is how far apart are two things. If a similarity or distance measure produces a value in :math:`[0, 1]`, then we can convert between the two easily.
+
+- If :math:`s` is the similarity, then :math:`d = 1 - s` is the distance.
+- If :math:`d` is the distance, then :math:`s = 1 - d` is the similarity.
+
+If we use a contingency table to summarize a bivariate binary data, the following similarity and distance measures may be derived entirely from a, b, c and/or d. The general pattern is that similarity and distance is always a ratio. The numerator in the ratio defines what we are interested in measuring. When we have a and/or d in the numerator, it is likely we are measuring similarity; when we have c and/or d in the numerator, it is likely we are measuring distance. The denominator considers what is important in considering; is it the matches, mismatches or both?
+
+.. list-table:: Similarity measures for 2 x 2 contingency table :cite:`2010:choi,2020:psu-binary`
    :header-rows: 1
 
    * - Name
-     - Coefficient
-     - Emphasis
-   * - Sokal-Michener :cite:`2010:choi`
-     - :math:`\frac{a + d}{p}`
-     - Equal weights for 11 and 00 matches
-   * - Sørensen–Dice coefficient :cite:`2020:wiki-dice`
-     - :math:`\frac{2(a + d)}{2(a + d) + b + c}`
-     - Double weights for 11 and 00 matches
-   * - Roger-Tanimoto :cite:`2010:choi`
-     - :math:`\frac{a + d}{a + d + 2(b + c)}`
-     - Double weights for mismatches
-   * - Russell-Rao coefficient :cite:`2010:choi`
-     - :math:`\frac{a}{p}`
-     - Proportion of 11 matches
-   * - Jaccard similarity coefficent :cite:`2020:wiki-jaccard`
-     - :math:`\frac{a}{a + b + c}`
-     - Ignores 00 matches
-   * - Jaccard distance :cite:`2020:wiki-jaccard`
-     - :math:`\frac{b + c}{a + b + c}`
-     -
-   * - Czekanowski :cite:`2010:choi`
-     - :math:`\frac{2a}{2a + b + c}`
-     - Ignores 00 matches and double weights for 11 matches
-   * - Soka-Sneath-I :cite:`2010:choi`
-     - :math:`\frac{a}{a + 2(b + c)}`
-     - Ignores 00 matches and double weights for mismatches
-   * - Tanimoto similarity :cite:`2020:wiki-jaccard`
-     - :math:`\frac{a}{b + c}`
-     - Ratio of 11 matches to mismatches ignoring 00
+     - Computation
+   * - 3W-Jaccard
+     - :math:`\frac{3a}{3a+b+c}`
+   * - Ample
+     - :math:`\left|\frac{a(c+d)}{c(a+b)}\right|`
+   * - Anderberg
+     - :math:`\frac{\sigma-\sigma'}{2n}`
+   * - Baroni-Urbani-Buser-I
+     - :math:`\frac{\sqrt{ad}+a}{\sqrt{ad}+a+b+c}`
+   * - Baroni-Urbani-Buser-II
+     - :math:`\frac{\sqrt{ad}+a-(b+c)}{\sqrt{ad}+a+b+c}`
+   * - Braun-Banquet
+     - :math:`\frac{a}{\max(a+b,a+c)}`
+   * - Cole
+     - :math:`\frac{\sqrt{2}(ad-bc)}{\sqrt{(ad-bc)^2-(a+b)(a+c)(b+d)(c+d)}}`
+   * - Cosine
+     - :math:`\frac{a}{(a+b)(a+c)}`
+   * - Dennis
+     - :math:`\frac{ad-bc}{\sqrt{n(a+b)(a+c)}}`
+   * - Dice;Czekanowski;Nei-Li
+     - :math:`\frac{2a}{2a+b+c}`
+   * - Disperson
+     - :math:`\frac{ad-bc}{(a+b+c+d)^2}`
+   * - Driver-Kroeber
+     - :math:`\frac{a}{2}\left(\frac{1}{a+b}+\frac{1}{a+c}\right)`
+   * - Eyraud
+     - :math:`\frac{n^2(na-(a+b)(a+c))}{(a+b)(a+c)(b+d)(c+d)}`
+   * - Fager-McGowan
+     - :math:`\frac{a}{\sqrt{(a+b)(a+c)}}-\frac{max(a+b,a+c)}{2}`
+   * - Faith
+     - :math:`\frac{a+0.5d}{a+b+c+d}`
+   * - Forbes-II
+     - :math:`\frac{na-(a+b)(a+c)}{n \min(a+b,a+c) - (a+b)(a+c)}`
+   * - Forbesi
+     - :math:`\frac{pa}{(a+b)(a+c)}`
+   * - Fossum
+     - :math:`\frac{n(a-0.5)^2}{(a+b)(a+c)}`
+   * - Gilbert-Wells
+     - :math:`\log a - \log p - \log \frac{a+b}{p} - \log \frac{a+c}{p}`
+   * - Goodman-Kruskal
+     - :math:`\frac{\sigma - \sigma'}{2n-\sigma'}`
+   * -
+     - :math:`\sigma=\max(a,b)+\max(c,d)+\max(a,c)+\max(b,d)`
+   * -
+     - :math:`\sigma'=\max(a+c,b+d)+\max(a+b,c+d)`
+   * - Gower
+     - :math:`\frac{a+d}{\sqrt{(a+b)(a+c)(b+d)(c+d)}}`
+   * - Gower-Legendre
+     - :math:`\frac{a+d}{a+0.5b+0.5c+d}`
+   * - Hamann
+     - :math:`\frac{(a+d)-(b+c)}{a+b+c+d}`
+   * - Inner Product
+     - :math:`a+d`
+   * - Intersection
+     - :math:`a`
+   * - Jaccard :cite:`2020:wiki-jaccard`
+     - :math:`\frac{a}{a+b+c}`
+   * - Johnson
+     - :math:`\frac{a}{a+b}+\frac{a}{a+c}`
+   * - Kulczynski-I
+     - :math:`\frac{a}{b+c}`
+   * - Kulczynski-II
+     - :math:`\frac{0.5a(2a+b+c)}{(a+b)(a+c)}`
+   * -
+     - :math:`\frac{1}{2}\left(\frac{a}{a + b} + \frac{a}{a + c}\right)`
+   * - McConnaughey
+     - :math:`\frac{a^2 - bc}{(a+b)(a+c)}`
+   * - Micahel
+     - :math:`\frac{4(ad-bc)}{(a+d)^2+(b+c)^2}`
+   * - Mountford
+     - :math:`\frac{a}{0.5(ab + ac) + bc}`
+   * - Ochiai-I;Otsuka
+     - :math:`\frac{a}{\sqrt{(a+b)(a+c)}}`
    * - Ochiai :cite:`2020:stack-sim`
      - :math:`\sqrt{\frac{a}{a + b}\frac{a}{a + c}}`
-     -
-   * - Kulczynski-2 :cite:`2020:stack-sim`
-     - :math:`\frac{1}{2}\left(\frac{a}{a + b} + \frac{a}{a + c}\right)`
-     -
+   * - Ochiai-II
+     - :math:`\frac{ad}{\sqrt{(a+b)(a+c)(b+d)(c+d)}}`
+   * - Pearson-Heron-I
+     - :math:`\frac{ad-bc}{\sqrt{(a+b)(a+c)(b+d)(c+d)}}`
+   * - Pearson-Heron-II
+     - :math:`\cos\left(\frac{\pi \sqrt{bc}}{\sqrt{ad}+\sqrt{bc}}\right)`
+   * - Pearson-I
+     - :math:`\chi^2=\frac{n(ad-bc)^2}{(a+b)(a+c)(c+d)(b+d)}`
+   * - Pearson-II
+     - :math:`\sqrt{\frac{\chi^2}{n+\chi^2}}`
+   * - Pearson-II
+     - :math:`\sqrt{\frac{\rho}{n+\rho}}`
+   * -
+     - :math:`\rho=\frac{ad-bc}{\sqrt{(a+b)(a+c)(b+d)(c+d)}}`
+   * - Peirce
+     - :math:`\frac{ab+bc}{ab+2bc+cd}`
+   * - Roger-Tanimoto
+     - :math:`\frac{a+d}{a+2b+2c+d}`
+   * - Russell-Rao
+     - :math:`\frac{a}{a+b+c+d}`
+   * - Simpson
+     - :math:`\frac{a}{\min(a+b,a+c)}`
+   * - Sokal-Michener
+     - :math:`\frac{a+d}{a+b+c+d}`
+   * - Sokal-Sneath-I
+     - :math:`\frac{a}{a+2b+2c}`
+   * - Sokal-Sneath-II
+     - :math:`\frac{2a+2d}{2a+b+c+2d}`
+   * - Sokal-Sneath-III
+     - :math:`\frac{a+d}{b+c}`
+   * - Sokal-Sneath-IV
+     - :math:`\frac{1}{4}\left(\frac{a}{a+b}+\frac{a}{a+c}+\frac{d}{b+d}+\frac{d}{b+d}\right)`
+   * - Sokal-Sneath-V
+     - :math:`\frac{ad}{(a+b)(a+c)(b+d)\sqrt{c+d}}`
+   * - Sørensen–Dice coefficient :cite:`2020:wiki-dice`
+     - :math:`\frac{2(a + d)}{2(a + d) + b + c}`
+   * - Sorgenfrei
+     - :math:`\frac{a^2}{(a+b)(a+c)}`
+   * - Stiles
+     - :math:`\log_{10} \frac{n\left(|ad-bc|-\frac{n}{2}\right)^2}{(a+b)(a+c)(b+d)(c+d)}`
+   * - Tanimoto-I
+     - :math:`\frac{a}{2a+b+c}`
+   * - Tanimoto-II :cite:`2020:wiki-jaccard`
+     - :math:`\frac{a}{b + c}`
+   * - Tarwid
+     - :math:`\frac{na - (a+b)(a+c)}{na + (a+b)(a+c)}`
+   * - Trantuala
+     - :math:`\frac{a(c+d)}{c(a+b)}`
+   * - Yule-Q
+     - :math:`\frac{ad-bc}{ad+bc}`
+   * - Yule-w
+     - :math:`\frac{\sqrt{ad}-\sqrt{bc}}{\sqrt{ad}+\sqrt{bc}}`
+
+.. list-table:: Distance measures for 2 x 2 contingency table :cite:`2010:choi`
+   :header-rows: 1
+
+   * - Name
+     - Computation
+   * - Chord
+     - :math:`\sqrt{2\left(1 - \frac{a}{\sqrt{(a+b)(a+c)}}\right)}`
+   * - Euclid
+     - :math:`\sqrt{b+c}`
+   * - Hamming;Canberra;Manhattan;Cityblock;Minkowski
+     - :math:`b+c`
+   * - Hellinger
+     - :math:`2\sqrt{1 - \frac{a}{\sqrt{(a+b)(a+c)}}}`
+   * - Jaccard distance :cite:`2020:wiki-jaccard`
+     - :math:`\frac{b + c}{a + b + c}`
+   * - Lance-Williams;Bray-Curtis
+     - :math:`\frac{b+c}{2a+b+c}`
+   * - Mean-Manhattan
+     - :math:`\frac{b+c}{a+b+c+d}`
+   * - Pattern Difference
+     - :math:`\frac{4bc}{(a+b+c+d)^2}`
+   * - Shape Difference
+     - :math:`\frac{n(b+c)-(b-c)^2}{(a+b+c+d)^2}`
+   * - Size Difference
+     - :math:`\frac{(b+c)^2}{(a+b+c+d)^2}`
+   * - Squared-Euclid
+     - :math:`\sqrt{(b+c)^2}`
+   * - Vari
+     - :math:`\frac{b+c}{4a+4b+4c+4d}`
+   * - Yule-Q
+     - :math:`\frac{2bc}{ad+bc}`
 
 Concordant, discordant, tie
 ---------------------------
@@ -145,9 +287,9 @@ For each one of these observation pairs, we can determine if such a pair is conc
 
 Now we can finally attempt to describe how to determine if any pair of observations is concordant, discordant or tied. If we want to use math to determine so, then, for any two pairs of observations :math:`(X_i, Y_i)` and :math:`(X_j, Y_j)`, the following determines the status.
 
-- concordant if :math:`(X_j - X_i)(Y_j - Y_i) > 0`
-- discordant if :math:`(X_j - X_i)(Y_j - Y_i) < 0`
-- tied if :math:`(X_j - X_i)(Y_j - Y_i) = 0`
+- concordant when :math:`(X_j - X_i)(Y_j - Y_i) > 0`
+- discordant when :math:`(X_j - X_i)(Y_j - Y_i) < 0`
+- tied when :math:`(X_j - X_i)(Y_j - Y_i) = 0`
 
 If we like rules, then the following determines the status.
 
@@ -211,9 +353,9 @@ All pairs of observations will evaluate categorically to one of these statuses. 
 
 In this data set, the counts are :math:`C=6`, :math:`D=5` and :math:`T=4`. If we divide these counts with the total of pairs of observations, then we get the following probabilities.
 
-- :math:`\pi_C = \frac{C}{{n}\choose{2}} = \frac{6}{15}`
-- :math:`\pi_D = \frac{D}{{n}\choose{2}} = \frac{5}{15}`
-- :math:`\pi_T = \frac{T}{{n}\choose{2}} = \frac{4}{15}`
+- :math:`\pi_C = \frac{C}{{n}\choose{2}} = \frac{6}{15} = 0.40`
+- :math:`\pi_D = \frac{D}{{n}\choose{2}} = \frac{5}{15} = 0.33`
+- :math:`\pi_T = \frac{T}{{n}\choose{2}} = \frac{4}{15} = 0.27`
 
 Sometimes, it is desirable to distinguish between the types of ties. There are three possible types of ties.
 
@@ -277,11 +419,11 @@ Note, :math:`T = T^X + T^Y + T^{XY}`. If we want to distinguish between the tie 
 
 Distinguishing between ties, in this data set, the counts are :math:`C=6`, :math:`D=5`, :math:`T^X=2`, :math:`T^Y=1` and :math:`T^{XY}=1`. The probabilities of these statuses are as follows.
 
-- :math:`\pi_C = \frac{C}{{n}\choose{2}} = \frac{6}{15}`
-- :math:`\pi_D = \frac{D}{{n}\choose{2}} = \frac{5}{15}`
-- :math:`\pi_{T^X} = \frac{T^X}{{n}\choose{2}} = \frac{2}{15}`
-- :math:`\pi_{T^Y} = \frac{T^Y}{{n}\choose{2}} = \frac{1}{15}`
-- :math:`\pi_{T^{XY}} = \frac{T^{XY}}{{n}\choose{2}} = \frac{1}{15}`
+- :math:`\pi_C = \frac{C}{{n}\choose{2}} = \frac{6}{15} = 0.40`
+- :math:`\pi_D = \frac{D}{{n}\choose{2}} = \frac{5}{15} = 0.33`
+- :math:`\pi_{T^X} = \frac{T^X}{{n}\choose{2}} = \frac{2}{15} = 0.13`
+- :math:`\pi_{T^Y} = \frac{T^Y}{{n}\choose{2}} = \frac{1}{15} = 0.07`
+- :math:`\pi_{T^{XY}} = \frac{T^{XY}}{{n}\choose{2}} = \frac{1}{15} = 0.07`
 
 There are quite a few measures of associations using concordance as the basis for strength of association.
 
@@ -292,7 +434,7 @@ There are quite a few measures of associations using concordance as the basis fo
      - Formula
    * - Goodman-Kruskal's :math:`\gamma`
      - :math:`\gamma = \frac{\pi_C - \pi_D}{1 - \pi_T}`
-   * - Somer's :math:`d`
+   * - Somers' :math:`d`
      - :math:`d_{Y \cdot X} = \frac{\pi_C - \pi_D}{\pi_C + \pi_D + \pi_{T^Y}}`
    * -
      - :math:`d_{X \cdot Y} = \frac{\pi_C - \pi_D}{\pi_C + \pi_D + \pi_{T^X}}`
@@ -431,4 +573,4 @@ What :math:`\lambda_{A|B}` is trying to compute is the reduction of error in pre
 
 Generally speaking, :math:`\lambda_{A|B} \neq \lambda_{B|A}`, and :math:`\lambda` is thus an asymmetric association measure. To compute :math:`\lambda_{B|A}`, simply put :math:`B` in the columns and :math:`A` in the rows and reuse the formulas above.
 
-Furthermore, :math:`\lambda` can be used in studies of causality :cite:`1983:liebetrau`. We are not saying it is appropriate or even possible to entertain causality with just two variables alone :cite:`2020:pearl,2016:pearl,2009:pearl,1988:pearl`, but, when we have two categorical variables and want to know which is likely the cause and which the effect, the asymmetry between :math:`\lambda_{A|B}` and :math:`\lambda_{B|A}` may prove informational. Causal analysis based on two variables alone has been studied :cite:`2008:nips`.
+Furthermore, :math:`\lambda` can be used in studies of causality :cite:`1983:liebetrau`. We are not saying it is appropriate or even possible to entertain causality with just two variables alone :cite:`2020:pearl,2016:pearl,2009:pearl,1988:pearl`, but, when we have two categorical variables and want to know which is likely the cause and which the effect, the asymmetry between :math:`\lambda_{A|B}` and :math:`\lambda_{B|A}` may prove informational :cite:`2020:wiki-prospect`. Causal analysis based on two variables alone has been studied :cite:`2008:nips`.
