@@ -91,16 +91,123 @@ If we like rules, then the following determines the status.
 
 - concordant if :math:`X_i < X_j` and :math:`Y_i < Y_j` **or** :math:`X_i > X_j` and :math:`Y_i > Y_j`
 - discordant if :math:`X_i < X_j` and :math:`Y_i > Y_j` **or** :math:`X_i > X_j` and :math:`Y_i < Y_j`
-- tied if :math:`X_i = X_j` and :math:`Y_i = Y_j`
+- tied if :math:`X_i = X_j` **or** :math:`Y_i = Y_j`
 
-All pairs of observations will evaluate categorically to one of these statuses. Continuing with our dummy data above, the concordancy status of the 15 pairs of observations are as follows.
+All pairs of observations will evaluate categorically to one of these statuses. Continuing with our dummy data above, the concordancy status of the 15 pairs of observations are as follows (where concordant is C, discordant is D and tied is T).
 
-.. list-table:: Raw Data for :math:`X` and :math:`Y`
+.. list-table:: Concordancy Status
    :header-rows: 1
 
    * - :math:`(X_i, Y_i)`
      - :math:`(X_j, Y_j)`
      - status
+   * - :math:`(1, 3)`
+     - :math:`(1, 3)`
+     - T
+   * - :math:`(1, 3)`
+     - :math:`(2, 4)`
+     - C
+   * - :math:`(1, 3)`
+     - :math:`(0, 2)`
+     - C
+   * - :math:`(1, 3)`
+     - :math:`(0, 4)`
+     - D
+   * - :math:`(1, 3)`
+     - :math:`(2, 2)`
+     - D
+   * - :math:`(1, 3)`
+     - :math:`(2, 4)`
+     - C
+   * - :math:`(1, 3)`
+     - :math:`(0, 2)`
+     - C
+   * - :math:`(1, 3)`
+     - :math:`(0, 4)`
+     - D
+   * - :math:`(1, 3)`
+     - :math:`(2, 2)`
+     - D
+   * - :math:`(2, 4)`
+     - :math:`(0, 2)`
+     - C
+   * - :math:`(2, 4)`
+     - :math:`(0, 4)`
+     - C
+   * - :math:`(2, 4)`
+     - :math:`(2, 2)`
+     - T
+   * - :math:`(0, 2)`
+     - :math:`(0, 4)`
+     - T
+   * - :math:`(0, 2)`
+     - :math:`(2, 2)`
+     - T
+   * - :math:`(0, 4)`
+     - :math:`(2, 2)`
+     - D
+
+In this data set, the counts are :math:`C=6`, :math:`D=5` and :math:`T=4`. Sometimes, it is desirable to distinguish between the types of ties. There are three possible types of ties.
+
+- :math:`T^X` are ties on only :math:`X`
+- :math:`T^Y` are ties on only :math:`Y`
+- :math:`T^{XY}` are ties on both :math:`X` and :math:`Y`
+
+Note, :math:`T = T^X + T^Y + T^{XY}`. If we want to distinguish between the tie types, then the status of each pair of observations is as follows.
+
+.. list-table:: Concordancy Status
+   :header-rows: 1
+
+   * - :math:`(X_i, Y_i)`
+     - :math:`(X_j, Y_j)`
+     - status
+   * - :math:`(1, 3)`
+     - :math:`(1, 3)`
+     - :math:`T^{XY}`
+   * - :math:`(1, 3)`
+     - :math:`(2, 4)`
+     - C
+   * - :math:`(1, 3)`
+     - :math:`(0, 2)`
+     - C
+   * - :math:`(1, 3)`
+     - :math:`(0, 4)`
+     - D
+   * - :math:`(1, 3)`
+     - :math:`(2, 2)`
+     - D
+   * - :math:`(1, 3)`
+     - :math:`(2, 4)`
+     - C
+   * - :math:`(1, 3)`
+     - :math:`(0, 2)`
+     - C
+   * - :math:`(1, 3)`
+     - :math:`(0, 4)`
+     - D
+   * - :math:`(1, 3)`
+     - :math:`(2, 2)`
+     - D
+   * - :math:`(2, 4)`
+     - :math:`(0, 2)`
+     - C
+   * - :math:`(2, 4)`
+     - :math:`(0, 4)`
+     - C
+   * - :math:`(2, 4)`
+     - :math:`(2, 2)`
+     - :math:`T^X`
+   * - :math:`(0, 2)`
+     - :math:`(0, 4)`
+     - :math:`T^X`
+   * - :math:`(0, 2)`
+     - :math:`(2, 2)`
+     - :math:`T^Y`
+   * - :math:`(0, 4)`
+     - :math:`(2, 2)`
+     - D
+
+Distinguishing between ties, in this data set, the counts are :math:`C=6`, :math:`D=5`, :math:`T^X=2`, :math:`T^Y=1` and :math:`T^{XY}=1`.
 
 Goodman-Kruskal's :math:`\lambda`
 ---------------------------------
