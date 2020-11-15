@@ -114,7 +114,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{1}{2}\left(\frac{a}{a + b} + \frac{a}{a + c}\right)`
    * - McConnaughey
      - :math:`\frac{a^2 - bc}{(a+b)(a+c)}`
-   * - Micahel
+   * - Michael
      - :math:`\frac{4(ad-bc)}{(a+d)^2+(b+c)^2}`
    * - Mountford
      - :math:`\frac{a}{0.5(ab + ac) + bc}`
@@ -168,7 +168,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{a}{b + c}`
    * - Tarwid
      - :math:`\frac{na - (a+b)(a+c)}{na + (a+b)(a+c)}`
-   * - Trantuala
+   * - Tarantula
      - :math:`\frac{a(c+d)}{c(a+b)}`
    * - Yule-Q
      - :math:`\frac{ad-bc}{ad+bc}`
