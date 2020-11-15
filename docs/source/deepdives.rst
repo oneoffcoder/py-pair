@@ -32,7 +32,7 @@ Also, look at how the table is structured with the value 1 coming before the val
    * - Total
      - a + c
      - b + d
-     - p = a + b + c + d
+     - n = a + b + c + d
 
 Note that a and d are `matches` and b and c are `mismatches`. Sometimes, depending on the context, matching on 0 is not considered a match; for example, if 1 is the presence of something and 0 is the absence, then an observation of absence and absence does not really look like a match (you cannot say two things match on what is not there).
 
@@ -81,11 +81,11 @@ If we use a contingency table to summarize a bivariate binary data, the followin
    * - Forbes-II
      - :math:`\frac{na-(a+b)(a+c)}{n \min(a+b,a+c) - (a+b)(a+c)}`
    * - Forbesi
-     - :math:`\frac{pa}{(a+b)(a+c)}`
+     - :math:`\frac{na}{(a+b)(a+c)}`
    * - Fossum
      - :math:`\frac{n(a-0.5)^2}{(a+b)(a+c)}`
    * - Gilbert-Wells
-     - :math:`\log a - \log p - \log \frac{a+b}{p} - \log \frac{a+c}{p}`
+     - :math:`\log a - \log n - \log \frac{a+b}{n} - \log \frac{a+c}{n}`
    * - Goodman-Kruskal
      - :math:`\frac{\sigma - \sigma'}{2n-\sigma'}`
    * -
