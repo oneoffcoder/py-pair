@@ -40,12 +40,12 @@ class CategoricalTable(ContingencyTable):
         df = pd.DataFrame([(x, y) for x, y in zip(a, b)], columns=['a', 'b'])
 
         if a_vals is None:
-            a_vals = sorted(list(set(a)))
+            pass
         else:
             a_vals = sorted(list(df.a.unique()))
 
         if b_vals is None:
-            b_vals = sorted(list(set(b)))
+            pass
         else:
             b_vals = sorted(list(df.b.unique()))
 
@@ -389,29 +389,201 @@ class BinaryTable(CategoricalTable):
         :param b_1: The zero value for b. Defaults to 1.
         """
         super().__init__(a, b, a_vals=[a_0, a_1], b_vals=[b_0, b_1])
+
         self._a_0 = a_0
         self._a_1 = a_1
         self._b_0 = b_0
         self._b_1 = b_1
 
+        self.__a = self.observed[a_1][b_1]
+        self.__b = self.observed[a_1][b_0]
+        self.__c = self.observed[a_0][b_1]
+        self.__d = self.observed[a_0][b_0]
+
     @property
-    def jaccard_similarity(self):
-        """
-        `Jaccard Index <https://en.wikipedia.org/wiki/Jaccard_index>`_.
+    @lru_cache(maxsize=None)
+    def __abcd(self):
+        return self.__a, self.__b, self.__c, self.__d
 
-        :return: Jaccard similarity.
-        """
-        a_0 = self._a_map[self._a_0]
-        a_1 = self._a_map[self._a_1]
-        b_0 = self._b_map[self._b_0]
-        b_1 = self._b_map[self._b_1]
+    @property
+    def __sigma(self):
+        a, b, c, d = self.__abcd
+        return max(a, b) + max(c, d) + max(a, c) + max(b, d)
 
-        m_11 = self.observed[a_1][b_1]
-        m_01 = self.observed[a_0][b_1]
-        m_10 = self.observed[a_1][b_0]
+    @property
+    def __sigma_prime(self):
+        a, b, c, d = self.__abcd
+        return max(a + c, b + d) + max(a + b, c + d)
 
-        s = m_11 / (m_01 + m_10 + m_11)
-        return s
+    @property
+    def jaccard_3w(self):
+        a, b, c, d = self.__abcd
+        return 3 * a / (3 * a + b + c)
+
+    @property
+    def ample(self):
+        a, b, c, d = self.__abcd
+        return abs((a*(c+d))/(c*(a+b)))
+
+    @property
+    def anderberg(self):
+        return (self.__sigma - self.__sigma_prime) / (2 * self._n)
+
+    @property
+    def baroni_urbani_buser_i(self):
+        a, b, c, d = self.__abcd
+        return (sqrt(a * d) + a) / (sqrt(a * d) + a + b + c)
+
+    @property
+    def baroni_urbani_buser_ii(self):
+        a, b, c, d = self.__abcd
+        return (sqrt(a * d) + a - (b + c)) / (sqrt(a * d) + a + b + c)
+
+    @property
+    def braun_banquet(self):
+        a, b, c, d = self.__abcd
+        return a / max(a + b, a + c)
+
+    @property
+    def cole(self):
+        a, b, c, d = self.__abcd
+        return (sqrt(2) * (a * d - b * c)) / sqrt((a * d - b * c)**2 - (a+b) * (a+c) * (b+d) * (c+d))
+
+    @property
+    def cosine(self):
+        a, b, c, d = self.__abcd
+        return a / ((a+b) * (a+c))
+
+    @property
+    def dennis(self):
+        a, b, c, d = self.__abcd
+        return (a*d - b*c) / sqrt(n*(a+b)*(a+c))
+
+    @property
+    def dice(self):
+        a, b, c, d = self.__abcd
+        return (2 * a) / (2*a + b + c)
+
+    @property
+    def disperson(self):
+        a, b, c, d = self.__abcd
+        return (a*d - b*c) / (a+b+c+d) ** 2
+
+    @property
+    def driver_kroeber(self):
+        a, b, c, d = self.__abcd
+        return (a / 2) * ((1/(a+b))+(1/(a+c)))
+
+    @property
+    def eyraud(self):
+        a, b, c, d = self.__abcd
+        return (self._n**2 * (self._n * a - (a+b)*(a+c))) / ((a+b)*(a+c)*(b+d)*(c+d))
+
+    @property
+    def fager_mcgowan(self):
+        a, b, c, d = self.__abcd
+        return a/sqrt((a+b)*(a+c)) - max(a+b, a+c)/2
+
+    @property
+    def faith(self):
+        a, b, c, d = self.__abcd
+        return (a+0.5*d) / (a+b+c+d)
+
+    @property
+    def forbes_ii(self):
+        a, b, c, d = self.__abcd
+        return (self._n*a - (a+b)*(a+c)) / (self._n*min(a+b,a+c) - (a+b)*(a+c))
+
+    @property
+    def forbesi(self):
+        a, b, c, d = self.__abcd
+        return (self._n * a) / ((a+b)*(a+c))
+
+    @property
+    def fossum(self):
+        a, b, c, d = self.__abcd
+        return (self._n*(a-0.5)**2) / ((a+b)*(a+c))
+
+    @property
+    def gilbert_wells(self):
+        a, b, c, d = self.__abcd
+        return log(a) - log(self._n) - log((a+b)/self._n) - log((a+c)/self._n)
+
+    @property
+    def goodman_kruskal(self):
+        return (self.__sigma - self.__sigma_prime) / (2 * self._n - self.__sigma_prime)
+
+    @property
+    def gower(self):
+        a, b, c, d = self.__abcd
+        return (a+d) / sqrt((a+b)*(a+c)*(b+d)*(c+d))
+
+    @property
+    def gower_legendre(self):
+        a, b, c, d = self.__abcd
+        return (a+d) / (a + 0.5*(b+c) + d)
+
+    @property
+    def hamann(self):
+        a, b, c, d = self.__abcd
+        return ((a+d)-(b+c)) / (a+b+c+d)
+
+    @property
+    def inner_product(self):
+        a, *_, d = self.__abcd
+        return a + d
+
+    @property
+    def intersection(self):
+        a, *_ = self.__abcd
+        return a
+
+    @property
+    def jaccard(self):
+        a, b, c, d = self.__abcd
+        return a / (a+b+c)
+
+    @property
+    def johnson(self):
+        a, b, c, d = self.__abcd
+        return a/(a+b) + a/(a+c)
+
+    @property
+    def kulczynski_i(self):
+        a, b, c, d = self.__abcd
+        return a / (b+c)
+
+    @property
+    def kulcyznski_ii(self):
+        a, b, c, d = self.__abcd
+        return 0.5*((a/(a+b)) * (a/(a+c)))
+
+    @property
+    def mcconnaughey(self):
+        a, b, c, d = self.__abcd
+        return (a**2-b*c) / ((a+d)**2+(b+c)**2)
+
+    @property
+    def michael(self):
+        a, b, c, d = self.__abcd
+        return (4*(a*d-b*c)) / ((a+d)**2 + (b+c)**2)
+
+    @property
+    def mountford(self):
+        a, b, c, d = self.__abcd
+        return a / (0.5*(a*b+a*c)+b*c)
+
+    @property
+    def ochia_i(self):
+        a, b, c, d = self.__abcd
+        return sqrt((a/(a+b))*(a/(a+c)))
+
+    @property
+    def ochia_ii(self):
+        a, b, c, d = self.__abcd
+        return (a*d) / sqrt((a+b)*(a+c)*(b+d)*(c+d))
+
+
 
     @property
     def jaccard_distance(self):
