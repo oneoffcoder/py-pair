@@ -1,7 +1,7 @@
 from abc import ABC
 from functools import lru_cache, reduce
 from itertools import chain, product
-from math import sqrt, log2, pi, log
+from math import sqrt, log2, pi, log, cos
 
 import pandas as pd
 from scipy import stats
@@ -403,210 +403,860 @@ class BinaryTable(CategoricalTable):
     @property
     @lru_cache(maxsize=None)
     def __abcd(self):
+        """
+        Gets a, b, c, d.
+
+        :returns: a, b, c, d
+        """
         return self.__a, self.__b, self.__c, self.__d
 
     @property
     def __sigma(self):
+        """
+        Gets :math:`\\max(a, b) + \\max(c, d) + \\max(a, c) + \\max(b, d)`.
+
+        :returns: :math:`\\max(a, b) + \\max(c, d) + \\max(a, c) + \\max(b, d)`.
+        """
         a, b, c, d = self.__abcd
         return max(a, b) + max(c, d) + max(a, c) + max(b, d)
 
     @property
     def __sigma_prime(self):
+        """
+        Gets :math:`\\max(a + c, b + d) + \\max(a + b, c + d)`.
+
+        :return: :math:`\\max(a + c, b + d) + \\max(a + b, c + d)`
+        """
         a, b, c, d = self.__abcd
         return max(a + c, b + d) + max(a + b, c + d)
 
     @property
     def jaccard_3w(self):
+        """
+        3W-Jaccard
+
+        :math:`\\frac{3a}{3a+b+c}`
+
+        :return: 3W-Jaccard.
+        """
         a, b, c, d = self.__abcd
         return 3 * a / (3 * a + b + c)
 
     @property
     def ample(self):
+        """
+        Ample
+
+        :math:`\\left|\\frac{a(c+d)}{c(a+b)}\\right|`
+
+        :return: Ample.
+        """
         a, b, c, d = self.__abcd
         return abs((a*(c+d))/(c*(a+b)))
 
     @property
     def anderberg(self):
+        """
+        Anderberg
+
+        :math:`\\frac{\\sigma-\\sigma'}{2n}`
+
+        :return: Anderberg.
+        """
         return (self.__sigma - self.__sigma_prime) / (2 * self._n)
 
     @property
     def baroni_urbani_buser_i(self):
+        """
+        Baroni-Urbani-Buser-I
+
+        :math:`\\frac{\\sqrt{ad}+a}{\\sqrt{ad}+a+b+c}`
+
+        :return: Baroni-Urbani-Buser-I.
+        """
         a, b, c, d = self.__abcd
         return (sqrt(a * d) + a) / (sqrt(a * d) + a + b + c)
 
     @property
     def baroni_urbani_buser_ii(self):
+        """
+        Baroni-Urbani-Buser-II
+
+        :math:`\\frac{\\sqrt{ad}+a-(b+c)}{\\sqrt{ad}+a+b+c}`
+
+        :return: Baroni-Urbani-Buser-II.
+        """
         a, b, c, d = self.__abcd
         return (sqrt(a * d) + a - (b + c)) / (sqrt(a * d) + a + b + c)
 
     @property
     def braun_banquet(self):
+        """
+        Braun-Banquet
+
+        :math:`\\frac{a}{\\max(a+b,a+c)}`
+
+        :return: Braun-Banquet.
+        """
         a, b, c, d = self.__abcd
         return a / max(a + b, a + c)
 
     @property
     def cole(self):
+        """
+        Cole
+
+        :math:`\\frac{\\sqrt{2}(ad-bc)}{\\sqrt{(ad-bc)^2-(a+b)(a+c)(b+d)(c+d)}}`
+
+        :return: Cole.
+        """
         a, b, c, d = self.__abcd
         return (sqrt(2) * (a * d - b * c)) / sqrt((a * d - b * c)**2 - (a+b) * (a+c) * (b+d) * (c+d))
 
     @property
     def cosine(self):
+        """
+        Cosine
+
+        :math:`\\frac{a}{(a+b)(a+c)}`
+
+        :return: Cosine.
+        """
         a, b, c, d = self.__abcd
         return a / ((a+b) * (a+c))
 
     @property
     def dennis(self):
+        """
+        Dennis
+
+        :math:`\\frac{ad-bc}{\\sqrt{n(a+b)(a+c)}}`
+
+        :return: Dennis.
+        """
         a, b, c, d = self.__abcd
-        return (a*d - b*c) / sqrt(n*(a+b)*(a+c))
+        return (a*d - b*c) / sqrt(self._n*(a+b)*(a+c))
 
     @property
     def dice(self):
+        """
+        Dice; Czekanowski; Nei-Li
+
+        :math:`\\frac{2a}{2a+b+c}`
+
+        :return: Dice.
+        """
         a, b, c, d = self.__abcd
         return (2 * a) / (2*a + b + c)
 
     @property
     def disperson(self):
+        """
+        Disperson
+
+        :math:`\\frac{ad-bc}{(a+b+c+d)^2}`
+
+        :return: Disperson.
+        """
         a, b, c, d = self.__abcd
         return (a*d - b*c) / (a+b+c+d) ** 2
 
     @property
     def driver_kroeber(self):
+        """
+        Driver-Kroeber
+
+        :math:`\\frac{a}{2}\\left(\\frac{1}{a+b}+\\frac{1}{a+c}\\right)`
+
+        :return: Driver-Kroeber.
+        """
         a, b, c, d = self.__abcd
         return (a / 2) * ((1/(a+b))+(1/(a+c)))
 
     @property
     def eyraud(self):
+        """
+        Eyraud
+
+        :math:`\\frac{n^2(na-(a+b)(a+c))}{(a+b)(a+c)(b+d)(c+d)}`
+
+        :return: Eyraud.
+        """
         a, b, c, d = self.__abcd
         return (self._n**2 * (self._n * a - (a+b)*(a+c))) / ((a+b)*(a+c)*(b+d)*(c+d))
 
     @property
     def fager_mcgowan(self):
+        """
+        Fager-McGowan
+
+        :math:`\\frac{a}{\\sqrt{(a+b)(a+c)}}-\\frac{max(a+b,a+c)}{2}`
+
+        :return: Fager-McGowan.
+        """
         a, b, c, d = self.__abcd
         return a/sqrt((a+b)*(a+c)) - max(a+b, a+c)/2
 
     @property
     def faith(self):
+        """
+        Faith
+
+        :math:`\\frac{a+0.5d}{a+b+c+d}`
+
+        :return: Faith.
+        """
         a, b, c, d = self.__abcd
         return (a+0.5*d) / (a+b+c+d)
 
     @property
     def forbes_ii(self):
+        """
+        Forbes-II
+
+        :math:`\\frac{na-(a+b)(a+c)}{n \\min(a+b,a+c) - (a+b)(a+c)}`
+
+        :return: Forbes-II.
+        """
         a, b, c, d = self.__abcd
         return (self._n*a - (a+b)*(a+c)) / (self._n*min(a+b,a+c) - (a+b)*(a+c))
 
     @property
     def forbesi(self):
+        """
+        Forbesi
+
+        :math:`\\frac{na}{(a+b)(a+c)}`
+
+        :return: Forbesi.
+        """
         a, b, c, d = self.__abcd
         return (self._n * a) / ((a+b)*(a+c))
 
     @property
     def fossum(self):
+        """
+        Fossum
+
+        :math:`\\frac{n(a-0.5)^2}{(a+b)(a+c)}`
+
+        :return: Fossum.
+        """
         a, b, c, d = self.__abcd
         return (self._n*(a-0.5)**2) / ((a+b)*(a+c))
 
     @property
     def gilbert_wells(self):
+        """
+        Gilbert-Wells
+
+        :math:`\\log a - \\log n - \\log \\frac{a+b}{n} - \\log \\frac{a+c}{n}`
+
+        :return: Gilbert-Wells.
+        """
         a, b, c, d = self.__abcd
         return log(a) - log(self._n) - log((a+b)/self._n) - log((a+c)/self._n)
 
     @property
     def goodman_kruskal(self):
+        """
+        Goodman-Kruskal
+
+        :math:`\\frac{\\sigma - \\sigma'}{2n-\\sigma'}`
+
+        :return: Goodman-Kruskal.
+        """
         return (self.__sigma - self.__sigma_prime) / (2 * self._n - self.__sigma_prime)
 
     @property
     def gower(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return (a+d) / sqrt((a+b)*(a+c)*(b+d)*(c+d))
 
     @property
     def gower_legendre(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return (a+d) / (a + 0.5*(b+c) + d)
 
     @property
     def hamann(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return ((a+d)-(b+c)) / (a+b+c+d)
 
     @property
     def inner_product(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, *_, d = self.__abcd
         return a + d
 
     @property
     def intersection(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, *_ = self.__abcd
         return a
 
     @property
     def jaccard(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return a / (a+b+c)
 
     @property
     def johnson(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return a/(a+b) + a/(a+c)
 
     @property
     def kulczynski_i(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return a / (b+c)
 
     @property
     def kulcyznski_ii(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return 0.5*((a/(a+b)) * (a/(a+c)))
 
     @property
     def mcconnaughey(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return (a**2-b*c) / ((a+d)**2+(b+c)**2)
 
     @property
     def michael(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return (4*(a*d-b*c)) / ((a+d)**2 + (b+c)**2)
 
     @property
     def mountford(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return a / (0.5*(a*b+a*c)+b*c)
 
     @property
     def ochia_i(self):
+        """
+        `Fowlkes-Mallows Index <https://en.wikipedia.org/wiki/Fowlkes%E2%80%93Mallows_index>`_ is
+        typically used to judge the similarity between two clusters. A larger value indicates
+        that the clusters are more similar.
+        """
         a, b, c, d = self.__abcd
         return sqrt((a/(a+b))*(a/(a+c)))
 
     @property
     def ochia_ii(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
         a, b, c, d = self.__abcd
         return (a*d) / sqrt((a+b)*(a+c)*(b+d)*(c+d))
 
+    @property
+    def pearson_heron_i(self):
+        """
 
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (a*d-b*c) / sqrt((a+b)*(a+c)*(b+d)*(c+d))
+
+    @property
+    def pearson_heron_ii(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return cos((pi * sqrt(b*c))/(sqrt(a*d)+sqrt(b*c)))
+
+    @property
+    def pearson_i(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (self._n*(a*d-b*c)**2) / ((a+b)*(a+c)*(c+d)*(b+d))
+
+    @property
+    def person_ii(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        chisq = self.person_ii
+        return sqrt(chisq / (self._n + chisq))
+
+    @property
+    def peirce(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (a*b+b*c) / (a*b+2*b*c+c*d)
+
+    @property
+    def roger_tanimoto(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (a+d) / (a+2*(b+c)+d)
+
+    @property
+    def russel_rao(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return a / (a+b+c+d)
+
+    @property
+    def simpson(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return a / min(a+b,a+c)
+
+    @property
+    def sokal_michener(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (a+d)/(a+b+c+d)
+
+    @property
+    def sokal_sneath_i(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return a / (a+2*(b+c))
+
+    @property
+    def sokal_sneath_ii(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return 2*(a+d) / (2*(a+d) + b + c)
+
+    @property
+    def sokal_sneath_iii(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (a+d) / (b+c)
+
+    @property
+    def sokal_sneath_iv(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return 0.25*((a/(a+b))+(a/(a+c))+(d/(b+d))+(d/(b+d)))
+
+    @property
+    def sokal_sneath_v(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (a*d) / ((a+b)*(a+c)*(b+d)*sqrt(c+d))
+
+    @property
+    def sorensen_dice(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return 2*(a+d) / (2*(a+d)+b+c)
+
+    @property
+    def sorgenfrei(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return a**2/((a+b)*(a+c))
+
+    @property
+    def stiles(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return log((self._n*(abs(a*d-b*c) - 0.5)**2)/((a+b)*(a+c)*(b+d)*(c+d)), 10)
+
+    @property
+    def tanimoto_i(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return a / (2*a+b+c)
+
+    @property
+    def tanimoto_ii(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return a / (b+c)
+
+    @property
+    def tarwid(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        n = self._n
+        return (n*a-(a+b)*(a+c)) / (n*a+(a+b)*(a+c))
+
+    @property
+    def tarantula(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return a*(c+d) / (c*(a+b))
+
+    @property
+    def yule_q(self):
+        """
+        Yule's Q is based off of the odds ratio or cross-product ratio, :math:`\\alpha`.
+
+        :math:`Q = \\frac{\\alpha - 1}{\\alpha + 1}`
+
+        Yule's Q is the same as Goodman-Kruskal's :math:`\\lambda` for 2 x 2 contingency tables and is also
+        a measure of proportional reduction in error (PRE).
+
+        :return: Yule's Q.
+        """
+        a, b, c, d = self.__abcd
+        return (a*d-b*c)/(a*d+b*c)
+
+    @property
+    def yule_w(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (sqrt(a*d)-sqrt(b*c))/(sqrt(a*d)+sqrt(b*c))
+
+    @property
+    def chord(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return sqrt(2*(1 - a/sqrt((a+b)*(a+c))))
+
+    @property
+    def euclid(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return sqrt(b+c)
+
+    @property
+    def hamming(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return b + c
+
+    @property
+    def hellinger(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return 2*sqrt(1-a/sqrt((a+b)*(a+c)))
 
     @property
     def jaccard_distance(self):
         """
-        `Jaccard Index <https://en.wikipedia.org/wiki/Jaccard_index>`_.
 
-        :return: Jaccard distance.
+
+        :math:``
+
+        :return:
         """
-        d = 1.0 - self.jaccard_similarity
-        return d
+        a, b, c, d = self.__abcd
+        return (b+c)/(a+b+c)
 
     @property
-    def tanimoto_similarity(self):
+    def lance_williams(self):
         """
-        `Tanimoto similarity and distance <https://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_similarity_and_distance>`_.
 
-        :return: Tanimoto similarity.
+
+        :math:``
+
+        :return:
         """
-        count_11 = self._count(self._a_1, self._b_1)
-        count_01 = self._count(self._a_0, self._b_1)
-        count_10 = self._count(self._a_1, self._b_0)
-        s = count_11 / (count_01 + count_10)
-        return s
+        a, b, c, d = self.__abcd
+        return (b+c)/(2*a+b+c)
+
+    @property
+    def mean_manhattan(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (b+c)/(a+b+c+d)
+
+    @property
+    def pattern_difference(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (4*b*c) / (a+b+c+d)**2
+
+    @property
+    def shape_difference(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (self._n*(b+c)-(b-c)**2)/(a+b+c+d)**2
+
+    @property
+    def size_difference(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (b+c)**2/(a+b+c+d)**2
+
+    @property
+    def vari(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return (b+c) / (4*(a+b+c+d))
+
+    @property
+    def yule_q_difference(self):
+        """
+
+
+        :math:``
+
+        :return:
+        """
+        a, b, c, d = self.__abcd
+        return 2*b*c/(a*d+b*c)
 
     @property
     def tanimoto_distance(self):
@@ -649,35 +1299,6 @@ class BinaryTable(CategoricalTable):
         return s
 
     @property
-    def rand_index(self):
-        """
-        `Rand Index <https://en.wikipedia.org/wiki/Rand_index>`_.
-
-        :return: Rand Index.
-        """
-        tp = self._count(self._a_1, self._b_1)
-        fp = self._count(self._a_0, self._b_1)
-        fn = self._count(self._a_1, self._b_0)
-        tn = self._count(self._a_0, self._b_0)
-        s = (tp + tn) / (tp + fp + fn + tn)
-        return s
-
-    @property
-    def fowlkes_mallows_index(self):
-        """
-        `Fowlkes-Mallows Index <https://en.wikipedia.org/wiki/Fowlkes%E2%80%93Mallows_index>`_ is
-        typically used to judge the similarity between two clusters. A larger value indicates
-        that the clusters are more similar.
-
-        :return: Fowlkes-Mallows Index.
-        """
-        tp = self._count(self._a_1, self._b_1)
-        fp = self._count(self._a_0, self._b_1)
-        fn = self._count(self._a_1, self._b_0)
-        s = sqrt((tp / (tp + fp)) * (tp / (tp + fn)))
-        return s
-
-    @property
     def mcnemar_test(self):
         """
         `McNemar's test <https://en.wikipedia.org/wiki/McNemar%27s_test>`_.
@@ -707,22 +1328,6 @@ class BinaryTable(CategoricalTable):
         return ratio
 
     @property
-    def yule_q(self):
-        """
-        Yule's Q is based off of the odds ratio or cross-product ratio, :math:`\\alpha`.
-
-        :math:`Q = \\frac{\\alpha - 1}{\\alpha + 1}`
-
-        Yule's Q is the same as Goodman-Kruskal's :math:`\\lambda` for 2 x 2 contingency tables and is also
-        a measure of proportional reduction in error (PRE).
-
-        :return: Yule's Q.
-        """
-        alpha = self.odds_ratio
-        q = (alpha - 1) / (alpha + 1)
-        return q
-
-    @property
     def yule_y(self):
         """
         Yule's Y is based off of the odds ratio or cross-product ratio, :math:`\\alpha`.
@@ -736,7 +1341,7 @@ class BinaryTable(CategoricalTable):
         return q
 
     @property
-    def tetrachoric_correlation(self):
+    def tetrachoric(self):
         """
         Tetrachoric correlation ranges from :math:`[0, 1]`, where 0 indicates no agreement and
         1 indicates perfect agreement.
@@ -749,17 +1354,17 @@ class BinaryTable(CategoricalTable):
 
         :return: Tetrachoric correlation.
         """
-        n_00 = self._count(self._a_0, self._b_0)
-        n_01 = self._count(self._a_0, self._b_1)
-        n_10 = self._count(self._a_1, self._b_0)
-        n_11 = self._count(self._a_1, self._b_1)
+        d = self._count(self._a_0, self._b_0)
+        c = self._count(self._a_0, self._b_1)
+        b = self._count(self._a_1, self._b_0)
+        a = self._count(self._a_1, self._b_1)
 
-        if n_10 == 0 or n_01 == 0:
+        if b == 0 or c == 0:
             return 1.0
-        if n_00 == 0 or n_11 == 0:
+        if d == 0 or a == 0:
             return -1.0
 
-        y = pow((n_00 * n_11) / (n_10 * n_01), pi / 4.0)
+        y = pow((d * a) / (b * c), pi / 4.0)
         p = (y - 1) / (y + 1)
         return p
 

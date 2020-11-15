@@ -66,7 +66,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{a}{(a+b)(a+c)}`
    * - Dennis
      - :math:`\frac{ad-bc}{\sqrt{n(a+b)(a+c)}}`
-   * - Dice;Czekanowski;Nei-Li
+   * - Dice; Czekanowski; Nei-Li
      - :math:`\frac{2a}{2a+b+c}`
    * - Disperson
      - :math:`\frac{ad-bc}{(a+b+c+d)^2}`
@@ -118,9 +118,9 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{4(ad-bc)}{(a+d)^2+(b+c)^2}`
    * - Mountford
      - :math:`\frac{a}{0.5(ab + ac) + bc}`
-   * - Ochiai-I;Otsuka
+   * - Ochiai-I :cite:`2020:stack-sim`; Otsuka; Fowlkes-Mallows Index :cite:`2020:wiki-fowlkes`
      - :math:`\frac{a}{\sqrt{(a+b)(a+c)}}`
-   * - Ochiai :cite:`2020:stack-sim`
+   * -
      - :math:`\sqrt{\frac{a}{a + b}\frac{a}{a + c}}`
    * - Ochiai-II
      - :math:`\frac{ad}{\sqrt{(a+b)(a+c)(b+d)(c+d)}}`
@@ -144,7 +144,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{a}{a+b+c+d}`
    * - Simpson
      - :math:`\frac{a}{\min(a+b,a+c)}`
-   * - Sokal-Michener
+   * - Sokal-Michener; Rand Index
      - :math:`\frac{a+d}{a+b+c+d}`
    * - Sokal-Sneath-I
      - :math:`\frac{a}{a+2b+2c}`
@@ -170,6 +170,10 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{na - (a+b)(a+c)}{na + (a+b)(a+c)}`
    * - Tarantula
      - :math:`\frac{a(c+d)}{c(a+b)}`
+   * - Tetrachoric
+     - :math:`\frac{y-1}{y+1}`
+   * -
+     - :math:`y = \left(\frac{ad}{bc}\right)^{\frac{\pi}{4}}`
    * - Yule-Q
      - :math:`\frac{ad-bc}{ad+bc}`
    * - Yule-w
@@ -184,7 +188,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\sqrt{2\left(1 - \frac{a}{\sqrt{(a+b)(a+c)}}\right)}`
    * - Euclid
      - :math:`\sqrt{b+c}`
-   * - Hamming;Canberra;Manhattan;Cityblock;Minkowski
+   * - Hamming; Canberra; Manhattan; Cityblock; Minkowski
      - :math:`b+c`
    * - Hellinger
      - :math:`2\sqrt{1 - \frac{a}{\sqrt{(a+b)(a+c)}}}`

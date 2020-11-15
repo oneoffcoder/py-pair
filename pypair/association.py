@@ -199,7 +199,7 @@ def tetrachoric(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
     :param b_1: One value for b. Default is 1.
     :return: Tetrachoric correlation.
     """
-    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).tetrachoric_correlation
+    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).tetrachoric
 
 
 def __get_concordance(x, y):

@@ -94,7 +94,7 @@ def test_binary_table_creation():
     print(table.mcnemar_test)
     print(table.odds_ratio)
     print(table.contingency_coefficient)
-    print(table.tetrachoric_correlation)
+    print(table.tetrachoric)
     print(table.goodman_kruskal_lambda)
     print(table.goodman_kruskal_lambda_reversed)
     print(table.tschuprow_t)
