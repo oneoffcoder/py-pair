@@ -6,7 +6,7 @@ Let's go into some association measures in more details.
 Binary association
 ------------------
 
-The association between binary variables have been studied prolifically in the last 100 years :cite:`2010:choi,1970:cox,1984:reynolds,2020:ibm-proximities`. A binary variable has only two values. It is typical to re-encode these values into 0 or 1. How and why each of these two values are mapped to 0 or 1 is subjective, arbitrary and/or context-specific. For example, if we have a variable that captures the handedness, favoring left or right hand, of a person, we could map left to 0 and right to 1, or, left to 1 and right to 0. The 0-1 value representation of a binary variable's values is the common foundation for understanding association. Below is a contingency table created from two binary variables. Notice the main values of the tables are `a`, `b`, `c` and `d`.
+The association between binary variables have been studied prolifically in the last 100 years :cite:`2010:choi,1970:cox,1984:reynolds,2019:warrens,2020:ibm-proximities`. A binary variable has only two values. It is typical to re-encode these values into 0 or 1. How and why each of these two values are mapped to 0 or 1 is subjective, arbitrary and/or context-specific. For example, if we have a variable that captures the handedness, favoring left or right hand, of a person, we could map left to 0 and right to 1, or, left to 1 and right to 0. The 0-1 value representation of a binary variable's values is the common foundation for understanding association. Below is a contingency table created from two binary variables. Notice the main values of the tables are `a`, `b`, `c` and `d`.
 
 - :math:`a = N_{11}` is the count of when the two variables have a value of 1
 - :math:`b = N_{10}` is the count of when the row variable has a value of 1 and the column variable has a value of 0
@@ -43,7 +43,7 @@ In :cite:`2010:choi`, there are 76 similarity and distance measures identified (
 
 If we use a contingency table to summarize a bivariate binary data, the following similarity and distance measures may be derived entirely from `a`, `b`, `c` and/or `d`. The general pattern is that similarity and distance is always a ratio. The numerator in the ratio defines what we are interested in measuring. When we have `a` and/or `d` in the numerator, it is likely we are measuring similarity; when we have `b` and/or `c` in the numerator, it is likely we are measuring distance. The denominator considers what is important in considering; is it the matches, mismatches or both? The following tables list some identified similarity and distance measures based off of 2 x 2 contingency tables.
 
-.. list-table:: Similarity measures for 2 x 2 contingency table :cite:`2010:choi,2020:psu-binary`
+.. list-table:: Similarity measures for 2 x 2 contingency table :cite:`2010:choi,2019:warrens,2020:psu-binary`
    :header-rows: 1
 
    * - Name
@@ -60,8 +60,10 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{\sqrt{ad}+a-(b+c)}{\sqrt{ad}+a+b+c}`
    * - Braun-Banquet
      - :math:`\frac{a}{\max(a+b,a+c)}`
-   * - Cole
+   * - Cole :cite:`2010:choi,2019:warrens`
      - :math:`\frac{\sqrt{2}(ad-bc)}{\sqrt{(ad-bc)^2-(a+b)(a+c)(b+d)(c+d)}}`
+   * -
+     - :math:`\frac{ad-bc}{\min((a+b)(a+c),(b+d)(c+d))}`
    * - Cosine
      - :math:`\frac{a}{(a+b)(a+c)}`
    * - Dennis
@@ -174,7 +176,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{y-1}{y+1}`
    * -
      - :math:`y = \left(\frac{ad}{bc}\right)^{\frac{\pi}{4}}`
-   * - Tverskey Index :cite:`2020:wiki-tversky`
+   * - Tversky Index :cite:`2020:wiki-tversky`
      - :math:`\frac{a}{a+\theta b+ \phi c}`
    * -
      - :math:`\theta` and :math:`\phi` are user-supplied parameters

@@ -516,13 +516,27 @@ class BinaryTable(CategoricalTable):
     @property
     @timeit
     @similarity
-    def cole(self):
+    def cole_i(self):
         """
-        Cole
+        Cole-I
 
         :math:`\\frac{\\sqrt{2}(ad-bc)}{\\sqrt{(ad-bc)^2-(a+b)(a+c)(b+d)(c+d)}}`
 
-        :return: Cole.
+        :return: Cole-I.
+        """
+        a, b, c, d = self.__abcd
+        return (2 * (a * d - b * c) ** 2) / ((a * d - b * c) ** 2 - (a + b) * (a + c) * (b + d) * (c + d))
+
+    @property
+    @timeit
+    @similarity
+    def cole_ii(self):
+        """
+        Cole-II
+
+        :math:`\\frac{ad-bc}{\\min((a+b)(a+c),(b+d)(c+d))}`
+
+        :return: Cole-II.
         """
         a, b, c, d = self.__abcd
         return (2 * (a * d - b * c) ** 2) / ((a * d - b * c) ** 2 - (a + b) * (a + c) * (b + d) * (c + d))
@@ -1524,6 +1538,24 @@ class BinaryTable(CategoricalTable):
         y = pow((d * a) / (b * c), pi / 4.0)
         p = (y - 1) / (y + 1)
         return p
+
+    @timeit
+    @similarity
+    def tversky_index(self, theta=1, phi=0):
+        """
+        Compute's Tversky's Index.
+
+        :math:`\\frac{a}{a+\\theta b+\\phi c}`
+
+        :math:`\\theta` and :math:`\\phi` are typically between :math:`[0,1]`
+        and :math:`\\theta + \\phi = 1`.
+
+        :param theta: Weight :math:`[0,1]` of how important match on row variable is. Default 1.
+        :param phi: Weight :math:`[0,1]` of how important match on column variable is. Default 0.
+        :return: Tversky's Index.
+        """
+        a, b, c, _ = self.__abcd
+        return a / (a + theta*b + phi*c)
 
 
 class ConfusionMatrix(BinaryTable):
