@@ -312,6 +312,24 @@ class CategoricalTable(ContingencyTable):
         s = top / bot
         return s
 
+    @lru_cache(maxsize=None)
+    def get(self, measure):
+        """
+        Gets the specified statistic.
+
+        :param measure: Name of statistic (association measure).
+        :return: Measure.
+        """
+        return getattr(self, measure)
+
+    @staticmethod
+    def get_measures():
+        is_property = lambda v: isinstance(v, property)
+        is_method = lambda n: not n.startswith('_CategoricalTable')
+        is_valid = lambda n, v: is_property(v) and is_method(n)
+        measures = sorted([n for n, v in vars(CategoricalTable).items() if is_valid(n, v)])
+        return measures
+
 
 class AgreementTable(CategoricalTable):
     """

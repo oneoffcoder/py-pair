@@ -150,7 +150,7 @@ def biserial(b, c, b_0=0, b_1=1):
 
 def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
     """
-    Gets the binary-binary measure of association.
+    Gets the binary-binary association.
 
     :param a: Binary variable (iterable).
     :param b: Binary variable (iterable).
@@ -166,29 +166,20 @@ def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
     return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
 
 
-def phi_coefficient(a, b):
+def categorical_categorical(a, b, measure='chisq', a_vals=None, b_vals=None):
     """
-    Computes the :math:`\\phi` coefficient.
+    Gets the categorical-categorical association.
 
-    :param a: Categorical data (iterable).
-    :param b: Categorical data (iterable).
-    :return: :math:`\\phi`.
+    :param a: Categorical variable (iterable).
+    :param b: Categorical variable (iterable).
+    :param measure: Measure. Default is `chisq`.
+    :param a_vals: The unique values in `a`.
+    :param b_vals: The unique values in `b`.
+    :return: Measure.
     """
-    return CategoricalTable(a, b).phi
-
-
-def goodman_kruskal_lambda(a, b):
-    """
-    Computes Goodman-Kruskal's :math:`\\lambda_{A|B}`. Requires two categorical variables `A` and `B`.
-    :math:`\\lambda_{A|B}` is the proportional reduction in error (PRE) of `A` knowing (given) `B`.
-    In general, :math:`\\lambda_{A|B} \\neq \\lambda_{B|A}`, and so this association measure
-    is `asymmetric`.
-
-    :param a: Categorical data (iterable).
-    :param b: Categorical data (iterable).
-    :return: :math:`\\lambda`.
-    """
-    return CategoricalTable(a, b).goodman_kruskal_lambda
+    if measure not in CategoricalTable.get_measures():
+        raise ValueError(f'{measure} is not a valid association measure.')
+    return CategoricalTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
 
 
 def __get_concordance(x, y):
