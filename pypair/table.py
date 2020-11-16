@@ -40,13 +40,9 @@ class CategoricalTable(ContingencyTable):
         df = pd.DataFrame([(x, y) for x, y in zip(a, b)], columns=['a', 'b'])
 
         if a_vals is None:
-            pass
-        else:
             a_vals = sorted(list(df.a.unique()))
 
         if b_vals is None:
-            pass
-        else:
             b_vals = sorted(list(df.b.unique()))
 
         observed = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] for y in b_vals] for x in a_vals]
@@ -1278,7 +1274,7 @@ class BinaryTable(CategoricalTable):
 
         :return: Tanimoto distance.
         """
-        d = -log2(self.tanimoto_similarity)
+        d = -log2(self.roger_tanimoto)
         return d
 
     @property
