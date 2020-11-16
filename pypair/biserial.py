@@ -4,15 +4,29 @@ from math import sqrt
 import pandas as pd
 from scipy.stats import norm
 
+from pypair.util import get_measures
+
 
 class Biserial(object):
+    """
+    Biserial association between a binary and continuous variable.
+    """
+
     def __init__(self, b, c, b_0=0, b_1=1):
+        """
+        ctor.
+
+        :param b: Binary variable (iterable).
+        :param c: Continuous variable (iterable).
+        :param b_0: Value for b is zero. Default 0.
+        :param b_1: Value for b is one. Default 1.
+        """
         self.__df = pd.DataFrame([(x, y) for x, y in zip(b, c) if pd.notna(x)], columns=['b', 'c'])
         self.__b_0 = b_0
         self.__b_1 = b_1
 
     @property
-    @lru_cache(max_size=None)
+    @lru_cache(maxsize=None)
     def __params(self):
         """
         Gets the parameters associated with the data.
@@ -36,7 +50,7 @@ class Biserial(object):
         return n, p, q, y_0, y_1, std
 
     @property
-    @lru_cache(max_size=None)
+    @lru_cache(maxsize=None)
     def biserial(self):
         """
         Computes the biserial correlation between a binary and continuous variable. The biserial correlation
@@ -71,7 +85,7 @@ class Biserial(object):
         return r_b
 
     @property
-    @lru_cache(max_size=None)
+    @lru_cache(maxsize=None)
     def point_biserial(self):
         """
         Computes the `point-biserial correlation coefficient <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm>`_
@@ -95,7 +109,7 @@ class Biserial(object):
         return r
 
     @property
-    @lru_cache(max_size=None)
+    @lru_cache(maxsize=None)
     def rank_biserial(self):
         """
         Computes the rank-biserial correlation between a binary variable :math:`X` and a continuous variable :math:`Y`.
@@ -114,3 +128,22 @@ class Biserial(object):
 
         r = 2 * (y_1 - y_0) / n
         return r
+
+    @lru_cache(maxsize=None)
+    def get(self, measure):
+        """
+        Gets the specified statistic.
+
+        :param measure: Name of statistic (association measure).
+        :return: Measure.
+        """
+        return getattr(self, measure)
+
+    @staticmethod
+    def get_measures():
+        """
+        Gets all the available measures.
+
+        :return: List of measures.
+        """
+        return get_measures('_Biserial', Biserial)

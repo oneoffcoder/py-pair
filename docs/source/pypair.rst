@@ -17,6 +17,17 @@ These are the basic contingency tables used to analyze categorical data.
     :show-inheritance:
     :special-members: __init__
 
+Biserial
+--------
+
+These are the biserial association measures.
+
+.. automodule:: pypair.biserial
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :special-members: __init__
+
 Associations
 ------------
 
@@ -34,6 +45,17 @@ Decorators
 These are decorators.
 
 .. automodule:: pypair.decorator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :special-members: __init__
+
+Utility
+-------
+
+These are utility functions.
+
+.. automodule:: pypair.util
     :members:
     :undoc-members:
     :show-inheritance:

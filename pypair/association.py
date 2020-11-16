@@ -1,6 +1,7 @@
 from functools import reduce
 from itertools import combinations
 
+from pypair.biserial import Biserial
 from pypair.table import BinaryTable, CategoricalTable
 
 
@@ -66,6 +67,22 @@ def categorical_categorical(a, b, measure='chisq', a_vals=None, b_vals=None):
     if measure not in CategoricalTable.get_measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return CategoricalTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
+
+
+def binary_continuous(b, c, measure='biserial', b_0=0, b_1=1):
+    """
+    Gets the binary-continuous association.
+
+    :param b: Binary variable (iterable).
+    :param c: Continuous variable (iterable).
+    :param measure: Measure. Default is `biserial`.
+    :param b_0: Value when `b` is zero. Default 0.
+    :param b_1: Value when `b` is one. Default is 1.
+    :return: Measure.
+    """
+    if measure not in Biserial.get_measures():
+        raise ValueError(f'{measure} is not a valid association measure.')
+    return Biserial(b, c, b_0=b_0, b_1=b_1).get(measure)
 
 
 def __get_concordance(x, y):
