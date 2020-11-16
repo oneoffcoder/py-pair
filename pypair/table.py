@@ -8,6 +8,7 @@ from scipy import stats
 from scipy.special import binom
 
 from pypair.decorator import timeit, similarity, distance
+from pypair.util import get_measures
 
 
 class ContingencyTable(ABC):
@@ -324,11 +325,7 @@ class CategoricalTable(ContingencyTable):
 
     @staticmethod
     def get_measures():
-        is_property = lambda v: isinstance(v, property)
-        is_method = lambda n: not n.startswith('_CategoricalTable')
-        is_valid = lambda n, v: is_property(v) and is_method(n)
-        measures = sorted([n for n, v in vars(CategoricalTable).items() if is_valid(n, v)])
-        return measures
+        return get_measures('_CategoricalTable', CategoricalTable)
 
 
 class AgreementTable(CategoricalTable):
@@ -1771,11 +1768,7 @@ class BinaryMeasures(object):
 
         :return: List of association measures.
         """
-        is_property = lambda v: isinstance(v, property)
-        is_method = lambda n: not n.startswith('_BinaryMeasures')
-        is_valid = lambda n, v: is_property(v) and is_method(n)
-        measures = sorted([n for n, v in vars(BinaryMeasures).items() if is_valid(n, v)])
-        return measures
+        return get_measures('_BinaryMeasures', BinaryMeasures)
 
 
 class BinaryTable(CategoricalTable):
@@ -2280,11 +2273,7 @@ class CmMeasures(object):
 
         :return: List of measures.
         """
-        is_property = lambda v: isinstance(v, property)
-        is_method = lambda n: not n.startswith('_CmMeasures')
-        is_valid = lambda n, v: is_property(v) and is_method(n)
-        measures = sorted([n for n, v in vars(CmMeasures).items() if is_valid(n, v)])
-        return measures
+        return get_measures('_CmMeasures', CmMeasures)
 
 
 class ConfusionMatrix(BinaryTable):
