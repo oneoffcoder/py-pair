@@ -919,7 +919,7 @@ class BinaryTable(CategoricalTable):
         """
         Russel-Rao
 
-        :math:`\frac{a}{a+b+c+d}`
+        :math:`\\frac{a}{a+b+c+d}`
 
         :return: Russel-Rao.
         """
@@ -929,7 +929,7 @@ class BinaryTable(CategoricalTable):
     @property
     def simpson(self):
         """
-        Simpson
+        Simpson (or `Overlap <https://en.wikipedia.org/wiki/Overlap_coefficient>`_).
 
         :math:`\\frac{a}{\\min(a+b,a+c)}`
 

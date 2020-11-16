@@ -1,7 +1,7 @@
 Introduction
 ============
 
-PyPair is a statistical library to compute pairwise association between any two variables. A reasonable taxonomy of variable types in statistics is as follows :cite:`2020:uom,2020:idre,2020:laerd,2020:graphpad`.
+PyPair is a statistical library to compute pairwise association between any two variables. A reasonable taxonomy of variable types in statistics is as follows :cite:`2020:uom,2020:idre,2020:laerd,2020:graphpad,2020:minitab`.
 
 - Categorical: A variable whose values have no intrinsic ordering. An example is a variable indicating the continents: North America, South America, Asia, Arctic, Antarctica, Africa and Europe. There is no ordering to these continents; we cannot say North America comes before Africa. Categorical variables are also referred to as `qualitative` variables.
     - Binary: A categorical variable that has only 2 values. An example is a variable indicating whether or not someone likes to eat pizza; the values could be ``yes`` or ``no``. It is common to encode the binary values to ``0`` and ``1`` for storage and numerical convenience, but do not be fooled, there is still no numerical ordering. These variables are also referred to in the wild as `dichotomous` variables.
@@ -25,7 +25,7 @@ PyPair is a statistical library to compute pairwise association between any two 
 
 Assuming we have data and we know the variable types in this data using the taxonomy above, we might want to make a progression of analyses from univariate, bivariate and to multivariate analyses. Along the way, for bivariate analysis, we are often curious about the association between any two pairs of variables. We want to know both the magnitude (the strength, is it small or big?) and direction (the sign, is it positive or negative?) of the association. When the variables are all of the same type, association measures may be abound to conduct pairwise association; if all the variables are continuous, we might just want to apply canonical Pearson correlation.
 
-The tough situation is when we have a mixed variable type of dataset; and this tough situation is quite often the normal situation. How do we find the association between a continuous and categorical variable? We can create a table as below to map the available association measures for any two types of variables :cite:`2020:calkins`. (In the table below, we collapse all continuous variable types into one).
+The tough situation is when we have a mixed variable type of dataset; and this tough situation is quite often the normal situation. How do we find the association between a continuous and categorical variable? We can create a table as below to map the available association measures for any two types of variables :cite:`2020:calkins,2020:psu-continuous`. (In the table below, we collapse all continuous variable types into one).
 
 .. raw:: html
 
