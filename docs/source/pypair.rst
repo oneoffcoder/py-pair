@@ -26,3 +26,14 @@ Some of the functions here are just wrappers around the contingency tables and m
     :undoc-members:
     :show-inheritance:
     :special-members: __init__
+
+Decorators
+----------
+
+These are decorators.
+
+.. automodule:: pypair.decorator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :special-members: __init__
