@@ -452,7 +452,7 @@ class BinaryTable(CategoricalTable):
         :return: Ample.
         """
         a, b, c, d = self.__abcd
-        return abs((a*(c+d))/(c*(a+b)))
+        return abs((a * (c + d)) / (c * (a + b)))
 
     @property
     def anderberg(self):
@@ -511,7 +511,7 @@ class BinaryTable(CategoricalTable):
         :return: Cole.
         """
         a, b, c, d = self.__abcd
-        return (sqrt(2) * (a * d - b * c)) / sqrt((a * d - b * c)**2 - (a+b) * (a+c) * (b+d) * (c+d))
+        return (sqrt(2) * (a * d - b * c)) / sqrt((a * d - b * c) ** 2 - (a + b) * (a + c) * (b + d) * (c + d))
 
     @property
     def cosine(self):
@@ -523,7 +523,7 @@ class BinaryTable(CategoricalTable):
         :return: Cosine.
         """
         a, b, c, d = self.__abcd
-        return a / ((a+b) * (a+c))
+        return a / ((a + b) * (a + c))
 
     @property
     def dennis(self):
@@ -535,7 +535,7 @@ class BinaryTable(CategoricalTable):
         :return: Dennis.
         """
         a, b, c, d = self.__abcd
-        return (a*d - b*c) / sqrt(self._n*(a+b)*(a+c))
+        return (a * d - b * c) / sqrt(self._n * (a + b) * (a + c))
 
     @property
     def dice(self):
@@ -547,7 +547,7 @@ class BinaryTable(CategoricalTable):
         :return: Dice.
         """
         a, b, c, d = self.__abcd
-        return (2 * a) / (2*a + b + c)
+        return (2 * a) / (2 * a + b + c)
 
     @property
     def disperson(self):
@@ -559,7 +559,7 @@ class BinaryTable(CategoricalTable):
         :return: Disperson.
         """
         a, b, c, d = self.__abcd
-        return (a*d - b*c) / (a+b+c+d) ** 2
+        return (a * d - b * c) / (a + b + c + d) ** 2
 
     @property
     def driver_kroeber(self):
@@ -571,7 +571,7 @@ class BinaryTable(CategoricalTable):
         :return: Driver-Kroeber.
         """
         a, b, c, d = self.__abcd
-        return (a / 2) * ((1/(a+b))+(1/(a+c)))
+        return (a / 2) * ((1 / (a + b)) + (1 / (a + c)))
 
     @property
     def eyraud(self):
@@ -583,7 +583,7 @@ class BinaryTable(CategoricalTable):
         :return: Eyraud.
         """
         a, b, c, d = self.__abcd
-        return (self._n**2 * (self._n * a - (a+b)*(a+c))) / ((a+b)*(a+c)*(b+d)*(c+d))
+        return (self._n ** 2 * (self._n * a - (a + b) * (a + c))) / ((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
     def fager_mcgowan(self):
@@ -595,7 +595,7 @@ class BinaryTable(CategoricalTable):
         :return: Fager-McGowan.
         """
         a, b, c, d = self.__abcd
-        return a/sqrt((a+b)*(a+c)) - max(a+b, a+c)/2
+        return a / sqrt((a + b) * (a + c)) - max(a + b, a + c) / 2
 
     @property
     def faith(self):
@@ -607,7 +607,7 @@ class BinaryTable(CategoricalTable):
         :return: Faith.
         """
         a, b, c, d = self.__abcd
-        return (a+0.5*d) / (a+b+c+d)
+        return (a + 0.5 * d) / (a + b + c + d)
 
     @property
     def forbes_ii(self):
@@ -619,7 +619,7 @@ class BinaryTable(CategoricalTable):
         :return: Forbes-II.
         """
         a, b, c, d = self.__abcd
-        return (self._n*a - (a+b)*(a+c)) / (self._n*min(a+b,a+c) - (a+b)*(a+c))
+        return (self._n * a - (a + b) * (a + c)) / (self._n * min(a + b, a + c) - (a + b) * (a + c))
 
     @property
     def forbesi(self):
@@ -631,7 +631,7 @@ class BinaryTable(CategoricalTable):
         :return: Forbesi.
         """
         a, b, c, d = self.__abcd
-        return (self._n * a) / ((a+b)*(a+c))
+        return (self._n * a) / ((a + b) * (a + c))
 
     @property
     def fossum(self):
@@ -643,7 +643,7 @@ class BinaryTable(CategoricalTable):
         :return: Fossum.
         """
         a, b, c, d = self.__abcd
-        return (self._n*(a-0.5)**2) / ((a+b)*(a+c))
+        return (self._n * (a - 0.5) ** 2) / ((a + b) * (a + c))
 
     @property
     def gilbert_wells(self):
@@ -655,7 +655,7 @@ class BinaryTable(CategoricalTable):
         :return: Gilbert-Wells.
         """
         a, b, c, d = self.__abcd
-        return log(a) - log(self._n) - log((a+b)/self._n) - log((a+c)/self._n)
+        return log(a) - log(self._n) - log((a + b) / self._n) - log((a + c) / self._n)
 
     @property
     def goodman_kruskal(self):
@@ -678,7 +678,7 @@ class BinaryTable(CategoricalTable):
         :return: Gower.
         """
         a, b, c, d = self.__abcd
-        return (a+d) / sqrt((a+b)*(a+c)*(b+d)*(c+d))
+        return (a + d) / sqrt((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
     def gower_legendre(self):
@@ -690,7 +690,7 @@ class BinaryTable(CategoricalTable):
         :return: Gower-Legendre.
         """
         a, b, c, d = self.__abcd
-        return (a+d) / (a + 0.5*(b+c) + d)
+        return (a + d) / (a + 0.5 * (b + c) + d)
 
     @property
     def hamann(self):
@@ -702,7 +702,7 @@ class BinaryTable(CategoricalTable):
         :return: Hamann.
         """
         a, b, c, d = self.__abcd
-        return ((a+d)-(b+c)) / (a+b+c+d)
+        return ((a + d) - (b + c)) / (a + b + c + d)
 
     @property
     def inner_product(self):
@@ -738,7 +738,7 @@ class BinaryTable(CategoricalTable):
         :return: Jaccard.
         """
         a, b, c, d = self.__abcd
-        return a / (a+b+c)
+        return a / (a + b + c)
 
     @property
     def johnson(self):
@@ -750,7 +750,7 @@ class BinaryTable(CategoricalTable):
         :return: Johnson.
         """
         a, b, c, d = self.__abcd
-        return a/(a+b) + a/(a+c)
+        return a / (a + b) + a / (a + c)
 
     @property
     def kulczynski_i(self):
@@ -762,7 +762,7 @@ class BinaryTable(CategoricalTable):
         :return: Kulczynski-I.
         """
         a, b, c, d = self.__abcd
-        return a / (b+c)
+        return a / (b + c)
 
     @property
     def kulcyznski_ii(self):
@@ -774,7 +774,7 @@ class BinaryTable(CategoricalTable):
         :return: Kulczynski-II.
         """
         a, b, c, d = self.__abcd
-        return 0.5*((a/(a+b)) * (a/(a+c)))
+        return 0.5 * ((a / (a + b)) * (a / (a + c)))
 
     @property
     def mcconnaughey(self):
@@ -786,7 +786,7 @@ class BinaryTable(CategoricalTable):
         :return: McConnaughey.
         """
         a, b, c, d = self.__abcd
-        return (a**2-b*c) / ((a+d)**2+(b+c)**2)
+        return (a ** 2 - b * c) / ((a + d) ** 2 + (b + c) ** 2)
 
     @property
     def michael(self):
@@ -798,7 +798,7 @@ class BinaryTable(CategoricalTable):
         :return: Michael.
         """
         a, b, c, d = self.__abcd
-        return (4*(a*d-b*c)) / ((a+d)**2 + (b+c)**2)
+        return (4 * (a * d - b * c)) / ((a + d) ** 2 + (b + c) ** 2)
 
     @property
     def mountford(self):
@@ -810,7 +810,7 @@ class BinaryTable(CategoricalTable):
         :return: Mountford.
         """
         a, b, c, d = self.__abcd
-        return a / (0.5*(a*b+a*c)+b*c)
+        return a / (0.5 * (a * b + a * c) + b * c)
 
     @property
     def ochia_i(self):
@@ -826,7 +826,7 @@ class BinaryTable(CategoricalTable):
         :return: Ochai-I.
         """
         a, b, c, d = self.__abcd
-        return sqrt((a/(a+b))*(a/(a+c)))
+        return sqrt((a / (a + b)) * (a / (a + c)))
 
     @property
     def ochia_ii(self):
@@ -838,7 +838,7 @@ class BinaryTable(CategoricalTable):
         :return: Ochia-II.
         """
         a, b, c, d = self.__abcd
-        return (a*d) / sqrt((a+b)*(a+c)*(b+d)*(c+d))
+        return (a * d) / sqrt((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
     def pearson_heron_i(self):
@@ -850,7 +850,7 @@ class BinaryTable(CategoricalTable):
         :return: Pearson-Heron-I.
         """
         a, b, c, d = self.__abcd
-        return (a*d-b*c) / sqrt((a+b)*(a+c)*(b+d)*(c+d))
+        return (a * d - b * c) / sqrt((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
     def pearson_heron_ii(self):
@@ -862,7 +862,7 @@ class BinaryTable(CategoricalTable):
         :return: Pearson-Heron-II.
         """
         a, b, c, d = self.__abcd
-        return cos((pi * sqrt(b*c))/(sqrt(a*d)+sqrt(b*c)))
+        return cos((pi * sqrt(b * c)) / (sqrt(a * d) + sqrt(b * c)))
 
     @property
     def pearson_i(self):
@@ -874,7 +874,7 @@ class BinaryTable(CategoricalTable):
         :return: Pearson-I.
         """
         a, b, c, d = self.__abcd
-        return (self._n*(a*d-b*c)**2) / ((a+b)*(a+c)*(c+d)*(b+d))
+        return (self._n * (a * d - b * c) ** 2) / ((a + b) * (a + c) * (c + d) * (b + d))
 
     @property
     def person_ii(self):
@@ -900,7 +900,7 @@ class BinaryTable(CategoricalTable):
         :return: Peirce.
         """
         a, b, c, d = self.__abcd
-        return (a*b+b*c) / (a*b+2*b*c+c*d)
+        return (a * b + b * c) / (a * b + 2 * b * c + c * d)
 
     @property
     def roger_tanimoto(self):
@@ -912,7 +912,7 @@ class BinaryTable(CategoricalTable):
         :return: Roger-Tanimoto.
         """
         a, b, c, d = self.__abcd
-        return (a+d) / (a+2*(b+c)+d)
+        return (a + d) / (a + 2 * (b + c) + d)
 
     @property
     def russel_rao(self):
@@ -924,7 +924,7 @@ class BinaryTable(CategoricalTable):
         :return: Russel-Rao.
         """
         a, b, c, d = self.__abcd
-        return a / (a+b+c+d)
+        return a / (a + b + c + d)
 
     @property
     def simpson(self):
@@ -936,7 +936,7 @@ class BinaryTable(CategoricalTable):
         :return: Simpson.
         """
         a, b, c, d = self.__abcd
-        return a / min(a+b,a+c)
+        return a / min(a + b, a + c)
 
     @property
     def sokal_michener(self):
@@ -948,7 +948,7 @@ class BinaryTable(CategoricalTable):
         :return: Sokal-Michener.
         """
         a, b, c, d = self.__abcd
-        return (a+d)/(a+b+c+d)
+        return (a + d) / (a + b + c + d)
 
     @property
     def sokal_sneath_i(self):
@@ -961,7 +961,7 @@ class BinaryTable(CategoricalTable):
         :return: Sokal-Sneath-I.
         """
         a, b, c, d = self.__abcd
-        return a / (a+2*(b+c))
+        return a / (a + 2 * (b + c))
 
     @property
     def sokal_sneath_ii(self):
@@ -973,7 +973,7 @@ class BinaryTable(CategoricalTable):
         :return: Sokal-Sneath-II.
         """
         a, b, c, d = self.__abcd
-        return 2*(a+d) / (2*(a+d) + b + c)
+        return 2 * (a + d) / (2 * (a + d) + b + c)
 
     @property
     def sokal_sneath_iii(self):
@@ -985,7 +985,7 @@ class BinaryTable(CategoricalTable):
         :return: Sokal-Sneath-III.
         """
         a, b, c, d = self.__abcd
-        return (a+d) / (b+c)
+        return (a + d) / (b + c)
 
     @property
     def sokal_sneath_iv(self):
@@ -997,7 +997,7 @@ class BinaryTable(CategoricalTable):
         :return: Sokal-Sneath-IV.
         """
         a, b, c, d = self.__abcd
-        return 0.25*((a/(a+b))+(a/(a+c))+(d/(b+d))+(d/(b+d)))
+        return 0.25 * ((a / (a + b)) + (a / (a + c)) + (d / (b + d)) + (d / (b + d)))
 
     @property
     def sokal_sneath_v(self):
@@ -1009,7 +1009,7 @@ class BinaryTable(CategoricalTable):
         :return: Sokal-Sneath-V.
         """
         a, b, c, d = self.__abcd
-        return (a*d) / ((a+b)*(a+c)*(b+d)*sqrt(c+d))
+        return (a * d) / ((a + b) * (a + c) * (b + d) * sqrt(c + d))
 
     @property
     def sorensen_dice(self):
@@ -1021,7 +1021,7 @@ class BinaryTable(CategoricalTable):
         :return: Sørensen–Dice,
         """
         a, b, c, d = self.__abcd
-        return 2*(a+d) / (2*(a+d)+b+c)
+        return 2 * (a + d) / (2 * (a + d) + b + c)
 
     @property
     def sorgenfrei(self):
@@ -1033,7 +1033,7 @@ class BinaryTable(CategoricalTable):
         :return: Sorgenfrei.
         """
         a, b, c, d = self.__abcd
-        return a**2/((a+b)*(a+c))
+        return a ** 2 / ((a + b) * (a + c))
 
     @property
     def stiles(self):
@@ -1045,7 +1045,7 @@ class BinaryTable(CategoricalTable):
         :return: Stiles.
         """
         a, b, c, d = self.__abcd
-        return log((self._n*(abs(a*d-b*c) - 0.5)**2)/((a+b)*(a+c)*(b+d)*(c+d)), 10)
+        return log((self._n * (abs(a * d - b * c) - 0.5) ** 2) / ((a + b) * (a + c) * (b + d) * (c + d)), 10)
 
     @property
     def tanimoto_i(self):
@@ -1057,7 +1057,7 @@ class BinaryTable(CategoricalTable):
         :return: Tanimoto-I.
         """
         a, b, c, d = self.__abcd
-        return a / (2*a+b+c)
+        return a / (2 * a + b + c)
 
     @property
     def tanimoto_ii(self):
@@ -1069,7 +1069,7 @@ class BinaryTable(CategoricalTable):
         :return: Tanimoto-II.
         """
         a, b, c, d = self.__abcd
-        return a / (b+c)
+        return a / (b + c)
 
     @property
     def tarwid(self):
@@ -1082,7 +1082,7 @@ class BinaryTable(CategoricalTable):
         """
         a, b, c, d = self.__abcd
         n = self._n
-        return (n*a-(a+b)*(a+c)) / (n*a+(a+b)*(a+c))
+        return (n * a - (a + b) * (a + c)) / (n * a + (a + b) * (a + c))
 
     @property
     def tarantula(self):
@@ -1094,7 +1094,7 @@ class BinaryTable(CategoricalTable):
         :return: Tarantula.
         """
         a, b, c, d = self.__abcd
-        return a*(c+d) / (c*(a+b))
+        return a * (c + d) / (c * (a + b))
 
     @property
     def yule_q(self):
@@ -1113,7 +1113,7 @@ class BinaryTable(CategoricalTable):
         :return: Yule's Q.
         """
         a, b, c, d = self.__abcd
-        return (a*d-b*c)/(a*d+b*c)
+        return (a * d - b * c) / (a * d + b * c)
 
     @property
     def yule_w(self):
@@ -1125,7 +1125,7 @@ class BinaryTable(CategoricalTable):
         :return: Yule's w.
         """
         a, b, c, d = self.__abcd
-        return (sqrt(a*d)-sqrt(b*c))/(sqrt(a*d)+sqrt(b*c))
+        return (sqrt(a * d) - sqrt(b * c)) / (sqrt(a * d) + sqrt(b * c))
 
     @property
     def chord(self):
@@ -1137,7 +1137,7 @@ class BinaryTable(CategoricalTable):
         :return: Chord (distance).
         """
         a, b, c, d = self.__abcd
-        return sqrt(2*(1 - a/sqrt((a+b)*(a+c))))
+        return sqrt(2 * (1 - a / sqrt((a + b) * (a + c))))
 
     @property
     def euclid(self):
@@ -1149,7 +1149,7 @@ class BinaryTable(CategoricalTable):
         :return: Euclid (distance).
         """
         a, b, c, d = self.__abcd
-        return sqrt(b+c)
+        return sqrt(b + c)
 
     @property
     def hamming(self):
@@ -1173,7 +1173,7 @@ class BinaryTable(CategoricalTable):
         :return: Hellinger (distance).
         """
         a, b, c, d = self.__abcd
-        return 2*sqrt(1-a/sqrt((a+b)*(a+c)))
+        return 2 * sqrt(1 - a / sqrt((a + b) * (a + c)))
 
     @property
     def jaccard_distance(self):
@@ -1185,7 +1185,7 @@ class BinaryTable(CategoricalTable):
         :return: Jaccard (distance).
         """
         a, b, c, d = self.__abcd
-        return (b+c)/(a+b+c)
+        return (b + c) / (a + b + c)
 
     @property
     def lance_williams(self):
@@ -1197,7 +1197,7 @@ class BinaryTable(CategoricalTable):
         :return: Lance-Williams (distance).
         """
         a, b, c, d = self.__abcd
-        return (b+c)/(2*a+b+c)
+        return (b + c) / (2 * a + b + c)
 
     @property
     def mean_manhattan(self):
@@ -1209,7 +1209,7 @@ class BinaryTable(CategoricalTable):
         :return: Mean-Manhattan (distance).
         """
         a, b, c, d = self.__abcd
-        return (b+c)/(a+b+c+d)
+        return (b + c) / (a + b + c + d)
 
     @property
     def pattern_difference(self):
@@ -1221,7 +1221,7 @@ class BinaryTable(CategoricalTable):
         :return: Pattern difference (distance).
         """
         a, b, c, d = self.__abcd
-        return (4*b*c) / (a+b+c+d)**2
+        return (4 * b * c) / (a + b + c + d) ** 2
 
     @property
     def shape_difference(self):
@@ -1233,7 +1233,7 @@ class BinaryTable(CategoricalTable):
         :return: Shape difference (distance).
         """
         a, b, c, d = self.__abcd
-        return (self._n*(b+c)-(b-c)**2)/(a+b+c+d)**2
+        return (self._n * (b + c) - (b - c) ** 2) / (a + b + c + d) ** 2
 
     @property
     def size_difference(self):
@@ -1245,7 +1245,7 @@ class BinaryTable(CategoricalTable):
         :return: Size difference (distance).
         """
         a, b, c, d = self.__abcd
-        return (b+c)**2/(a+b+c+d)**2
+        return (b + c) ** 2 / (a + b + c + d) ** 2
 
     @property
     def vari(self):
@@ -1257,7 +1257,7 @@ class BinaryTable(CategoricalTable):
         :return: Vari (distance).
         """
         a, b, c, d = self.__abcd
-        return (b+c) / (4*(a+b+c+d))
+        return (b + c) / (4 * (a + b + c + d))
 
     @property
     def yule_q_difference(self):
@@ -1269,7 +1269,7 @@ class BinaryTable(CategoricalTable):
         :return: Yule's q (distance).
         """
         a, b, c, d = self.__abcd
-        return 2*b*c/(a*d+b*c)
+        return 2 * b * c / (a * d + b * c)
 
     @property
     def tanimoto_distance(self):

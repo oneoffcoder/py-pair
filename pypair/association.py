@@ -12,6 +12,7 @@ class Concordance(object):
     """
     Stores the concordance, discordant and tie counts.
     """
+
     def __init__(self, d, t, t_x, t_y, c):
         """
         ctor.
