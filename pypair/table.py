@@ -963,7 +963,7 @@ class BinaryTable(CategoricalTable):
 
         :return: Pearson-II.
         """
-        chisq = self.person_ii
+        chisq = self.chisq
         return sqrt(chisq / (self._n + chisq))
 
     @property

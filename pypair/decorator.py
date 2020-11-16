@@ -12,7 +12,7 @@ def timeit(f):
         start = time.time()
         output = f(*args, **kwargs)
         diff = time.time() - start
-        print(f'{f.__name__}: {diff}')
+        # print(f'{f.__name__}: {diff}')
         return output
 
     return wrapper
