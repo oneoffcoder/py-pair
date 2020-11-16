@@ -7,6 +7,8 @@ import pandas as pd
 from scipy import stats
 from scipy.special import binom
 
+from pypair.decorator import timeit, similarity, distance
+
 
 class ContingencyTable(ABC):
     """
@@ -407,6 +409,7 @@ class BinaryTable(CategoricalTable):
         return self.__a, self.__b, self.__c, self.__d
 
     @property
+    @timeit
     def __sigma(self):
         """
         Gets :math:`\\max(a, b) + \\max(c, d) + \\max(a, c) + \\max(b, d)`.
@@ -417,6 +420,7 @@ class BinaryTable(CategoricalTable):
         return max(a, b) + max(c, d) + max(a, c) + max(b, d)
 
     @property
+    @timeit
     def __sigma_prime(self):
         """
         Gets :math:`\\max(a + c, b + d) + \\max(a + b, c + d)`.
@@ -427,6 +431,8 @@ class BinaryTable(CategoricalTable):
         return max(a + c, b + d) + max(a + b, c + d)
 
     @property
+    @timeit
+    @similarity
     def jaccard_3w(self):
         """
         3W-Jaccard
@@ -439,6 +445,8 @@ class BinaryTable(CategoricalTable):
         return 3 * a / (3 * a + b + c)
 
     @property
+    @timeit
+    @similarity
     def ample(self):
         """
         Ample
@@ -451,6 +459,8 @@ class BinaryTable(CategoricalTable):
         return abs((a * (c + d)) / (c * (a + b)))
 
     @property
+    @timeit
+    @similarity
     def anderberg(self):
         """
         Anderberg
@@ -462,6 +472,8 @@ class BinaryTable(CategoricalTable):
         return (self.__sigma - self.__sigma_prime) / (2 * self._n)
 
     @property
+    @timeit
+    @similarity
     def baroni_urbani_buser_i(self):
         """
         Baroni-Urbani-Buser-I
@@ -474,6 +486,8 @@ class BinaryTable(CategoricalTable):
         return (sqrt(a * d) + a) / (sqrt(a * d) + a + b + c)
 
     @property
+    @timeit
+    @similarity
     def baroni_urbani_buser_ii(self):
         """
         Baroni-Urbani-Buser-II
@@ -486,6 +500,8 @@ class BinaryTable(CategoricalTable):
         return (sqrt(a * d) + a - (b + c)) / (sqrt(a * d) + a + b + c)
 
     @property
+    @timeit
+    @similarity
     def braun_banquet(self):
         """
         Braun-Banquet
@@ -498,6 +514,8 @@ class BinaryTable(CategoricalTable):
         return a / max(a + b, a + c)
 
     @property
+    @timeit
+    @similarity
     def cole(self):
         """
         Cole
@@ -510,6 +528,8 @@ class BinaryTable(CategoricalTable):
         return (sqrt(2) * (a * d - b * c)) / sqrt((a * d - b * c) ** 2 - (a + b) * (a + c) * (b + d) * (c + d))
 
     @property
+    @timeit
+    @similarity
     def cosine(self):
         """
         Cosine
@@ -522,6 +542,8 @@ class BinaryTable(CategoricalTable):
         return a / ((a + b) * (a + c))
 
     @property
+    @timeit
+    @similarity
     def dennis(self):
         """
         Dennis
@@ -534,6 +556,8 @@ class BinaryTable(CategoricalTable):
         return (a * d - b * c) / sqrt(self._n * (a + b) * (a + c))
 
     @property
+    @timeit
+    @similarity
     def dice(self):
         """
         Dice; Czekanowski; Nei-Li
@@ -546,6 +570,8 @@ class BinaryTable(CategoricalTable):
         return (2 * a) / (2 * a + b + c)
 
     @property
+    @timeit
+    @similarity
     def disperson(self):
         """
         Disperson
@@ -558,6 +584,8 @@ class BinaryTable(CategoricalTable):
         return (a * d - b * c) / (a + b + c + d) ** 2
 
     @property
+    @timeit
+    @similarity
     def driver_kroeber(self):
         """
         Driver-Kroeber
@@ -570,6 +598,8 @@ class BinaryTable(CategoricalTable):
         return (a / 2) * ((1 / (a + b)) + (1 / (a + c)))
 
     @property
+    @timeit
+    @similarity
     def eyraud(self):
         """
         Eyraud
@@ -582,6 +612,8 @@ class BinaryTable(CategoricalTable):
         return (self._n ** 2 * (self._n * a - (a + b) * (a + c))) / ((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
+    @timeit
+    @similarity
     def fager_mcgowan(self):
         """
         Fager-McGowan
@@ -594,6 +626,8 @@ class BinaryTable(CategoricalTable):
         return a / sqrt((a + b) * (a + c)) - max(a + b, a + c) / 2
 
     @property
+    @timeit
+    @similarity
     def faith(self):
         """
         Faith
@@ -606,6 +640,8 @@ class BinaryTable(CategoricalTable):
         return (a + 0.5 * d) / (a + b + c + d)
 
     @property
+    @timeit
+    @similarity
     def forbes_ii(self):
         """
         Forbes-II
@@ -618,6 +654,8 @@ class BinaryTable(CategoricalTable):
         return (self._n * a - (a + b) * (a + c)) / (self._n * min(a + b, a + c) - (a + b) * (a + c))
 
     @property
+    @timeit
+    @similarity
     def forbesi(self):
         """
         Forbesi
@@ -630,6 +668,8 @@ class BinaryTable(CategoricalTable):
         return (self._n * a) / ((a + b) * (a + c))
 
     @property
+    @timeit
+    @similarity
     def fossum(self):
         """
         Fossum
@@ -642,6 +682,8 @@ class BinaryTable(CategoricalTable):
         return (self._n * (a - 0.5) ** 2) / ((a + b) * (a + c))
 
     @property
+    @timeit
+    @similarity
     def gilbert_wells(self):
         """
         Gilbert-Wells
@@ -654,6 +696,8 @@ class BinaryTable(CategoricalTable):
         return log(a) - log(self._n) - log((a + b) / self._n) - log((a + c) / self._n)
 
     @property
+    @timeit
+    @similarity
     def goodman_kruskal(self):
         """
         Goodman-Kruskal
@@ -665,6 +709,8 @@ class BinaryTable(CategoricalTable):
         return (self.__sigma - self.__sigma_prime) / (2 * self._n - self.__sigma_prime)
 
     @property
+    @timeit
+    @similarity
     def gower(self):
         """
         Gower
@@ -677,6 +723,8 @@ class BinaryTable(CategoricalTable):
         return (a + d) / sqrt((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
+    @timeit
+    @similarity
     def gower_legendre(self):
         """
         Gower-Legendre
@@ -689,6 +737,8 @@ class BinaryTable(CategoricalTable):
         return (a + d) / (a + 0.5 * (b + c) + d)
 
     @property
+    @timeit
+    @similarity
     def hamann(self):
         """
         Hamann.
@@ -701,6 +751,8 @@ class BinaryTable(CategoricalTable):
         return ((a + d) - (b + c)) / (a + b + c + d)
 
     @property
+    @timeit
+    @similarity
     def inner_product(self):
         """
         Inner-product.
@@ -713,6 +765,8 @@ class BinaryTable(CategoricalTable):
         return a + d
 
     @property
+    @timeit
+    @similarity
     def intersection(self):
         """
         Intersection
@@ -725,6 +779,8 @@ class BinaryTable(CategoricalTable):
         return a
 
     @property
+    @timeit
+    @similarity
     def jaccard(self):
         """
         Jaccard
@@ -737,6 +793,8 @@ class BinaryTable(CategoricalTable):
         return a / (a + b + c)
 
     @property
+    @timeit
+    @similarity
     def johnson(self):
         """
         Johnson.
@@ -749,6 +807,8 @@ class BinaryTable(CategoricalTable):
         return a / (a + b) + a / (a + c)
 
     @property
+    @timeit
+    @similarity
     def kulczynski_i(self):
         """
         Kulczynski-I
@@ -761,6 +821,8 @@ class BinaryTable(CategoricalTable):
         return a / (b + c)
 
     @property
+    @timeit
+    @similarity
     def kulcyznski_ii(self):
         """
         Kulczynski-II
@@ -773,6 +835,8 @@ class BinaryTable(CategoricalTable):
         return 0.5 * ((a / (a + b)) * (a / (a + c)))
 
     @property
+    @timeit
+    @similarity
     def mcconnaughey(self):
         """
         McConnaughey
@@ -785,6 +849,8 @@ class BinaryTable(CategoricalTable):
         return (a ** 2 - b * c) / ((a + d) ** 2 + (b + c) ** 2)
 
     @property
+    @timeit
+    @similarity
     def michael(self):
         """
         Michael
@@ -797,6 +863,8 @@ class BinaryTable(CategoricalTable):
         return (4 * (a * d - b * c)) / ((a + d) ** 2 + (b + c) ** 2)
 
     @property
+    @timeit
+    @similarity
     def mountford(self):
         """
         Mountford
@@ -809,6 +877,8 @@ class BinaryTable(CategoricalTable):
         return a / (0.5 * (a * b + a * c) + b * c)
 
     @property
+    @timeit
+    @similarity
     def ochia_i(self):
         """
         Ochia-I
@@ -825,6 +895,8 @@ class BinaryTable(CategoricalTable):
         return sqrt((a / (a + b)) * (a / (a + c)))
 
     @property
+    @timeit
+    @similarity
     def ochia_ii(self):
         """
         Ochia-II
@@ -837,6 +909,8 @@ class BinaryTable(CategoricalTable):
         return (a * d) / sqrt((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
+    @timeit
+    @similarity
     def pearson_heron_i(self):
         """
         Pearson-Heron-I
@@ -849,6 +923,8 @@ class BinaryTable(CategoricalTable):
         return (a * d - b * c) / sqrt((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
+    @timeit
+    @similarity
     def pearson_heron_ii(self):
         """
         Pearson-Heron-II
@@ -861,6 +937,8 @@ class BinaryTable(CategoricalTable):
         return cos((pi * sqrt(b * c)) / (sqrt(a * d) + sqrt(b * c)))
 
     @property
+    @timeit
+    @similarity
     def pearson_i(self):
         """
         Pearson-I
@@ -873,6 +951,8 @@ class BinaryTable(CategoricalTable):
         return (self._n * (a * d - b * c) ** 2) / ((a + b) * (a + c) * (c + d) * (b + d))
 
     @property
+    @timeit
+    @similarity
     def person_ii(self):
         """
         Pearson-II
@@ -887,6 +967,8 @@ class BinaryTable(CategoricalTable):
         return sqrt(chisq / (self._n + chisq))
 
     @property
+    @timeit
+    @similarity
     def peirce(self):
         """
         Peirce
@@ -899,6 +981,8 @@ class BinaryTable(CategoricalTable):
         return (a * b + b * c) / (a * b + 2 * b * c + c * d)
 
     @property
+    @timeit
+    @similarity
     def roger_tanimoto(self):
         """
         Roger-Tanimoto
@@ -911,6 +995,8 @@ class BinaryTable(CategoricalTable):
         return (a + d) / (a + 2 * (b + c) + d)
 
     @property
+    @timeit
+    @similarity
     def russel_rao(self):
         """
         Russel-Rao
@@ -923,6 +1009,8 @@ class BinaryTable(CategoricalTable):
         return a / (a + b + c + d)
 
     @property
+    @timeit
+    @similarity
     def simpson(self):
         """
         Simpson (or `Overlap <https://en.wikipedia.org/wiki/Overlap_coefficient>`_).
@@ -935,6 +1023,8 @@ class BinaryTable(CategoricalTable):
         return a / min(a + b, a + c)
 
     @property
+    @timeit
+    @similarity
     def sokal_michener(self):
         """
         Sokal-Michener
@@ -947,6 +1037,8 @@ class BinaryTable(CategoricalTable):
         return (a + d) / (a + b + c + d)
 
     @property
+    @timeit
+    @similarity
     def sokal_sneath_i(self):
         """
         Sokal-Sneath-I
@@ -960,6 +1052,8 @@ class BinaryTable(CategoricalTable):
         return a / (a + 2 * (b + c))
 
     @property
+    @timeit
+    @similarity
     def sokal_sneath_ii(self):
         """
         Sokal-Sneath-II
@@ -972,6 +1066,8 @@ class BinaryTable(CategoricalTable):
         return 2 * (a + d) / (2 * (a + d) + b + c)
 
     @property
+    @timeit
+    @similarity
     def sokal_sneath_iii(self):
         """
         Sokal-Sneath-III
@@ -984,6 +1080,8 @@ class BinaryTable(CategoricalTable):
         return (a + d) / (b + c)
 
     @property
+    @timeit
+    @similarity
     def sokal_sneath_iv(self):
         """
         Sokal-Sneath-IV
@@ -996,6 +1094,8 @@ class BinaryTable(CategoricalTable):
         return 0.25 * ((a / (a + b)) + (a / (a + c)) + (d / (b + d)) + (d / (b + d)))
 
     @property
+    @timeit
+    @similarity
     def sokal_sneath_v(self):
         """
         Sokal-Sneath-V
@@ -1008,6 +1108,8 @@ class BinaryTable(CategoricalTable):
         return (a * d) / ((a + b) * (a + c) * (b + d) * sqrt(c + d))
 
     @property
+    @timeit
+    @similarity
     def sorensen_dice(self):
         """
         Sørensen–Dice
@@ -1020,6 +1122,8 @@ class BinaryTable(CategoricalTable):
         return 2 * (a + d) / (2 * (a + d) + b + c)
 
     @property
+    @timeit
+    @similarity
     def sorgenfrei(self):
         """
         Sorgenfrei
@@ -1032,6 +1136,8 @@ class BinaryTable(CategoricalTable):
         return a ** 2 / ((a + b) * (a + c))
 
     @property
+    @timeit
+    @similarity
     def stiles(self):
         """
         Stiles
@@ -1044,6 +1150,8 @@ class BinaryTable(CategoricalTable):
         return log((self._n * (abs(a * d - b * c) - 0.5) ** 2) / ((a + b) * (a + c) * (b + d) * (c + d)), 10)
 
     @property
+    @timeit
+    @similarity
     def tanimoto_i(self):
         """
         Tanimoto-I
@@ -1056,6 +1164,8 @@ class BinaryTable(CategoricalTable):
         return a / (2 * a + b + c)
 
     @property
+    @timeit
+    @similarity
     def tanimoto_ii(self):
         """
         Tanimoto-II
@@ -1068,6 +1178,8 @@ class BinaryTable(CategoricalTable):
         return a / (b + c)
 
     @property
+    @timeit
+    @similarity
     def tarwid(self):
         """
         Tarwind
@@ -1081,6 +1193,8 @@ class BinaryTable(CategoricalTable):
         return (n * a - (a + b) * (a + c)) / (n * a + (a + b) * (a + c))
 
     @property
+    @timeit
+    @similarity
     def tarantula(self):
         """
         Tarantula
@@ -1093,6 +1207,8 @@ class BinaryTable(CategoricalTable):
         return a * (c + d) / (c * (a + b))
 
     @property
+    @timeit
+    @similarity
     def yule_q(self):
         """
         Yule's Q
@@ -1112,6 +1228,8 @@ class BinaryTable(CategoricalTable):
         return (a * d - b * c) / (a * d + b * c)
 
     @property
+    @timeit
+    @similarity
     def yule_w(self):
         """
         Yule's w
@@ -1124,6 +1242,8 @@ class BinaryTable(CategoricalTable):
         return (sqrt(a * d) - sqrt(b * c)) / (sqrt(a * d) + sqrt(b * c))
 
     @property
+    @timeit
+    @distance
     def chord(self):
         """
         Chord
@@ -1136,6 +1256,8 @@ class BinaryTable(CategoricalTable):
         return sqrt(2 * (1 - a / sqrt((a + b) * (a + c))))
 
     @property
+    @timeit
+    @distance
     def euclid(self):
         """
         Euclid
@@ -1148,6 +1270,8 @@ class BinaryTable(CategoricalTable):
         return sqrt(b + c)
 
     @property
+    @timeit
+    @distance
     def hamming(self):
         """
         Hamming; Canberra; Manhattan; Cityblock; Minkowski
@@ -1160,6 +1284,8 @@ class BinaryTable(CategoricalTable):
         return b + c
 
     @property
+    @timeit
+    @distance
     def hellinger(self):
         """
         Hellinger
@@ -1172,6 +1298,8 @@ class BinaryTable(CategoricalTable):
         return 2 * sqrt(1 - a / sqrt((a + b) * (a + c)))
 
     @property
+    @timeit
+    @distance
     def jaccard_distance(self):
         """
         Jaccard
@@ -1184,6 +1312,8 @@ class BinaryTable(CategoricalTable):
         return (b + c) / (a + b + c)
 
     @property
+    @timeit
+    @distance
     def lance_williams(self):
         """
         Lance-Williams; Bray-Curtis
@@ -1196,6 +1326,8 @@ class BinaryTable(CategoricalTable):
         return (b + c) / (2 * a + b + c)
 
     @property
+    @timeit
+    @distance
     def mean_manhattan(self):
         """
         Mean-Manhattan
@@ -1208,6 +1340,8 @@ class BinaryTable(CategoricalTable):
         return (b + c) / (a + b + c + d)
 
     @property
+    @timeit
+    @distance
     def pattern_difference(self):
         """
         Pattern difference
@@ -1220,6 +1354,8 @@ class BinaryTable(CategoricalTable):
         return (4 * b * c) / (a + b + c + d) ** 2
 
     @property
+    @timeit
+    @distance
     def shape_difference(self):
         """
         Shape difference
@@ -1232,6 +1368,8 @@ class BinaryTable(CategoricalTable):
         return (self._n * (b + c) - (b - c) ** 2) / (a + b + c + d) ** 2
 
     @property
+    @timeit
+    @distance
     def size_difference(self):
         """
         Size difference
@@ -1244,6 +1382,8 @@ class BinaryTable(CategoricalTable):
         return (b + c) ** 2 / (a + b + c + d) ** 2
 
     @property
+    @timeit
+    @distance
     def vari(self):
         """
         Vari
@@ -1256,6 +1396,8 @@ class BinaryTable(CategoricalTable):
         return (b + c) / (4 * (a + b + c + d))
 
     @property
+    @timeit
+    @distance
     def yule_q_difference(self):
         """
         Yule's q
@@ -1268,6 +1410,8 @@ class BinaryTable(CategoricalTable):
         return 2 * b * c / (a * d + b * c)
 
     @property
+    @timeit
+    @distance
     def tanimoto_distance(self):
         """
         `Tanimoto similarity and distance <https://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_similarity_and_distance>`_.
