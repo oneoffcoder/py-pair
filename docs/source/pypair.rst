@@ -9,6 +9,7 @@ These are the basic contingency tables used to analyze categorical data.
 - CategoricalTable
 - BinaryTable
 - ConfusionMatrix
+- AgreementTable
 
 .. automodule:: pypair.table
     :members:
