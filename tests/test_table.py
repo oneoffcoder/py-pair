@@ -27,7 +27,7 @@ def teardown():
 @with_setup(setup, teardown)
 def test_confusion_matrix_creation():
     """
-    Tests creating BinaryTable.
+    Tests creating ConfusionMatrix.
 
     :return: None.
     """
@@ -35,35 +35,12 @@ def test_confusion_matrix_creation():
     b = [0, 0, 0, 1, 1, 0, 0, 1, 1, 1]
 
     table = ConfusionMatrix(a, b)
-    print(table.tp)
-    print(table.fp)
-    print(table.fn)
-    print(table.tn)
-    print(table.n)
-    print(table.tpr)
-    print(table.tnr)
-    print(table.ppv)
-    print(table.npv)
-    print(table.fnr)
-    print(table.fpr)
-    print(table.fdr)
-    print(table.fomr)
-    print(table.pt)
-    print(table.ts)
-    print(table.acc)
-    print(table.ba)
-    print(table.f1)
-    print(table.mcc)
-    print(table.bm)
-    print(table.mk)
-    print(table.sensitivity)
-    print(table.specificity)
-    print(table.precision)
-    print(table.recall)
-    print(table.prevalence)
-    print(table.plr)
-    print(table.nlr)
-    print(table.dor)
+    for measure in ConfusionMatrix.get_measures():
+        stats = table.get(measure)
+        if isinstance(stats, tuple):
+            print(f'{stats[0]:.8f}, {stats[1]:.8f}: {measure}')
+        else:
+            print(f'{stats:.8f}: {measure}')
 
 
 @with_setup(setup, teardown)

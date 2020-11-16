@@ -31,7 +31,7 @@ class Concordance(object):
 
     def __add__(self, other):
         d = self.d + other.d
-        t = self.t + other.t
+        t = self.t + other.m
         t_x = self.t_x + other.t_x
         t_y = self.t_y + other.t_y
         c = self.c + other.c
@@ -341,6 +341,6 @@ def goodman_kruskal_gamma(x, y):
     :return: :math:`\\gamma`.
     """
     c, n = __get_concordance(x, y)
-    p_d, p_t, p_c = c.d / n, c.t / n, c.c / n
+    p_d, p_t, p_c = c.d / n, c.m / n, c.c / n
     gamma = (p_c - p_d) / (1 - p_t)
     return gamma

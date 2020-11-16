@@ -401,6 +401,7 @@ class BinaryMeasures(object):
 
     @property
     @timeit
+    @lru_cache(maxsize=None)
     def __sigma(self):
         """
         Gets :math:`\\max(a, b) + \\max(c, d) + \\max(a, c) + \\max(b, d)`.
@@ -412,6 +413,7 @@ class BinaryMeasures(object):
 
     @property
     @timeit
+    @lru_cache(maxsize=None)
     def __sigma_prime(self):
         """
         Gets :math:`\\max(a + c, b + d) + \\max(a + b, c + d)`.
@@ -424,6 +426,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def jaccard_3w(self):
         """
         3W-Jaccard
@@ -438,6 +441,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def ample(self):
         """
         Ample
@@ -452,6 +456,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def anderberg(self):
         """
         Anderberg
@@ -466,6 +471,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def baroni_urbani_buser_i(self):
         """
         Baroni-Urbani-Buser-I
@@ -480,6 +486,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def baroni_urbani_buser_ii(self):
         """
         Baroni-Urbani-Buser-II
@@ -494,6 +501,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def braun_banquet(self):
         """
         Braun-Banquet
@@ -508,6 +516,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def cole_i(self):
         """
         Cole-I
@@ -522,6 +531,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def cole_ii(self):
         """
         Cole-II
@@ -536,6 +546,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def cosine(self):
         """
         Cosine
@@ -550,6 +561,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def dennis(self):
         """
         Dennis
@@ -564,6 +576,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def dice(self):
         """
         Dice; Czekanowski; Nei-Li
@@ -578,6 +591,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def disperson(self):
         """
         Disperson
@@ -592,6 +606,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def driver_kroeber(self):
         """
         Driver-Kroeber
@@ -606,6 +621,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def eyraud(self):
         """
         Eyraud
@@ -620,6 +636,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def fager_mcgowan(self):
         """
         Fager-McGowan
@@ -634,6 +651,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def faith(self):
         """
         Faith
@@ -648,6 +666,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def forbes_ii(self):
         """
         Forbes-II
@@ -662,6 +681,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def forbesi(self):
         """
         Forbesi
@@ -676,6 +696,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def fossum(self):
         """
         Fossum
@@ -690,6 +711,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def gilbert_wells(self):
         """
         Gilbert-Wells
@@ -704,6 +726,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def goodman_kruskal(self):
         """
         Goodman-Kruskal
@@ -718,6 +741,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def gower(self):
         """
         Gower
@@ -732,6 +756,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def gower_legendre(self):
         """
         Gower-Legendre
@@ -746,6 +771,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def hamann(self):
         """
         Hamann.
@@ -760,6 +786,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def inner_product(self):
         """
         Inner-product.
@@ -774,6 +801,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def intersection(self):
         """
         Intersection
@@ -788,6 +816,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def jaccard(self):
         """
         Jaccard
@@ -802,6 +831,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def johnson(self):
         """
         Johnson.
@@ -816,6 +846,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def kulczynski_i(self):
         """
         Kulczynski-I
@@ -830,6 +861,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def kulcyznski_ii(self):
         """
         Kulczynski-II
@@ -844,6 +876,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def mcconnaughey(self):
         """
         McConnaughey
@@ -858,6 +891,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def michael(self):
         """
         Michael
@@ -872,6 +906,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def mountford(self):
         """
         Mountford
@@ -886,6 +921,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def ochia_i(self):
         """
         Ochia-I
@@ -904,6 +940,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def ochia_ii(self):
         """
         Ochia-II
@@ -918,6 +955,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def pearson_heron_i(self):
         """
         Pearson-Heron-I
@@ -932,6 +970,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def pearson_heron_ii(self):
         """
         Pearson-Heron-II
@@ -946,6 +985,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def pearson_i(self):
         """
         Pearson-I
@@ -960,6 +1000,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def chisq(self):
         """
         :math:`\\chi^2` (alias for Pearson-I)
@@ -971,6 +1012,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def person_ii(self):
         """
         Pearson-II
@@ -988,6 +1030,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def peirce(self):
         """
         Peirce
@@ -1002,6 +1045,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def roger_tanimoto(self):
         """
         Roger-Tanimoto
@@ -1016,6 +1060,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def russel_rao(self):
         """
         Russel-Rao
@@ -1030,6 +1075,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def simpson(self):
         """
         Simpson (or `Overlap <https://en.wikipedia.org/wiki/Overlap_coefficient>`_).
@@ -1044,6 +1090,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def sokal_michener(self):
         """
         Sokal-Michener
@@ -1058,6 +1105,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def sokal_sneath_i(self):
         """
         Sokal-Sneath-I
@@ -1073,6 +1121,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def sokal_sneath_ii(self):
         """
         Sokal-Sneath-II
@@ -1087,6 +1136,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def sokal_sneath_iii(self):
         """
         Sokal-Sneath-III
@@ -1101,6 +1151,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def sokal_sneath_iv(self):
         """
         Sokal-Sneath-IV
@@ -1115,6 +1166,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def sokal_sneath_v(self):
         """
         Sokal-Sneath-V
@@ -1129,6 +1181,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def sorensen_dice(self):
         """
         Sørensen–Dice
@@ -1143,6 +1196,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def sorgenfrei(self):
         """
         Sorgenfrei
@@ -1157,6 +1211,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def stiles(self):
         """
         Stiles
@@ -1171,6 +1226,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def tanimoto_i(self):
         """
         Tanimoto-I
@@ -1185,6 +1241,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def tanimoto_ii(self):
         """
         Tanimoto-II
@@ -1199,6 +1256,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def tarwid(self):
         """
         Tarwind
@@ -1213,6 +1271,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def tarantula(self):
         """
         Tarantula
@@ -1227,6 +1286,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def yule_q(self):
         """
         Yule's Q
@@ -1248,6 +1308,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def yule_w(self):
         """
         Yule's w
@@ -1262,6 +1323,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def chord(self):
         """
         Chord
@@ -1276,6 +1338,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def euclid(self):
         """
         Euclid
@@ -1290,6 +1353,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def hamming(self):
         """
         Hamming; Canberra; Manhattan; Cityblock; Minkowski
@@ -1304,6 +1368,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def hellinger(self):
         """
         Hellinger
@@ -1318,6 +1383,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def jaccard_distance(self):
         """
         Jaccard
@@ -1332,6 +1398,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def lance_williams(self):
         """
         Lance-Williams; Bray-Curtis
@@ -1346,6 +1413,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def mean_manhattan(self):
         """
         Mean-Manhattan
@@ -1360,6 +1428,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def pattern_difference(self):
         """
         Pattern difference
@@ -1374,6 +1443,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def shape_difference(self):
         """
         Shape difference
@@ -1388,6 +1458,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def size_difference(self):
         """
         Size difference
@@ -1402,6 +1473,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def vari(self):
         """
         Vari
@@ -1416,6 +1488,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def yule_q_difference(self):
         """
         Yule's q
@@ -1430,6 +1503,7 @@ class BinaryMeasures(object):
     @property
     @timeit
     @distance
+    @lru_cache(maxsize=None)
     def tanimoto_distance(self):
         """
         `Tanimoto similarity and distance <https://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_similarity_and_distance>`_.
@@ -1440,6 +1514,8 @@ class BinaryMeasures(object):
         return d
 
     @property
+    @timeit
+    @lru_cache(maxsize=None)
     def cramer_v(self):
         """
         `Cramer's V <https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V>`_.
@@ -1452,6 +1528,8 @@ class BinaryMeasures(object):
         return s
 
     @property
+    @timeit
+    @lru_cache(maxsize=None)
     def contingency_coefficient(self):
         """
         `Contingency coefficient <https://en.wikipedia.org/wiki/Contingency_table#Cram%C3%A9r's_V_and_the_contingency_coefficient_C>`_.
@@ -1464,6 +1542,8 @@ class BinaryMeasures(object):
         return s
 
     @property
+    @timeit
+    @lru_cache(maxsize=None)
     def tschuprow_t(self):
         """
         `Tschuprow's T <https://en.wikipedia.org/wiki/Tschuprow%27s_T>`_.
@@ -1474,6 +1554,8 @@ class BinaryMeasures(object):
         return s
 
     @property
+    @timeit
+    @lru_cache(maxsize=None)
     def mcnemar_test(self):
         """
         `McNemar's test <https://en.wikipedia.org/wiki/McNemar%27s_test>`_.
@@ -1486,6 +1568,8 @@ class BinaryMeasures(object):
         return chisq, p
 
     @property
+    @timeit
+    @lru_cache(maxsize=None)
     def odds_ratio(self):
         """
         `Odds ratio <https://en.wikipedia.org/wiki/Contingency_table#Odds_ratio>`_. The odds
@@ -1504,6 +1588,8 @@ class BinaryMeasures(object):
         return ratio
 
     @property
+    @timeit
+    @lru_cache(maxsize=None)
     def yule_y(self):
         """
         Yule's Y is based off of the odds ratio or cross-product ratio, :math:`\\alpha`.
@@ -1517,10 +1603,12 @@ class BinaryMeasures(object):
         return q
 
     @property
+    @timeit
+    @lru_cache(maxsize=None)
     def tetrachoric(self):
         """
-        Tetrachoric correlation ranges from :math:`[0, 1]`, where 0 indicates no agreement and
-        1 indicates perfect agreement.
+        Tetrachoric correlation ranges from :math:`[-1, 1]`, where 0 indicates no agreement,
+        1 indicates perfect agreement and -1 indicates perfect disagreement.
 
         - if :math:`b=0` or :math:`c=0`, 1.0
         - if :math:`a=0` or :math:`b=0`, -1.0
@@ -1547,6 +1635,7 @@ class BinaryMeasures(object):
 
     @timeit
     @similarity
+    @lru_cache(maxsize=None)
     def tversky_index(self, theta=1, phi=0):
         """
         Compute's Tversky's Index.
@@ -1713,6 +1802,471 @@ class BinaryTable(CategoricalTable):
         return self.__measures.get(measure)
 
 
+class CmMeasures(object):
+    """
+    Confusion matrix measures.
+    """
+    def __init__(self, tp, fn, fp, tn):
+        """
+        ctor.
+
+        :param tp: True positive ``TP`` count.
+        :param fn: False negative ``FN`` count.
+        :param fp: False positive ``FP`` count.
+        :param tn: True negative ``TN`` count.
+        """
+        self.__tp = tp
+        self.__fn = fn
+        self.__fp = fp
+        self.__tn = tn
+        self.__n = tp + fn + fp + tn
+
+    @property
+    def tp(self):
+        """
+        TP
+
+        :return: TP.
+        """
+        return self.__tp
+
+    @property
+    def fn(self):
+        """
+        FN
+
+        :return: FN.
+        """
+        return self.__fn
+
+    @property
+    def fp(self):
+        """
+        FP
+
+        :return: FP.
+        """
+        return self.__fp
+
+    @property
+    def tn(self):
+        """
+        TN
+
+        :return: TN.
+        """
+        return self.__tn
+
+    @property
+    def n(self):
+        """
+        :math:`N = TP + FN + FP + TN`
+
+        :return: N.
+        """
+        return self.__n
+
+    @property
+    def __counts(self):
+        """
+        Returns TP, FN, FP, TN, N.
+
+        :return: TP, FN, FP, TN, N.
+        """
+        return self.__tp, self.__fn, self.__fp, self.__tn, self.__n
+
+    @property
+    @lru_cache(maxsize=None)
+    def tpr(self):
+        """
+        True positive rate.
+
+        :math:`TPR = \\frac{TP}{TP + FN}`
+
+        Aliases
+
+        - sensitivity
+        - recall
+        - hit rate
+        - power
+        - probability of detection
+
+        :return: TPR.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return tp / (tp + fn)
+
+    @property
+    @lru_cache(maxsize=None)
+    def tnr(self):
+        """
+        True negative rate.
+
+        :math:`TNR = \\frac{TN}{TN + FP}`
+
+        Aliases
+
+        - specificity
+        - selectivity
+
+        :return: TNR.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return tn / (tn + fp)
+
+    @property
+    @lru_cache(maxsize=None)
+    def ppv(self):
+        """
+        Positive predictive value.
+
+        :math:`PPV = \\frac{TP}{TP + FP}`
+
+        Aliases
+
+        - precision
+
+        :return: PPV.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return tp / (tp + fp)
+
+    @property
+    @lru_cache(maxsize=None)
+    def npv(self):
+        """
+        Negative predictive value.
+
+        :math:`NPV = \\frac{TN}{TN + FN}`
+
+        :return: NPV.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return tn / (tn + fn)
+
+    @property
+    @lru_cache(maxsize=None)
+    def fnr(self):
+        """
+        False negative rate.
+
+        :math:`FNR = \\frac{FN}{FN + TP}`
+
+        Aliases
+
+        - miss rate
+
+        :return: FNR.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return fn / (fn + tp)
+
+    @property
+    @lru_cache(maxsize=None)
+    def fpr(self):
+        """
+        False positive rate.
+
+        :math:`FPR = \\frac{FP}{FP + TN}`
+
+        Aliases
+
+        - fall-out
+        - probability of false alarm
+
+        :return: FPR.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return fp / (fp + tn)
+
+    @property
+    @lru_cache(maxsize=None)
+    def fdr(self):
+        """
+        False discovery rate.
+
+        :math:`FDR = \\frac{FP}{FP + TP}`
+
+        :return: FDR.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return fp / (fp + tp)
+
+    @property
+    @lru_cache(maxsize=None)
+    def fomr(self):
+        """
+        False omission rate.
+
+        :math:`FOR = \\frac{FN}{FN + TN}`
+
+        :return: FOR.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return fn / (fn + tn)
+
+    @property
+    @lru_cache(maxsize=None)
+    def pt(self):
+        """
+        Prevalence threshold.
+
+        :math:`PT = \\frac{\\sqrt{TPR(-TNR + 1)} + TNR - 1}{TPR + TNR - 1}`
+
+        :return: Prevalence threshold.
+        """
+        tpr = self.tpr
+        tnr = self.tnr
+
+        return (sqrt(tpr * (-tnr + 1)) + tnr - 1) / (tpr + tnr - 1)
+
+    @property
+    @lru_cache(maxsize=None)
+    def ts(self):
+        """
+        Threat score.
+
+        :math:`TS = \\frac{TP}{TP + FN + FP}`
+
+        Aliases
+
+        - critical success index (CSI).
+
+        :return: TS.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return tp / (tp + fn + fp)
+
+    @property
+    @lru_cache(maxsize=None)
+    def acc(self):
+        """
+        Accuracy.
+
+        :math:`ACC = \\frac{TP + TN}{TP + TN + FP + FN}`
+
+        :return: Accuracy.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return (tp + tn) / (tp + tn + fp + fn)
+
+    @property
+    @lru_cache(maxsize=None)
+    def ba(self):
+        """
+        Balanced accuracy.
+
+        :math:`BA = \\frac{TPR + TNR}{2}`
+
+        :return: Balanced accuracy.
+        """
+        return (self.tpr + self.tnr) / 2
+
+    @property
+    @lru_cache(maxsize=None)
+    def f1(self):
+        """
+        F1 score: harmonic mean of precision and sensitivity.
+
+        :math:`F1 = \\frac{PPV \\times TPR}{PPV + TPR}`
+
+        :return: F1.
+        """
+        return 2 * (self.ppv * self.tpr) / (self.ppv + self.tpr)
+
+    @property
+    @lru_cache(maxsize=None)
+    def mcc(self):
+        """
+        Matthew's correlation coefficient.
+
+        :math:`MCC = \\frac{TP + TN - FP \\times FN}{\\sqrt{(TP + FP)(TP + FN)(TN + FP)(TN + FN)}}`
+
+        :return: MCC.
+        """
+        tp, fn, fp, tn, n = self.__counts
+
+        return (tp + tn - fp * fn) / sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+
+    @property
+    @lru_cache(maxsize=None)
+    def bm(self):
+        """
+        Bookmaker informedness.
+
+        :math:`BI = TPR + TNR - 1`
+
+        :return: BM.
+        """
+        return self.tpr + self.tnr - 1
+
+    @property
+    @lru_cache(maxsize=None)
+    def mk(self):
+        """
+        Markedness.
+
+        :math:`MK = PPV + NPV - 1`
+
+        Aliases
+
+        - deltaP
+
+        :return: Markedness.
+        """
+        return self.ppv + self.npv - 1
+
+    @property
+    @lru_cache(maxsize=None)
+    def sensitivity(self):
+        """
+        Alias to TPR.
+
+        :return: Sensitivity.
+        """
+        return self.tpr
+
+    @property
+    @lru_cache(maxsize=None)
+    def specificity(self):
+        """
+        Alias to TNR.
+
+        :return: Specificity.
+        """
+        return self.tnr
+
+    @property
+    @lru_cache(maxsize=None)
+    def precision(self):
+        """
+        Alias to PPV.
+
+        :return: PPV.
+        """
+        return self.ppv
+
+    @property
+    @lru_cache(maxsize=None)
+    def recall(self):
+        """
+        Alias to TPR.
+
+        :return: TPR.
+        """
+        return self.tpr
+
+    @property
+    @lru_cache(maxsize=None)
+    def prevalence(self):
+        """
+        Prevalence.
+
+        :math:`\\frac{TP + FN}{N}`
+
+        :return: Prevalence.
+        """
+        tp, fn, fp, tn, n = self.__counts
+        return (tp + fn) / n
+
+    @property
+    @lru_cache(maxsize=None)
+    def plr(self):
+        """
+        Positive likelihood ratio.
+
+        :math:`PLR = \\frac{TPR}{FPR}`
+
+        Aliases
+
+        - LR+
+
+        :return: PLR.
+        """
+        return self.tpr / self.fpr
+
+    @property
+    @lru_cache(maxsize=None)
+    def nlr(self):
+        """
+        Negative likelihood ratio.
+
+        :math:`NLR = \\frac{FNR}{TNR}`
+
+        Aliases
+
+        - LR-
+
+        :return: NLR.
+        """
+        return self.fnr / self.tnr
+
+    @property
+    @lru_cache(maxsize=None)
+    def dor(self):
+        """
+        Diagnostic odds ratio.
+
+        :math:`\\frac{PLR}{NLR}`
+
+        :return: DOR.
+        """
+        return self.plr / self.nlr
+
+    @lru_cache(maxsize=None)
+    def get(self, measure):
+        """
+        Gets the specified statistic.
+
+        :param measure: Name of statistic.
+        :return: Measure.
+        """
+        return getattr(self, measure)
+
+    @staticmethod
+    def get_measures():
+        """
+        Gets a (sorted) list of all measures.
+
+        - ``acc``
+        - ``ba``
+        - ``bm``
+        - ``dor``
+        - ``f1``
+        - ``fdr``
+        - ``fn``
+        - ``fnr``
+        - ``fomr``
+        - ``fp``
+        - ``fpr``
+        - ``mcc``
+        - ``mk``
+        - ``n``
+        - ``nlr``
+        - ``npv``
+        - ``plr``
+        - ``ppv``
+        - ``precision``
+        - ``prevalence``
+        - ``pt``
+        - ``recall``
+        - ``sensitivity``
+        - ``specificity``
+        - ``tn``
+        - ``tnr``
+        - ``tp``
+        - ``tpr``
+        - ``ts``
+
+        :return: List of measures.
+        """
+        is_property = lambda v: isinstance(v, property)
+        is_method = lambda n: not n.startswith('_CmMeasures')
+        is_valid = lambda n, v: is_property(v) and is_method(n)
+        measures = sorted([n for n, v in vars(CmMeasures).items() if is_valid(n, v)])
+        return measures
+
+
 class ConfusionMatrix(BinaryTable):
     """
     Represents a `confusion matrix <https://en.wikipedia.org/wiki/Confusion_matrix>`_. The confusion
@@ -1747,354 +2301,30 @@ class ConfusionMatrix(BinaryTable):
         """
         super().__init__(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1)
 
-    @property
-    def tp(self):
+        tp = self._a
+        fn = self._b
+        fp = self._c
+        tn = self._d
+
+        self.__measures = CmMeasures(tp, fn, fp, tn)
+
+    @staticmethod
+    def get_measures():
         """
-        True positive. Count of when `a=1` and `b=1`.
+        Gets a (sorted) list of all association measures available.
 
-        :return: TP.
+        :return: List of association measures.
         """
-        return self._a
+        return CmMeasures.get_measures()
 
-    @property
-    def fp(self):
+    def get(self, measure):
         """
-        False positive. Count of when `a=0` and `b=1`.
+        Gets the specified statistic.
 
-        :return: FP.
+        :param measure: Name of statistic (association measure).
+        :return: Measure.
         """
-        return self._c
+        return self.__measures.get(measure)
 
-    @property
-    def fn(self):
-        """
-        False negative. Count of when `a=1` and `b=0`.
 
-        :return: FN.
-        """
-        return self._b
 
-    @property
-    def tn(self):
-        """
-        True negative. Count of when `a=0` and `b=0`.
-
-        :return: TN.
-        """
-        return self._d
-
-    @property
-    @lru_cache(maxsize=None)
-    def n(self):
-        """
-        Total number of data. Count of `TP + FP + FN + TN`.
-
-        :return: N.
-        """
-        return self.tp + self.fp + self.fn + self.tn
-
-    @property
-    def tpr(self):
-        """
-        True positive rate.
-
-        :math:`TPR = \\frac{TP}{TP + FN}`
-
-        Aliases
-
-        - sensitivity
-        - recall
-        - hit rate
-        - power
-        - probability of detection
-
-        :return: TPR.
-        """
-        return self.tp / (self.tp + self.fn)
-
-    @property
-    def tnr(self):
-        """
-        True negative rate.
-
-        :math:`TNR = \\frac{TN}{TN + FP}`
-
-        Aliases
-
-        - specificity
-        - selectivity
-
-        :return: TNR.
-        """
-        return self.tn / (self.tn + self.fp)
-
-    @property
-    def ppv(self):
-        """
-        Positive predictive value.
-
-        :math:`PPV = \\frac{TP}{TP + FP}`
-
-        Aliases
-
-        - precision
-
-        :return: PPV.
-        """
-        return self.tp / (self.tp + self.fp)
-
-    @property
-    def npv(self):
-        """
-        Negative predictive value.
-
-        :math:`NPV = \\frac{TN}{TN + FN}`
-
-        :return: NPV.
-        """
-        return self.tn / (self.tn + self.fn)
-
-    @property
-    def fnr(self):
-        """
-        False negative rate.
-
-        :math:`FNR = \\frac{FN}{FN + TP}`
-
-        Aliases
-
-        - miss rate
-
-        :return: FNR.
-        """
-        return self.fn / (self.fn + self.tp)
-
-    @property
-    def fpr(self):
-        """
-        False positive rate.
-
-        :math:`FPR = \\frac{FP}{FP + TN}`
-
-        Aliases
-
-        - fall-out
-        - probability of false alarm
-
-        :return: FPR.
-        """
-        return self.fp / (self.fp + self.tn)
-
-    @property
-    def fdr(self):
-        """
-        False discovery rate.
-
-        :math:`FDR = \\frac{FP}{FP + TP}`
-
-        :return: FDR.
-        """
-        return self.fp / (self.fp + self.tp)
-
-    @property
-    def fomr(self):
-        """
-        False omission rate.
-
-        :math:`FOR = \\frac{FN}{FN + TN}`
-
-        :return: FOR.
-        """
-        return self.fn / (self.fn + self.tn)
-
-    @property
-    def pt(self):
-        """
-        Prevalence threshold.
-
-        :math:`PT = \\frac{\\sqrt{TPR(-TNR + 1)} + TNR - 1}{TPR + TNR - 1}`
-
-        :return: Prevalence threshold.
-        """
-        tpr = self.tpr
-        tnr = self.tnr
-
-        return (sqrt(tpr * (-tnr + 1)) + tnr - 1) / (tpr + tnr - 1)
-
-    @property
-    def ts(self):
-        """
-        Threat score.
-
-        :math:`TS = \\frac{TP}{TP + FN + FP}`
-
-        Aliases
-
-        - critical success index (CSI).
-
-        :return: TS.
-        """
-        return self.tp / (self.tp + self.fn + self.fp)
-
-    @property
-    def acc(self):
-        """
-        Accuracy.
-
-        :math:`ACC = \\frac{TP + TN}{TP + TN + FP + FN}`
-
-        :return: Accuracy.
-        """
-        return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
-
-    @property
-    def ba(self):
-        """
-        Balanced accuracy.
-
-        :math:`BA = \\frac{TPR + TNR}{2}`
-
-        :return: Balanced accuracy.
-        """
-        return (self.tpr + self.tnr) / 2
-
-    @property
-    def f1(self):
-        """
-        F1 score: harmonic mean of precision and sensitivity.
-
-        :math:`F1 = \\frac{PPV \\times TPR}{PPV + TPR}`
-
-        :return: F1.
-        """
-        return 2 * (self.ppv * self.tpr) / (self.ppv + self.tpr)
-
-    @property
-    def mcc(self):
-        """
-        Matthew's correlation coefficient.
-
-        :math:`MCC = \\frac{TP + TN - FP \\times FN}{\\sqrt{(TP + FP)(TP + FN)(TN + FP)(TN + FN)}}`
-
-        :return: MCC.
-        """
-        tp = self.tp
-        tn = self.tn
-        fp = self.fp
-        fn = self.fn
-
-        return (tp + tn - fp * fn) / sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
-
-    @property
-    def bm(self):
-        """
-        Bookmaker informedness.
-
-        :math:`BI = TPR + TNR - 1`
-
-        :return: BM.
-        """
-        return self.tpr + self.tnr - 1
-
-    @property
-    def mk(self):
-        """
-        Markedness.
-
-        :math:`MK = PPV + NPV - 1`
-
-        Aliases
-
-        - deltaP
-
-        :return: Markedness.
-        """
-        return self.ppv + self.npv - 1
-
-    @property
-    def sensitivity(self):
-        """
-        Alias to TPR.
-
-        :return: Sensitivity.
-        """
-        return self.tpr
-
-    @property
-    def specificity(self):
-        """
-        Alias to TNR.
-
-        :return: Specificity.
-        """
-        return self.tnr
-
-    @property
-    def precision(self):
-        """
-        Alias to PPV.
-
-        :return: PPV.
-        """
-        return self.ppv
-
-    @property
-    def recall(self):
-        """
-        Alias to TPR.
-
-        :return: TPR.
-        """
-        return self.tpr
-
-    @property
-    def prevalence(self):
-        """
-        Prevalence.
-
-        :math:`\\frac{TP + FN}{N}`
-
-        :return: Prevalence.
-        """
-        return (self.tp + self.fn) / self.n
-
-    @property
-    def plr(self):
-        """
-        Positive likelihood ratio.
-
-        :math:`PLR = \\frac{TPR}{FPR}`
-
-        Aliases
-
-        - LR+
-
-        :return: PLR.
-        """
-        return self.tpr / self.fpr
-
-    @property
-    def nlr(self):
-        """
-        Negative likelihood ratio.
-
-        :math:`NLR = \\frac{FNR}{TNR}`
-
-        Aliases
-
-        - LR-
-
-        :return: NLR.
-        """
-        return self.fnr / self.tnr
-
-    @property
-    def dor(self):
-        """
-        Diagnostic odds ratio.
-
-        :math:`\\frac{PLR}{NLR}`
-
-        :return: DOR.
-        """
-        return self.plr / self.nlr
