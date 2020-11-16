@@ -19,6 +19,6 @@ for _, r in df[df.type == 'd'].sort_values(['name']).iterrows():
     e_name = r['name']
     e_form = r.equation
     name = f'   * - {e_name}'
-    eqn =  f'     - :math:`{e_form}`'
+    eqn = f'     - :math:`{e_form}`'
     print(name)
     print(eqn)

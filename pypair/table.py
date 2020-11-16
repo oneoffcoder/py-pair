@@ -374,6 +374,7 @@ class BinaryMeasures(object):
     """
     Binary measures based off of `a`, `b`, `c` and `d` from a 2x2 contingency table.
     """
+
     def __init__(self, a, b, c, d):
         """
         ctor.
@@ -1806,6 +1807,7 @@ class CmMeasures(object):
     """
     Confusion matrix measures.
     """
+
     def __init__(self, tp, fn, fp, tn):
         """
         ctor.
@@ -2325,6 +2327,3 @@ class ConfusionMatrix(BinaryTable):
         :return: Measure.
         """
         return self.__measures.get(measure)
-
-
-

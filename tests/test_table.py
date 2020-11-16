@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 from nose import with_setup
-from numpy.testing import assert_array_equal, assert_almost_equal
+from numpy.testing import assert_array_equal
 
 from pypair.table import BinaryTable, CategoricalTable, ConfusionMatrix
 
