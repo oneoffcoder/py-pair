@@ -15,6 +15,7 @@ is_property = lambda v: isinstance(v, property)
 is_method = lambda n: not n.startswith('_BinaryTable')
 is_valid = lambda n, v: is_property(v) and is_method(n)
 
+stuff = vars(BinaryTable)
 measures = [n for n, v in vars(BinaryTable).items() if is_valid(n, v)]
 for measure in measures:
     try:
