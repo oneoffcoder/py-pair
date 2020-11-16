@@ -148,6 +148,22 @@ def biserial(b, c, b_0=0, b_1=1):
     return r_b
 
 
+def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
+    """
+    Gets the binary-binary measure of association.
+
+    :param a: Binary variable (iterable).
+    :param b: Binary variable (iterable).
+    :param measure: Measure. Default is `chisq`.
+    :param a_0: The a zero value. Default 0.
+    :param a_1: The a one value. Default 1.
+    :param b_0: The b zero value. Default 0.
+    :param b_1: The b one value. Default 1.
+    :return: Measure.
+    """
+    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
+
+
 def phi_coefficient(a, b):
     """
     Computes the :math:`\\phi` coefficient.
@@ -157,21 +173,6 @@ def phi_coefficient(a, b):
     :return: :math:`\\phi`.
     """
     return CategoricalTable(a, b).phi
-
-
-def cramer_v(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
-    """
-    Computes Cramer's V. Only for two binary variables.
-
-    :param a: Binary data (iterable).
-    :param b: Binary data (iterable).
-    :param a_0: Zero value for a. Default is 0.
-    :param a_1: One value for a. Default is 1.
-    :param b_0: Zero value for b. Default is 0.
-    :param b_1: One value for b. Default is 1.
-    :return: Cramer's V.
-    """
-    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).cramer_v
 
 
 def goodman_kruskal_lambda(a, b):
@@ -186,21 +187,6 @@ def goodman_kruskal_lambda(a, b):
     :return: :math:`\\lambda`.
     """
     return CategoricalTable(a, b).goodman_kruskal_lambda
-
-
-def tetrachoric(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
-    """
-    Computes the tetrachoric correlation. Only for two binary variables.
-
-    :param a: Binary data (iterable).
-    :param b: Binary data (iterable).
-    :param a_0: Zero value for a. Default is 0.
-    :param a_1: One value for a. Default is 1.
-    :param b_0: Zero value for b. Default is 0.
-    :param b_1: One value for b. Default is 1.
-    :return: Tetrachoric correlation.
-    """
-    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).tetrachoric
 
 
 def __get_concordance(x, y):
