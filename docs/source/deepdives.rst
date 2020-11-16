@@ -156,7 +156,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{1}{4}\left(\frac{a}{a+b}+\frac{a}{a+c}+\frac{d}{b+d}+\frac{d}{b+d}\right)`
    * - Sokal-Sneath-V
      - :math:`\frac{ad}{(a+b)(a+c)(b+d)\sqrt{c+d}}`
-   * - Sørensen–Dice coefficient :cite:`2020:wiki-dice`
+   * - Sørensen–Dice :cite:`2020:wiki-dice`
      - :math:`\frac{2(a + d)}{2(a + d) + b + c}`
    * - Sorgenfrei
      - :math:`\frac{a^2}{(a+b)(a+c)}`
@@ -194,7 +194,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`2\sqrt{1 - \frac{a}{\sqrt{(a+b)(a+c)}}}`
    * - Jaccard distance :cite:`2020:wiki-jaccard`
      - :math:`\frac{b + c}{a + b + c}`
-   * - Lance-Williams;Bray-Curtis
+   * - Lance-Williams; Bray-Curtis
      - :math:`\frac{b+c}{2a+b+c}`
    * - Mean-Manhattan
      - :math:`\frac{b+c}{a+b+c+d}`
