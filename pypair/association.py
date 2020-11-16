@@ -1,5 +1,5 @@
 from functools import reduce
-from itertools import chain, combinations
+from itertools import combinations
 from math import sqrt
 
 import pandas as pd
@@ -256,9 +256,6 @@ def __get_concordance(x, y):
     data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
     results = combinations(data, 2)
     results = map(lambda tup: get_concordance(tup[0], tup[1]), results)
-    # results = ([get_concordance(p1, p2) for j, p2 in enumerate(data) if j > i] for i, p1 in enumerate(data))
-    results = filter(lambda arr: len(arr) > 0, results)
-    results = chain(*results)
     concordance = reduce(lambda c1, c2: c1 + c2, results)
     n = len(data)
     return concordance, n
@@ -344,6 +341,6 @@ def goodman_kruskal_gamma(x, y):
     :return: :math:`\\gamma`.
     """
     c, n = __get_concordance(x, y)
-    p_d, p_t, p_c = c.d / n, c.m / n, c.c / n
+    p_d, p_t, p_c = c.d / n, c.t / n, c.c / n
     gamma = (p_c - p_d) / (1 - p_t)
     return gamma
