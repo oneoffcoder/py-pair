@@ -525,7 +525,7 @@ class BinaryTable(CategoricalTable):
         :return: Cole.
         """
         a, b, c, d = self.__abcd
-        return (sqrt(2) * (a * d - b * c)) / sqrt((a * d - b * c) ** 2 - (a + b) * (a + c) * (b + d) * (c + d))
+        return (2 * (a * d - b * c) ** 2) / ((a * d - b * c) ** 2 - (a + b) * (a + c) * (b + d) * (c + d))
 
     @property
     @timeit
