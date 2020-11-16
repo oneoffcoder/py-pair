@@ -1,5 +1,5 @@
 from functools import reduce
-from itertools import chain
+from itertools import chain, combinations
 from math import sqrt
 
 import pandas as pd
@@ -31,7 +31,7 @@ class Concordance(object):
 
     def __add__(self, other):
         d = self.d + other.d
-        t = self.t + other.m
+        t = self.t + other.t
         t_x = self.t_x + other.t_x
         t_y = self.t_y + other.t_y
         c = self.c + other.c
@@ -254,7 +254,10 @@ def __get_concordance(x, y):
 
     is_valid = lambda a, b: a is not None and b is not None
     data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
-    results = ((get_concordance(p1, p2) for j, p2 in enumerate(data) if j > i) for i, p1 in enumerate(data))
+    results = combinations(data, 2)
+    results = map(lambda tup: get_concordance(tup[0], tup[1]), results)
+    # results = ([get_concordance(p1, p2) for j, p2 in enumerate(data) if j > i] for i, p1 in enumerate(data))
+    results = filter(lambda arr: len(arr) > 0, results)
     results = chain(*results)
     concordance = reduce(lambda c1, c2: c1 + c2, results)
     n = len(data)
