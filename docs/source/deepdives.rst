@@ -6,7 +6,7 @@ Let's go into some association measures in more details.
 Binary association
 ------------------
 
-The association between binary variables have been studied prolifically in the last 100 years :cite:`2010:choi,1970:cox,1984:reynolds,2020:ibm-proximities`. A binary variable has only two values. It is typical to re-encode these values into 0 or 1. How and why each of these two values are mapped to 0 or 1 is subjective, arbitrary and/or context-specific. For example, if we have a variable that captures the handedness, favoring left or right hand, of a person, we could map left to 0 and right to 1, or, left to 1 and right to 0. The 0-1 value representation of a binary variable's values is the common foundation for understanding association. Below is a contingency table created from two binary variables. Notice the main values of the tables are a, b, c, d.
+The association between binary variables have been studied prolifically in the last 100 years :cite:`2010:choi,1970:cox,1984:reynolds,2020:ibm-proximities`. A binary variable has only two values. It is typical to re-encode these values into 0 or 1. How and why each of these two values are mapped to 0 or 1 is subjective, arbitrary and/or context-specific. For example, if we have a variable that captures the handedness, favoring left or right hand, of a person, we could map left to 0 and right to 1, or, left to 1 and right to 0. The 0-1 value representation of a binary variable's values is the common foundation for understanding association. Below is a contingency table created from two binary variables. Notice the main values of the tables are `a`, `b`, `c` and `d`.
 
 - :math:`a = N_{11}` is the count of when the two variables have a value of 1
 - :math:`b = N_{10}` is the count of when the row variable has a value of 1 and the column variable has a value of 0
@@ -34,14 +34,14 @@ Also, look at how the table is structured with the value 1 coming before the val
      - b + d
      - n = a + b + c + d
 
-Note that a and d are `matches` and b and c are `mismatches`. Sometimes, depending on the context, matching on 0 is not considered a match; for example, if 1 is the presence of something and 0 is the absence, then an observation of absence and absence does not really look like a match (you cannot say two things match on what is not there).
+Note that a and d are `matches` and b and c are `mismatches`. Sometimes, depending on the context, matching on 0 is not considered a match. For example, if 1 is the presence of something and 0 is the absence, then an observation of absence and absence does not really feel right to consider as a match (you cannot say two things match on what is not there). Additionally, when 1 is presence and 0 is absence, and the data is very sparse (a lot of 0's compared to 1's), considering absence and absence as matching will make it appear that the two variables are very similar.
 
 In :cite:`2010:choi`, there are 76 similarity and distance measures identified (some are not unique and/or redundant). Similarity is how `alike` are two things, and distance is how `different` are two things; or, in other words, similarity is how close are two things and distance is how far apart are two things. If a similarity or distance measure produces a value in :math:`[0, 1]`, then we can convert between the two easily.
 
 - If :math:`s` is the similarity, then :math:`d = 1 - s` is the distance.
 - If :math:`d` is the distance, then :math:`s = 1 - d` is the similarity.
 
-If we use a contingency table to summarize a bivariate binary data, the following similarity and distance measures may be derived entirely from a, b, c and/or d. The general pattern is that similarity and distance is always a ratio. The numerator in the ratio defines what we are interested in measuring. When we have a and/or d in the numerator, it is likely we are measuring similarity; when we have c and/or d in the numerator, it is likely we are measuring distance. The denominator considers what is important in considering; is it the matches, mismatches or both? The following tables list some identified similarity and distance measures based off of 2 x 2 contingency tables.
+If we use a contingency table to summarize a bivariate binary data, the following similarity and distance measures may be derived entirely from `a`, `b`, `c` and/or `d`. The general pattern is that similarity and distance is always a ratio. The numerator in the ratio defines what we are interested in measuring. When we have `a` and/or `d` in the numerator, it is likely we are measuring similarity; when we have `b` and/or `c` in the numerator, it is likely we are measuring distance. The denominator considers what is important in considering; is it the matches, mismatches or both? The following tables list some identified similarity and distance measures based off of 2 x 2 contingency tables.
 
 .. list-table:: Similarity measures for 2 x 2 contingency table :cite:`2010:choi,2020:psu-binary`
    :header-rows: 1
@@ -175,7 +175,7 @@ If we use a contingency table to summarize a bivariate binary data, the followin
    * -
      - :math:`y = \left(\frac{ad}{bc}\right)^{\frac{\pi}{4}}`
    * - Tverskey Index :cite:`2020:wiki-tversky`
-     - :math:`\frac{a+d}{a+\theta b+ \phi c+d}`
+     - :math:`\frac{a}{a+\theta b+ \phi c}`
    * -
      - :math:`\theta` and :math:`\phi` are user-supplied parameters
    * - Yule-Q
@@ -214,6 +214,15 @@ If we use a contingency table to summarize a bivariate binary data, the followin
      - :math:`\frac{b+c}{4a+4b+4c+4d}`
    * - Yule-Q
      - :math:`\frac{2bc}{ad+bc}`
+
+Instead of using `a`, `b`, `c` and `d` from a contingency table to define these association measures, it is common to use set notation. For two binary variables, :math:`X` and :math:`Y`, the following are equivalent.
+
+- :math:`|X \cap Y| = a`
+- :math:`|X \setminus Y| = b`
+- :math:`|Y \setminus X| = c`
+- :math:`|X \cup Y| = a + b + c`
+
+You will notice that `d` does not show up in the above relationship.
 
 Concordant, discordant, tie
 ---------------------------
