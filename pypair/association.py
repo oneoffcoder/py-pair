@@ -161,6 +161,8 @@ def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
     :param b_1: The b one value. Default 1.
     :return: Measure.
     """
+    if measure not in BinaryTable.get_measures():
+        raise ValueError(f'{measure} is not a valid association measure.')
     return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
 
 
