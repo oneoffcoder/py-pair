@@ -28,6 +28,7 @@ def teardown():
 def test_confusion_matrix_creation():
     """
     Tests creating BinaryTable.
+
     :return: None.
     """
     a = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
@@ -68,41 +69,29 @@ def test_confusion_matrix_creation():
 @with_setup(setup, teardown)
 def test_binary_table_creation():
     """
-    Tests creating BinaryTable.
+    Tests creating BinaryTable. The data is simulated from this `site <https://www.mathsisfun.com/data/chi-square-test.html>`_.
+
     :return: None.
     """
-    a = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
-    b = [0, 0, 0, 1, 1, 0, 0, 1, 1, 1]
+    get_data = lambda x, y, n: [(x, y) for _ in range(n)]
+    data = get_data(1, 1, 207) + get_data(1, 0, 282) + get_data(0, 1, 231) + get_data(0, 0, 242)
+    a = [a for a, _ in data]
+    b = [b for _, b in data]
 
     table = BinaryTable(a, b)
-    assert_array_equal(table.observed, [[3, 2], [2, 3]])
-    assert_array_equal(table.expected, [[2.5, 2.5], [2.5, 2.5]])
-
-    assert_almost_equal(table.chisq, 0.4, decimal=5)
-    assert_almost_equal(table.phi, 0.2, decimal=5)
-
-    assert_almost_equal(table.jaccard, 0.42857142857142855, decimal=5)
-    assert_almost_equal(table.jaccard_distance, 0.5714285714285714, decimal=5)
-
-    assert_almost_equal(table.cramer_v, 0.2, decimal=5)
-    print(table.adjusted_rand_index)
-    print(table.mcnemar_test)
-    print(table.odds_ratio)
-    print(table.contingency_coefficient)
-    print(table.tetrachoric)
-    print(table.goodman_kruskal_lambda)
-    print(table.goodman_kruskal_lambda_reversed)
-    print(table.tschuprow_t)
-    print(table.uncertainty_coefficient)
-    print(table.uncertainty_coefficient_reversed)
-    print(table.mutual_information)
-    assert 1 == 1
+    for measure in BinaryTable.get_measures():
+        stats = table.get(measure)
+        if isinstance(stats, tuple):
+            print(f'{stats[0]:.8f}, {stats[1]:.8f}: {measure}')
+        else:
+            print(f'{stats:.8f}: {measure}')
 
 
 @with_setup(setup, teardown)
 def test_categorical_table_creation():
     """
     Tests creating CategoricalTable.
+
     :return: None.
     """
     a = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
