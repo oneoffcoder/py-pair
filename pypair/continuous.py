@@ -3,7 +3,7 @@ from itertools import combinations
 from math import sqrt
 
 import pandas as pd
-from scipy.stats import pearsonr, spearmanr, kendalltau
+from scipy.stats import pearsonr, spearmanr, kendalltau, f_oneway, kruskal, linregress
 
 from pypair.util import MeasureMixin
 
@@ -50,6 +50,17 @@ class Continuous(MeasureMixin, object):
         """
         r = kendalltau(self.__a, self.__b)
         return r.correlation, r.pvalue
+
+    @property
+    @lru_cache(maxsize=None)
+    def regression(self):
+        """
+        `Line regression <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.linregress.html>`_.
+
+        :return: Coefficient, p-value
+        """
+        slope, intercept, r_value, p_value, std_err = linregress(self.__a, self.__b)
+        return r_value, p_value
 
 
 class CorrelationRatio(MeasureMixin, object):
@@ -129,6 +140,32 @@ class CorrelationRatio(MeasureMixin, object):
         :returns: :math:`\\eta`.
         """
         return sqrt(self.eta_squared)
+
+    @property
+    @lru_cache(maxsize=None)
+    def anova(self):
+        """
+        Computes an `ANOVA test <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.f_oneway.html>`_.
+
+        :return: F-statistic, p-value.
+        """
+        df = self.__df
+        samples = [df[df.x == x].y for x in df.x.unique()]
+        r = f_oneway(*samples)
+        return r.statistic, r.pvalue
+
+    @property
+    @lru_cache(maxsize=None)
+    def kruskal(self):
+        """
+        Computes the `Kruskal-Wallis H-test <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.kruskal.html>`_.
+
+        :return: H-statistic, p-value.
+        """
+        df = self.__df
+        samples = [df[df.x == x].y for x in df.x.unique()]
+        r = kruskal(*samples)
+        return r.statistic, r.pvalue
 
 
 class Counts(object):
