@@ -1,6 +1,6 @@
 from pypair.biserial import Biserial
 from pypair.continuous import Concordance, CorrelationRatio
-from pypair.table import BinaryTable, CategoricalTable
+from pypair.contigency import BinaryTable, CategoricalTable
 
 
 def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):

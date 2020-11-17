@@ -4,7 +4,7 @@ import numpy as np
 from nose import with_setup
 from numpy.testing import assert_array_equal
 
-from pypair.table import BinaryTable, CategoricalTable, ConfusionMatrix
+from pypair.contigency import BinaryTable, CategoricalTable, ConfusionMatrix
 
 
 def setup():

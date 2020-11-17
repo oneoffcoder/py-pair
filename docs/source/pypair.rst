@@ -1,8 +1,8 @@
 PyPair
 ======
 
-Tables
-------
+Contigency Table Analysis
+-------------------------
 
 These are the basic contingency tables used to analyze categorical data.
 
@@ -11,7 +11,7 @@ These are the basic contingency tables used to analyze categorical data.
 - ConfusionMatrix
 - AgreementTable
 
-.. automodule:: pypair.table
+.. automodule:: pypair.contigency
     :members:
     :undoc-members:
     :show-inheritance:

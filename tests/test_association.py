@@ -7,7 +7,7 @@ from pypair.association import binary_binary, categorical_categorical, \
     binary_continuous, concordance, categorical_continuous
 from pypair.biserial import Biserial
 from pypair.continuous import Concordance, CorrelationRatio
-from pypair.table import BinaryTable, CategoricalTable
+from pypair.contigency import BinaryTable, CategoricalTable
 
 
 def setup():
