@@ -4,7 +4,8 @@
 
 PyPair is a statistical library to compute pairwise association between any two variables.
 
-[Documentation is available](https://py-pair.readthedocs.io/). 
+- [Documentation](https://py-pair.readthedocs.io/)
+- [PyPi](https://pypi.org/project/pypair/) 
 
 # Docker
 
