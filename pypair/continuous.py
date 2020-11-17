@@ -78,6 +78,11 @@ class CorrelationRatio(object):
     @property
     @lru_cache(maxsize=None)
     def eta(self):
+        """
+        Gets :math:`\\eta`.
+
+        :returns: :math:`\\eta`.
+        """
         return sqrt(self.eta_squared)
 
     @lru_cache(maxsize=None)
