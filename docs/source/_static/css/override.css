@@ -1,8 +1,11 @@
+table.expand {
+    width: 100%;
+}
 table.rc-headers, th.rc-headers, td.rc-headers {
             border: 1px dashed blue;
             border-collapse: collapse;
             padding: 5px;
-        }
-        th.heading, td.heading {
-            font-weight: bold;
-        }
+}
+th.heading, td.heading {
+    font-weight: bold;
+}

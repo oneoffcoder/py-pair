@@ -25,47 +25,44 @@ PyPair is a statistical library to compute pairwise association between any two 
 
 Assuming we have data and we know the variable types in this data using the taxonomy above, we might want to make a progression of analyses from univariate, bivariate and to multivariate analyses. Along the way, for bivariate analysis, we are often curious about the association between any two pairs of variables. We want to know both the magnitude (the strength, is it small or big?) and direction (the sign, is it positive or negative?) of the association. When the variables are all of the same type, association measures may be abound to conduct pairwise association; if all the variables are continuous, we might just want to apply canonical Pearson correlation.
 
-The tough situation is when we have a mixed variable type of dataset; and this tough situation is quite often the normal situation. How do we find the association between a continuous and categorical variable? We can create a table as below to map the available association measures for any two types of variables :cite:`2020:calkins,2020:psu-continuous`. (In the table below, we collapse all continuous variable types into one).
+The tough situation is when we have a mixed variable type of dataset; and this tough situation is quite often the normal situation. How do we find the association between a continuous and categorical variable? We can create a table as below to map the available association measure approaches for any two types of variables :cite:`2020:calkins,2020:psu-continuous`. (In the table below, we collapse all categorical and continuous variable types).
 
 .. raw:: html
 
-    <table class="rc-headers">
+    <table class="rc-headers expand">
         <tr>
             <td class="rc-headers"></td>
-            <td class="rc-headers heading">Binary</td>
-            <td class="rc-headers heading">Nominal</td>
-            <td class="rc-headers heading">Ordinal</td>
+            <td class="rc-headers heading">Categorical</td>
             <td class="rc-headers heading">Continuous</td>
         </tr>
         <tr>
-            <td class="rc-headers heading">Binary</td>
+            <td class="rc-headers heading">Categorical</td>
             <td class="rc-headers">
-                Jaccard, Dice, Yule, Russell-Rao, Sokal-Michener, Rogers-Tanimoto, Kulzinsky, Phi
+                <ul>
+                    <li>Confusion Matrix</li>
+                    <li>2x2 Contingency Table Analysis</li>
+                    <li>RxC Contingency Table Analysis</li>
+                    <li>Agreement Analysis</li>
+                </ul>
             </td>
             <td class="rc-headers">-</td>
-            <td class="rc-headers">-</td>
-            <td class="rc-headers">-</td>
         </tr>
         <tr>
-            <td class="rc-headers heading">Nominal</td>
-            <td class="rc-headers">Phi</td>
-            <td class="rc-headers">Phi, L, C, Lambda</td>
-            <td class="rc-headers">-</td>
-            <td class="rc-headers">-</td>
-        </tr>
-        <tr>
-            <td class="rc-headers heading">Ordinal</td>
-            <td class="rc-headers">Phi</td>
-            <td class="rc-headers">Rank biserial</td>
-            <td class="rc-headers">Spearman rho</td>
-            <td class="rc-headers">-</td>
-        </tr>
-        <tr class="rc-headers">
             <td class="rc-headers heading">Continuous</td>
-            <td class="rc-headers">Point-biserial</td>
-            <td class="rc-headers">Eta</td>
-            <td class="rc-headers">Biserial</td>
-            <td class="rc-headers">Pearson, Kendall, Spearman, Cosine</td>
+            <td class="rc-headers">
+                <ul>
+                    <li>Biserial</li>
+                    <li>Correlation Ratio</li>
+                    <li>ANOVA</li>
+                    <li>Clustering Coefficients</li>
+                </ul>
+            </td>
+            <td class="rc-headers">
+                <ul>
+                    <li>Correlation</li>
+                    <li>Concordance</li>
+                </ul>
+            </td>
         </tr>
     </table>
 
