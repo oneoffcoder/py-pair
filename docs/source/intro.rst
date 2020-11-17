@@ -63,7 +63,7 @@ The tough situation is when we have a mixed variable type of dataset; and this t
         <tr class="rc-headers">
             <td class="rc-headers heading">Continuous</td>
             <td class="rc-headers">Point-biserial</td>
-            <td class="rc-headers">Point-biserial</td>
+            <td class="rc-headers">Eta</td>
             <td class="rc-headers">Biserial</td>
             <td class="rc-headers">Pearson, Kendall, Spearman, Cosine</td>
         </tr>
