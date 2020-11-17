@@ -35,7 +35,7 @@ def test_confusion_matrix_creation():
     b = [0, 0, 0, 1, 1, 0, 0, 1, 1, 1]
 
     table = ConfusionMatrix(a, b)
-    for measure in ConfusionMatrix.get_measures():
+    for measure in ConfusionMatrix.measures():
         stats = table.get(measure)
         if isinstance(stats, tuple):
             print(f'{stats[0]:.8f}, {stats[1]:.8f}: {measure}')
@@ -56,7 +56,7 @@ def test_binary_table_creation():
     b = [b for _, b in data]
 
     table = BinaryTable(a, b)
-    for measure in BinaryTable.get_measures():
+    for measure in BinaryTable.measures():
         stats = table.get(measure)
         if isinstance(stats, tuple):
             print(f'{stats[0]:.8f}, {stats[1]:.8f}: {measure}')

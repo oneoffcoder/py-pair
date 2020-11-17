@@ -1,6 +1,6 @@
 from pypair.biserial import Biserial
 from pypair.contigency import BinaryTable, CategoricalTable, ConfusionMatrix, AgreementTable
-from pypair.continuous import Concordance, CorrelationRatio
+from pypair.continuous import Concordance, CorrelationRatio, Continuous
 
 
 def confusion(a, b, measure='acc', a_0=0, a_1=1, b_0=0, b_1=1):
@@ -16,7 +16,7 @@ def confusion(a, b, measure='acc', a_0=0, a_1=1, b_0=0, b_1=1):
     :param b_1: The b one value. Default 1.
     :return: Measure.
     """
-    if measure not in ConfusionMatrix.get_measures():
+    if measure not in ConfusionMatrix.measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return ConfusionMatrix(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
 
@@ -34,7 +34,7 @@ def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
     :param b_1: The b one value. Default 1.
     :return: Measure.
     """
-    if measure not in BinaryTable.get_measures():
+    if measure not in BinaryTable.measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
 
@@ -50,7 +50,7 @@ def categorical_categorical(a, b, measure='chisq', a_vals=None, b_vals=None):
     :param b_vals: The unique values in `b`.
     :return: Measure.
     """
-    if measure not in CategoricalTable.get_measures():
+    if measure not in CategoricalTable.measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return CategoricalTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
 
@@ -66,7 +66,7 @@ def agreement(a, b, measure='chohen_k', a_vals=None, b_vals=None):
     :param b_vals: The unique values in `b`.
     :return: Measure.
     """
-    if measure not in AgreementTable.get_measures():
+    if measure not in AgreementTable.measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return AgreementTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
 
@@ -82,7 +82,7 @@ def binary_continuous(b, c, measure='biserial', b_0=0, b_1=1):
     :param b_1: Value when `b` is one. Default is 1.
     :return: Measure.
     """
-    if measure not in Biserial.get_measures():
+    if measure not in Biserial.measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return Biserial(b, c, b_0=b_0, b_1=b_1).get(measure)
 
@@ -96,7 +96,7 @@ def categorical_continuous(x, y, measure='eta'):
     :param measure: Measure. Default is `eta`.
     :return: Measure.
     """
-    if measure not in CorrelationRatio.get_measures():
+    if measure not in CorrelationRatio.measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return CorrelationRatio(x, y).get(measure)
 
@@ -110,6 +110,20 @@ def concordance(x, y, measure='kendall_tau'):
     :param measure: Measure. Default is `kendall_tau`.
     :return: Measure.
     """
-    if measure not in Concordance.get_measures():
+    if measure not in Concordance.measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return Concordance(x, y).get(measure)
+
+
+def continuous_continuous(x, y, measure='pearson'):
+    """
+    Gets the continuous-continuous association.
+
+    :param x: Continuous variable (iterable).
+    :param y: Continuous variable (iterable).
+    :param measure: Measure. Default is 'pearson'.
+    :return: Measure.
+    """
+    if measure not in Continuous.measures():
+        raise ValueError(f'{measure} is not a valid association measure.')
+    return Continuous(x, y).get(measure)

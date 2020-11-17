@@ -3,11 +3,56 @@ from itertools import combinations
 from math import sqrt
 
 import pandas as pd
+from scipy.stats import pearsonr, spearmanr, kendalltau
 
-from pypair.util import get_measures
+from pypair.util import MeasureMixin
 
 
-class CorrelationRatio(object):
+class Continuous(MeasureMixin, object):
+    def __init__(self, a, b):
+        """
+        ctor.
+
+        :param a: Continuous variable (iterable).
+        :param b: Continuous variable (iterable).
+        """
+        self.__a = a
+        self.__b = b
+
+    @property
+    @lru_cache(maxsize=None)
+    def pearson(self):
+        """
+        `Pearson's r <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.pearsonr.html>`_.
+
+        :return: Pearson's r, p-value.
+        """
+        return pearsonr(self.__a, self.__b)
+
+    @property
+    @lru_cache(maxsize=None)
+    def spearman(self):
+        """
+        `Spearman's r <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.spearmanr.html>`_.
+
+        :return: Spearman's r, p-value.
+        """
+        r = spearmanr(self.__a, self.__b)
+        return r.correlation, r.pvalue
+
+    @property
+    @lru_cache(maxsize=None)
+    def kendall(self):
+        """
+        `Kendall's tau <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.kendalltau.html>`_.
+
+        :return: Kendall's tau, p-value.
+        """
+        r = kendalltau(self.__a, self.__b)
+        return r.correlation, r.pvalue
+
+
+class CorrelationRatio(MeasureMixin, object):
     """
     `Correlation ratio <https://en.wikipedia.org/wiki/Correlation_ratio>`_.
 
@@ -85,25 +130,6 @@ class CorrelationRatio(object):
         """
         return sqrt(self.eta_squared)
 
-    @lru_cache(maxsize=None)
-    def get(self, measure):
-        """
-        Gets the specified statistic.
-
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
-        """
-        return getattr(self, measure)
-
-    @staticmethod
-    def get_measures():
-        """
-        Gets all the available measures.
-
-        :return: List of measures.
-        """
-        return get_measures('_CorrelationRatio', CorrelationRatio)
-
 
 class Counts(object):
     """
@@ -135,7 +161,7 @@ class Counts(object):
         return Counts(d, t_xy, t_x, t_y, c)
 
 
-class Concordance(object):
+class Concordance(MeasureMixin, object):
     """
     Concordance for continuous and ordinal data.
     """
@@ -291,22 +317,3 @@ class Concordance(object):
         p_d, p_t, p_c = c.d / n, (c.t_xy + c.t_x + c.t_y) / n, c.c / n
         gamma = (p_c - p_d) / (1 - p_t)
         return gamma
-
-    @lru_cache(maxsize=None)
-    def get(self, measure):
-        """
-        Gets the specified statistic.
-
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
-        """
-        return getattr(self, measure)
-
-    @staticmethod
-    def get_measures():
-        """
-        Gets all the available measures.
-
-        :return: List of measures.
-        """
-        return get_measures('_Concordance', Concordance)

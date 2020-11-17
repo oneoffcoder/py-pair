@@ -4,10 +4,10 @@ import numpy as np
 from nose import with_setup
 
 from pypair.association import binary_binary, categorical_categorical, \
-    binary_continuous, concordance, categorical_continuous
+    binary_continuous, concordance, categorical_continuous, continuous_continuous, confusion
 from pypair.biserial import Biserial
-from pypair.continuous import Concordance, CorrelationRatio
-from pypair.contigency import BinaryTable, CategoricalTable
+from pypair.contigency import BinaryTable, CategoricalTable, ConfusionMatrix
+from pypair.continuous import Concordance, CorrelationRatio, Continuous
 
 
 def setup():
@@ -39,7 +39,7 @@ def test_binary_binary():
     a = [a for a, _ in data]
     b = [b for _, b in data]
 
-    for m in BinaryTable.get_measures():
+    for m in BinaryTable.measures():
         r = binary_binary(a, b, m)
         print(f'{r}: {m}')
 
@@ -56,7 +56,7 @@ def test_categorical_categorical():
     a = [a for a, _ in data]
     b = [b for _, b in data]
 
-    for m in CategoricalTable.get_measures():
+    for m in CategoricalTable.measures():
         r = categorical_categorical(a, b, m)
         print(f'{r}: {m}')
 
@@ -73,7 +73,7 @@ def test_binary_continuous():
     a = [a for a, _ in data]
     b = [b for _, b in data]
 
-    for m in Biserial.get_measures():
+    for m in Biserial.measures():
         r = binary_continuous(a, b, m)
         print(f'{r}: {m}')
 
@@ -88,7 +88,7 @@ def test_concordance():
     a = [1, 2, 3]
     b = [3, 2, 1]
 
-    for m in Concordance.get_measures():
+    for m in Concordance.measures():
         r = concordance(a, b, m)
         print(f'{r}: {m}')
 
@@ -96,7 +96,7 @@ def test_concordance():
 @with_setup(setup, teardown)
 def test_categorical_continuous():
     """
-    Tests categorical-continuous. Data take from `Wikipedia <https://en.wikipedia.org/wiki/Correlation_ratio>`_.
+    Tests categorical-continuous. Data taken from `Wikipedia <https://en.wikipedia.org/wiki/Correlation_ratio>`_.
 
     :return: None.
     """
@@ -107,6 +107,40 @@ def test_categorical_continuous():
     ]
     x = [x for x, _ in data]
     y = [y for _, y in data]
-    for m in CorrelationRatio.get_measures():
-        r = categorical_continuous(x, y)
+    for m in CorrelationRatio.measures():
+        r = categorical_continuous(x, y, m)
+        print(f'{r}: {m}')
+
+
+@with_setup(setup, teardown)
+def test_continuous_continuous():
+    """
+    Tests continuous-continuous.
+
+    :return: None.
+    """
+    x = [x for x in range(10)]
+    y = [y for y in range(10)]
+    for m in Continuous.measures():
+        r = continuous_continuous(x, y, m)
+        print(f'{r}: {m}')
+
+
+@with_setup(setup, teardown)
+def test_confusion():
+    """
+    Tests confusion matrix. Data taken from `here <https://www.dataschool.io/simple-guide-to-confusion-matrix-terminology/>`_.
+
+    :return: None
+    """
+    tn = [(0, 0) for _ in range(50)]
+    fp = [(0, 1) for _ in range(10)]
+    fn = [(1, 0) for _ in range(5)]
+    tp = [(1, 1) for _ in range(100)]
+    data = tn + fp + fn + tp
+    a = [a for a, _ in data]
+    b = [b for _, b in data]
+
+    for m in ConfusionMatrix.measures():
+        r = confusion(a, b, m)
         print(f'{r}: {m}')

@@ -4,10 +4,10 @@ from math import sqrt
 import pandas as pd
 from scipy.stats import norm
 
-from pypair.util import get_measures
+from pypair.util import MeasureMixin
 
 
-class Biserial(object):
+class Biserial(MeasureMixin, object):
     """
     Biserial association between a binary and continuous variable.
     """
@@ -128,22 +128,3 @@ class Biserial(object):
 
         r = 2 * (y_1 - y_0) / n
         return r
-
-    @lru_cache(maxsize=None)
-    def get(self, measure):
-        """
-        Gets the specified statistic.
-
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
-        """
-        return getattr(self, measure)
-
-    @staticmethod
-    def get_measures():
-        """
-        Gets all the available measures.
-
-        :return: List of measures.
-        """
-        return get_measures('_Biserial', Biserial)

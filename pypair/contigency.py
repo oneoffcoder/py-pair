@@ -8,10 +8,10 @@ from scipy import stats
 from scipy.special import binom
 
 from pypair.decorator import timeit, similarity, distance
-from pypair.util import get_measures
+from pypair.util import MeasureMixin
 
 
-class ContingencyTable(ABC):
+class ContingencyTable(MeasureMixin, ABC):
     """
     Abstract contingency table. All other tables inherit from this one.
     """
@@ -96,6 +96,7 @@ class CategoricalTable(ContingencyTable):
         return self._df.query(q).shape[0]
 
     @property
+    @lru_cache(maxsize=None)
     def chisq(self):
         """
         The `chi-square statistic <https://en.wikipedia.org/wiki/Chi-square_distribution>`_ :math:`\\chi^2`,
@@ -121,6 +122,7 @@ class CategoricalTable(ContingencyTable):
         return self._chisq
 
     @property
+    @lru_cache(maxsize=None)
     def chisq_dof(self):
         """
         Returns the degrees of freedom form :math:`\\chi^2`, which is defined as :math:`(R - 1)(C - 1)`,
@@ -132,6 +134,7 @@ class CategoricalTable(ContingencyTable):
         return (self._n_rows - 1) * (self._n_cols - 1)
 
     @property
+    @lru_cache(maxsize=None)
     def phi(self):
         """
         The `phi coefficient <https://en.wikipedia.org/wiki/Phi_coefficient>`_ :math:`\\phi` is defined
@@ -158,6 +161,7 @@ class CategoricalTable(ContingencyTable):
         return p_ab * log(c_ba)
 
     @property
+    @lru_cache(maxsize=None)
     def uncertainty_coefficient(self):
         """
         The `uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_ :math:`U(X|Y)`
@@ -192,6 +196,7 @@ class CategoricalTable(ContingencyTable):
         return e
 
     @property
+    @lru_cache(maxsize=None)
     def uncertainty_coefficient_reversed(self):
         """
         `Uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_.
@@ -213,6 +218,7 @@ class CategoricalTable(ContingencyTable):
         return e
 
     @property
+    @lru_cache(maxsize=None)
     def mutual_information(self):
         """
         The `mutual information <https://en.wikipedia.org/wiki/Mutual_information>`_ between
@@ -237,6 +243,7 @@ class CategoricalTable(ContingencyTable):
         return mi
 
     @property
+    @lru_cache(maxsize=None)
     def goodman_kruskal_lambda(self):
         """
         Goodman-Kruskal's lambda is the `proportional reduction in error`
@@ -273,6 +280,7 @@ class CategoricalTable(ContingencyTable):
         return gkl
 
     @property
+    @lru_cache(maxsize=None)
     def goodman_kruskal_lambda_reversed(self):
         """
         Computes :math:`\\lambda_{A|B}`.
@@ -286,6 +294,7 @@ class CategoricalTable(ContingencyTable):
         return gkl
 
     @property
+    @lru_cache(maxsize=None)
     def adjusted_rand_index(self):
         """
         The Adjusted Rand Index (ARI) should yield a value between
@@ -312,20 +321,6 @@ class CategoricalTable(ContingencyTable):
         bot = 0.5 * (a_i + b_j) - (a_i * b_j) / n
         s = top / bot
         return s
-
-    @lru_cache(maxsize=None)
-    def get(self, measure):
-        """
-        Gets the specified statistic.
-
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
-        """
-        return getattr(self, measure)
-
-    @staticmethod
-    def get_measures():
-        return get_measures('_CategoricalTable', CategoricalTable)
 
 
 class AgreementTable(CategoricalTable):
@@ -394,27 +389,8 @@ class AgreementTable(CategoricalTable):
         kappas = [kappa(theta_1(i), theta_2(i)) for i in range(n)]
         return kappas
 
-    @lru_cache(maxsize=None)
-    def get(self, measure):
-        """
-        Gets the specified statistic.
 
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
-        """
-        return getattr(self, measure)
-
-    @staticmethod
-    def get_measures():
-        """
-        Gets all the available measures.
-
-        :return: List of measures.
-        """
-        return get_measures('_AgreementTable', AgreementTable)
-
-
-class BinaryMeasures(object):
+class BinaryMeasures(MeasureMixin, object):
     """
     Binary measures based off of `a`, `b`, `c` and `d` from a 2x2 contingency table.
     """
@@ -1697,108 +1673,6 @@ class BinaryMeasures(object):
         a, b, c, _ = self.__abcd
         return a / (a + theta * b + phi * c)
 
-    @lru_cache(maxsize=None)
-    def get(self, measure):
-        """
-        Gets the specified statistic.
-
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
-        """
-        return getattr(self, measure)
-
-    @staticmethod
-    @lru_cache(maxsize=None)
-    def get_measures():
-        """
-        Gets a (sorted) list of all association measures available. This list below can grow or shrink (the list below
-        was generated once). If you call this method, you will always get the most up to date measures that are
-        available.
-
-        - ``ample``
-        - ``anderberg``
-        - ``baroni_urbani_buser_i``
-        - ``baroni_urbani_buser_ii``
-        - ``braun_banquet``
-        - ``chisq``
-        - ``chord``
-        - ``cole_i``
-        - ``cole_ii``
-        - ``contingency_coefficient``
-        - ``cosine``
-        - ``cramer_v``
-        - ``dennis``
-        - ``dice``
-        - ``disperson``
-        - ``driver_kroeber``
-        - ``euclid``
-        - ``eyraud``
-        - ``fager_mcgowan``
-        - ``faith``
-        - ``forbes_ii``
-        - ``forbesi``
-        - ``fossum``
-        - ``gilbert_wells``
-        - ``goodman_kruskal``
-        - ``gower``
-        - ``gower_legendre``
-        - ``hamann``
-        - ``hamming``
-        - ``hellinger``
-        - ``inner_product``
-        - ``intersection``
-        - ``jaccard``
-        - ``jaccard_3w``
-        - ``jaccard_distance``
-        - ``johnson``
-        - ``kulcyznski_ii``
-        - ``kulczynski_i``
-        - ``lance_williams``
-        - ``mcconnaughey``
-        - ``mcnemar_test``
-        - ``mean_manhattan``
-        - ``michael``
-        - ``mountford``
-        - ``ochia_i``
-        - ``ochia_ii``
-        - ``odds_ratio``
-        - ``pattern_difference``
-        - ``pearson_heron_i``
-        - ``pearson_heron_ii``
-        - ``pearson_i``
-        - ``peirce``
-        - ``person_ii``
-        - ``roger_tanimoto``
-        - ``russel_rao``
-        - ``shape_difference``
-        - ``simpson``
-        - ``size_difference``
-        - ``sokal_michener``
-        - ``sokal_sneath_i``
-        - ``sokal_sneath_ii``
-        - ``sokal_sneath_iii``
-        - ``sokal_sneath_iv``
-        - ``sokal_sneath_v``
-        - ``sorensen_dice``
-        - ``sorgenfrei``
-        - ``stiles``
-        - ``tanimoto_distance``
-        - ``tanimoto_i``
-        - ``tanimoto_ii``
-        - ``tarantula``
-        - ``tarwid``
-        - ``tetrachoric``
-        - ``tschuprow_t``
-        - ``vari``
-        - ``yule_q``
-        - ``yule_q_difference``
-        - ``yule_w``
-        - ``yule_y``
-
-        :return: List of association measures.
-        """
-        return get_measures('_BinaryMeasures', BinaryMeasures)
-
 
 class BinaryTable(CategoricalTable):
     """
@@ -1825,13 +1699,13 @@ class BinaryTable(CategoricalTable):
         self.__measures = BinaryMeasures(self._a, self._b, self._c, self._d)
 
     @staticmethod
-    def get_measures():
+    def measures():
         """
         Gets a (sorted) list of all association measures available.
 
         :return: List of association measures.
         """
-        return BinaryMeasures.get_measures()
+        return BinaryMeasures.measures()
 
     def get(self, measure):
         """
@@ -1843,7 +1717,7 @@ class BinaryTable(CategoricalTable):
         return self.__measures.get(measure)
 
 
-class CmMeasures(object):
+class CmMeasures(MeasureMixin, object):
     """
     Confusion matrix measures.
     """
@@ -2255,55 +2129,6 @@ class CmMeasures(object):
         """
         return self.plr / self.nlr
 
-    @lru_cache(maxsize=None)
-    def get(self, measure):
-        """
-        Gets the specified statistic.
-
-        :param measure: Name of statistic.
-        :return: Measure.
-        """
-        return getattr(self, measure)
-
-    @staticmethod
-    def get_measures():
-        """
-        Gets a (sorted) list of all measures.
-
-        - ``acc``
-        - ``ba``
-        - ``bm``
-        - ``dor``
-        - ``f1``
-        - ``fdr``
-        - ``fn``
-        - ``fnr``
-        - ``fomr``
-        - ``fp``
-        - ``fpr``
-        - ``mcc``
-        - ``mk``
-        - ``n``
-        - ``nlr``
-        - ``npv``
-        - ``plr``
-        - ``ppv``
-        - ``precision``
-        - ``prevalence``
-        - ``pt``
-        - ``recall``
-        - ``sensitivity``
-        - ``specificity``
-        - ``tn``
-        - ``tnr``
-        - ``tp``
-        - ``tpr``
-        - ``ts``
-
-        :return: List of measures.
-        """
-        return get_measures('_CmMeasures', CmMeasures)
-
 
 class ConfusionMatrix(BinaryTable):
     """
@@ -2347,13 +2172,13 @@ class ConfusionMatrix(BinaryTable):
         self.__measures = CmMeasures(tp, fn, fp, tn)
 
     @staticmethod
-    def get_measures():
+    def measures():
         """
         Gets a (sorted) list of all association measures available.
 
         :return: List of association measures.
         """
-        return CmMeasures.get_measures()
+        return CmMeasures.measures()
 
     def get(self, measure):
         """
