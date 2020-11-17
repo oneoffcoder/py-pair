@@ -6,6 +6,15 @@ PyPair is a statistical library to compute pairwise association between any two 
 
 [Documentation is available](https://py-pair.readthedocs.io/). 
 
+# Docker
+
+If building on WSL-2, change the line endings.
+
+```bash
+sed -i -e 's/\r$//' build.sh
+sed -i -e 's/\r$//' publish.sh
+```
+
 # Software Copyright
 
 ```
