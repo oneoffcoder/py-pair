@@ -9,6 +9,7 @@ pyflakes
 numpy
 scipy
 pandas
+scikit-learn
 # DOCUMENTATION
 sphinx
 sphinx_rtd_theme
