@@ -3,9 +3,10 @@ import random
 import numpy as np
 from nose import with_setup
 
-from pypair.association import kendall_tau, somers_d, goodman_kruskal_gamma, binary_binary, categorical_categorical, \
-    binary_continuous
+from pypair.association import binary_binary, categorical_categorical, \
+    binary_continuous, concordance
 from pypair.biserial import Biserial
+from pypair.continuous import Concordance
 from pypair.table import BinaryTable, CategoricalTable
 
 
@@ -78,42 +79,15 @@ def test_binary_continuous():
 
 
 @with_setup(setup, teardown)
-def test_kendall_tau():
+def test_concordance():
     """
-    Tests Kendall's :math:`\\tau`.
+    Tests concordance.
 
     :return: None.
     """
     a = [1, 2, 3]
     b = [3, 2, 1]
 
-    t = kendall_tau(a, b)
-    assert t == -1.0
-
-
-@with_setup(setup, teardown)
-def test_somers_d():
-    """
-    Tests Somers' d.
-
-    :return: None.
-    """
-    a = [1, 2, 3]
-    b = [3, 2, 1]
-
-    t = somers_d(a, b)
-    assert t == (-1.0, -1.0)
-
-
-@with_setup(setup, teardown)
-def test_goodman_kruskal_gamma():
-    """
-    Tests Goodman-Kruskal :math:`\\gamma`
-
-    :return: None.
-    """
-    a = [1, 2, 3]
-    b = [3, 2, 1]
-
-    t = goodman_kruskal_gamma(a, b)
-    assert t == -1.0
+    for m in Concordance.get_measures():
+        r = concordance(a, b, m)
+        print(f'{r}: {m}')
