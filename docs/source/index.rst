@@ -29,6 +29,7 @@ PyPair is a statistical library to compute pairwise association between any two 
    :caption: Contents
 
    intro
+   quickstart
    deepdives
    zzz-bib
 

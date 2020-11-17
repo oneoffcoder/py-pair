@@ -2,7 +2,9 @@
 
 # PyPair
 
-PyPair is a statistical library to compute pairwise association between any two variables. 
+PyPair is a statistical library to compute pairwise association between any two variables.
+
+[Documentation is available](https://py-pair.readthedocs.io/). 
 
 # Software Copyright
 

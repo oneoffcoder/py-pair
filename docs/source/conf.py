@@ -68,3 +68,18 @@ html_show_sphinx = False
 html_last_updated_fmt = '%b %d, %Y, %X'
 html_logo = '_static/images/logo-small.png'
 html_favicon = '_static/favicon.ico'
+html_theme_options = {
+    'canonical_url': 'https://py-pair.readthedocs.io/',
+    'analytics_id': 'UA-150762273-1',  #  Provided by Google in your dashboard
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': True,
+    'style_nav_header_background': '#0085CA',
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
+}
