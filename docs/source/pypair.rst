@@ -28,6 +28,17 @@ These are the biserial association measures.
     :show-inheritance:
     :special-members: __init__
 
+Continuous
+----------
+
+These are the continuous association measures.
+
+.. automodule:: pypair.continuous
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :special-members: __init__
+
 Associations
 ------------
 
