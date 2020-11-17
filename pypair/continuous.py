@@ -4,6 +4,7 @@ from math import sqrt
 
 import pandas as pd
 from scipy.stats import pearsonr, spearmanr, kendalltau, f_oneway, kruskal, linregress
+from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
 from pypair.util import MeasureMixin
 
@@ -166,6 +167,42 @@ class CorrelationRatio(MeasureMixin, object):
         samples = [df[df.x == x].y for x in df.x.unique()]
         r = kruskal(*samples)
         return r.statistic, r.pvalue
+
+    @property
+    @lru_cache(maxsize=None)
+    def silhouette(self):
+        """
+        `Silhouette coefficient <https://scikit-learn.org/stable/modules/clustering.html#silhouette-coefficient>`_.
+
+        :return: Silhouette coefficient.
+        """
+        labels = self.__df.x
+        X = self.__df[['y']]
+        return silhouette_score(X, labels)
+
+    @property
+    @lru_cache(maxsize=None)
+    def davies_bouldin(self):
+        """
+        `Davies-Bouldin Index <https://scikit-learn.org/stable/modules/clustering.html#davies-bouldin-index>`_.
+
+        :return: Davies-Bouldin Index.
+        """
+        labels = self.__df.x
+        X = self.__df[['y']]
+        return davies_bouldin_score(X, labels)
+
+    @property
+    @lru_cache(maxsize=None)
+    def calinski_harabasz(self):
+        """
+        `Calinski-Harabasz Index <https://scikit-learn.org/stable/modules/clustering.html#calinski-harabasz-index>`_.
+
+        :return: Calinski-Harabasz Index.
+        """
+        labels = self.__df.x
+        X = self.__df[['y']]
+        return calinski_harabasz_score(X, labels)
 
 
 class Counts(object):
