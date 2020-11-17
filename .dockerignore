@@ -1,0 +1,14 @@
+**/*.pyc
+.idea/
+docs/build/
+.pytest_cache/
+build/
+coverage/
+dist/
+pypair.egg-info/
+docs/build/
+.coverage
+.noseids
+.ipynb_checkpoints/
+joblib_memmap/
+.DS_store
