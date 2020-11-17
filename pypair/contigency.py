@@ -367,7 +367,7 @@ class AgreementTable(CategoricalTable):
     @property
     def cohen_light_k(self):
         """
-        Computes Cohen-Light :math:`\\kappa`. :math:`\\kappa` is a measure of conditional agreement.
+        Cohen-Light :math:`\\kappa`. :math:`\\kappa` is a measure of conditional agreement.
         Several :math:`\\kappa`, one for each unique value, will be computed and returned.
 
         - :math:`\\kappa = \\frac{\\theta_1 - \\theta_2}{1 - \\theta_2}`
