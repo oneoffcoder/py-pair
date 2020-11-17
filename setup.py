@@ -5,14 +5,14 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='pypair',
-    version='0.0.1',
+    version='1.0.0',
     author='Jee Vang',
     author_email='vangjee@gmail.com',
     packages=find_packages(exclude=('*.tests', '*.tests.*', 'tests.*', 'tests')),
     description='Pairwise association measures of statistical variable types',
     long_description=long_desc,
     long_description_content_type='text/markdown',
-    url='https://github.com/vangj/py-bbn',
+    url='https://github.com/oneoffcoder/py-pair',
     keywords=' '.join(['statistics', 'pairwise', 'association', 'correlation', 'measurement', 'strength']),
     install_requires=['scipy', 'numpy', 'pandas', 'scikit-learn'],
     classifiers=[

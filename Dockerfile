@@ -9,5 +9,5 @@ RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install build-essential -y
 COPY . /py-pair
-RUN conda install --file /py-pair/requirements.txt -y
+RUN conda install -c conda-forge --file /py-pair/requirements.txt -y
 RUN /py-pair/publish.sh

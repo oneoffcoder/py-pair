@@ -13,6 +13,7 @@ scikit-learn
 # DOCUMENTATION
 sphinx
 sphinx_rtd_theme
+sphinxcontrib-bibtex
 # PUBLISHING
 twine
 setuptools
