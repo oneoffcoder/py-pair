@@ -1,5 +1,5 @@
 from pypair.biserial import Biserial
-from pypair.continuous import Concordance
+from pypair.continuous import Concordance, CorrelationRatio
 from pypair.table import BinaryTable, CategoricalTable
 
 
@@ -51,6 +51,20 @@ def binary_continuous(b, c, measure='biserial', b_0=0, b_1=1):
     if measure not in Biserial.get_measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return Biserial(b, c, b_0=b_0, b_1=b_1).get(measure)
+
+
+def categorical_continuous(x, y, measure='eta'):
+    """
+    Gets the categorical-continuous association.
+
+    :param x: Categorical variable (iterable).
+    :param y: Continuous variable (iterable).
+    :param measure: Measure. Default is `eta`.
+    :return: Measure.
+    """
+    if measure not in CorrelationRatio.get_measures():
+        raise ValueError(f'{measure} is not a valid association measure.')
+    return CorrelationRatio(x, y).get(measure)
 
 
 def concordance(x, y, measure='kendall_tau'):

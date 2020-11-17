@@ -11,7 +11,8 @@ def timeit(f):
     def wrapper(*args, **kwargs):
         start = time.time()
         output = f(*args, **kwargs)
-        diff = time.time() - start
+        # diff = time.time() - start
+        time.time() - start
         # print(f'{f.__name__}: {diff}')
         return output
 

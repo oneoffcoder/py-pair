@@ -1,7 +1,103 @@
 from functools import reduce, lru_cache
 from itertools import combinations
+from math import sqrt
+
+import pandas as pd
 
 from pypair.util import get_measures
+
+
+class CorrelationRatio(object):
+    """
+    `Correlation ratio <https://en.wikipedia.org/wiki/Correlation_ratio>`_.
+
+    """
+
+    def __init__(self, x, y):
+        """
+        ctor.
+
+        :param x: Categorical variable (iterable).
+        :param y: Continuous variable (iterable).
+        """
+        is_valid = lambda a, b: a is not None and b is not None
+        self.__df = pd.DataFrame([(a, b) for a, b, in zip(x, y) if is_valid(a, b)], columns=['x', 'y'])
+
+    @property
+    @lru_cache(maxsize=None)
+    def __mean(self):
+        """
+        Gets the mean of :math:`\\bar{y}`.
+
+        :return: :math:`\\bar{y}`.
+        """
+        return self.__df.y.mean()
+
+    @property
+    @lru_cache(maxsize=None)
+    def __sigma_cat(self):
+        """
+        Gets :math:`\\sigma_{\\bar{y}}^2`
+
+        :return: :math:`\\sigma_{\\bar{y}}^2`.
+        """
+        stats = self.__df.groupby(['x']).agg(['count', 'mean']).reset_index()
+        stats.columns = stats.columns.droplevel(0)
+        stats = stats.rename(columns={'': 'x', 'count': 'n_x', 'mean': 'y_x'})
+        y = self.__mean
+
+        sigma = sum([r.n_x * (r.y_x - y) ** 2 for _, r in stats.iterrows()])
+
+        return sigma
+
+    @property
+    def __sigma_sam(self):
+        """
+        Gets :math:`\\sigma_{y}^2`
+
+        :return: :math:`\\sigma_{y}^2`.
+        """
+        y = self.__mean
+        sigma = sum((self.__df.y - y) ** 2)
+
+        return sigma
+
+    @property
+    @lru_cache(maxsize=None)
+    def eta_squared(self):
+        """
+        Gets :math:`\\eta^2 = \\frac{\\sigma_{\\bar{y}}^2}{\\sigma_{y}^2}`
+
+        :return: :math:`\\eta^2`.
+        """
+        sigma_cat = self.__sigma_cat
+        sigma_sam = self.__sigma_sam
+        eta = sigma_cat / sigma_sam
+        return eta
+
+    @property
+    @lru_cache(maxsize=None)
+    def eta(self):
+        return sqrt(self.eta_squared)
+
+    @lru_cache(maxsize=None)
+    def get(self, measure):
+        """
+        Gets the specified statistic.
+
+        :param measure: Name of statistic (association measure).
+        :return: Measure.
+        """
+        return getattr(self, measure)
+
+    @staticmethod
+    def get_measures():
+        """
+        Gets all the available measures.
+
+        :return: List of measures.
+        """
+        return get_measures('_CorrelationRatio', CorrelationRatio)
 
 
 class Counts(object):
