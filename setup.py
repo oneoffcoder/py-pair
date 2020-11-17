@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open('README.md', 'r') as fh:
+with open('INFO.md', 'r') as fh:
     long_desc = fh.read()
 
 setup(
