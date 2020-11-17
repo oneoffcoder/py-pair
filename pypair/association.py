@@ -1,6 +1,24 @@
 from pypair.biserial import Biserial
 from pypair.continuous import Concordance, CorrelationRatio
-from pypair.contigency import BinaryTable, CategoricalTable
+from pypair.contigency import BinaryTable, CategoricalTable, ConfusionMatrix
+
+
+def confusion(a, b, measure='acc', a_0=0, a_1=1, b_0=0, b_1=1):
+    """
+    Gets the specified confusion matrix stats.
+
+    :param a: Binary variable (iterable).
+    :param b: Binary variable (iterable).
+    :param measure: Measure. Default is `acc`.
+    :param a_0: The a zero value. Default 0.
+    :param a_1: The a one value. Default 1.
+    :param b_0: The b zero value. Default 0.
+    :param b_1: The b one value. Default 1.
+    :return: Measure.
+    """
+    if measure not in ConfusionMatrix.get_measures():
+        raise ValueError(f'{measure} is not a valid association measure.')
+    return ConfusionMatrix(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
 
 
 def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
