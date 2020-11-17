@@ -22,7 +22,7 @@ copyright = '2020, One-Off Coder'
 author = 'Jee Vang'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -66,3 +66,5 @@ html_css_files = [
 html_show_sourcelink = False
 html_show_sphinx = False
 html_last_updated_fmt = '%b %d, %Y, %X'
+html_logo = '_static/images/logo-small.png'
+html_favicon = '_static/favicon.ico'
