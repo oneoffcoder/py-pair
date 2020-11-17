@@ -1,6 +1,6 @@
 from pypair.biserial import Biserial
+from pypair.contigency import BinaryTable, CategoricalTable, ConfusionMatrix, AgreementTable
 from pypair.continuous import Concordance, CorrelationRatio
-from pypair.contigency import BinaryTable, CategoricalTable, ConfusionMatrix
 
 
 def confusion(a, b, measure='acc', a_0=0, a_1=1, b_0=0, b_1=1):
@@ -53,6 +53,22 @@ def categorical_categorical(a, b, measure='chisq', a_vals=None, b_vals=None):
     if measure not in CategoricalTable.get_measures():
         raise ValueError(f'{measure} is not a valid association measure.')
     return CategoricalTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
+
+
+def agreement(a, b, measure='chohen_k', a_vals=None, b_vals=None):
+    """
+    Gets the agreement association.
+
+    :param a: Categorical variable (iterable).
+    :param b: Categorical variable (iterable).
+    :param measure: Measure. Default is `chohen_k`.
+    :param a_vals: The unique values in `a`.
+    :param b_vals: The unique values in `b`.
+    :return: Measure.
+    """
+    if measure not in AgreementTable.get_measures():
+        raise ValueError(f'{measure} is not a valid association measure.')
+    return AgreementTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
 
 
 def binary_continuous(b, c, measure='biserial', b_0=0, b_1=1):

@@ -336,6 +336,14 @@ class AgreementTable(CategoricalTable):
     """
 
     def __init__(self, a, b, a_vals=None, b_vals=None):
+        """
+        ctor.
+
+        :param a: Categorical variable.
+        :param b: Categorical variable.
+        :param a_vals: Values in `a`. Default `None`; figure out empirically.
+        :param b_vals: Values in `b`. Default `None`; figure out empirically.
+        """
         super().__init__(a, b, a_vals=a_vals, b_vals=b_vals)
         if self._n_cols != self._n_rows:
             raise ValueError(f'Table not symmetric: rows={self._n_rows}, cols={self._n_cols}')
@@ -348,6 +356,7 @@ class AgreementTable(CategoricalTable):
             raise ValueError(f'Rating value mismatches: {a_set ^ b_set}')
 
     @property
+    @lru_cache(maxsize=None)
     def chohen_k(self):
         """
         Computes Cohen's :math:`\\kappa`.
@@ -365,6 +374,7 @@ class AgreementTable(CategoricalTable):
         return k
 
     @property
+    @lru_cache(maxsize=None)
     def cohen_light_k(self):
         """
         Cohen-Light :math:`\\kappa`. :math:`\\kappa` is a measure of conditional agreement.
@@ -383,6 +393,25 @@ class AgreementTable(CategoricalTable):
         n = len(self._a_map.keys())
         kappas = [kappa(theta_1(i), theta_2(i)) for i in range(n)]
         return kappas
+
+    @lru_cache(maxsize=None)
+    def get(self, measure):
+        """
+        Gets the specified statistic.
+
+        :param measure: Name of statistic (association measure).
+        :return: Measure.
+        """
+        return getattr(self, measure)
+
+    @staticmethod
+    def get_measures():
+        """
+        Gets all the available measures.
+
+        :return: List of measures.
+        """
+        return get_measures('_AgreementTable', AgreementTable)
 
 
 class BinaryMeasures(object):
