@@ -10,29 +10,29 @@ class Concordance(object):
     Stores the concordance, discordant and tie counts.
     """
 
-    def __init__(self, d, t, t_x, t_y, c):
+    def __init__(self, d, t_xy, t_x, t_y, c):
         """
         ctor.
 
         :param d: Discordant.
-        :param t: Tie.
+        :param t_xy: Tie.
         :param t_x: Tie on X.
         :param t_y: Tie on Y.
         :param c: Concordant.
         """
         self.d = d
-        self.t = t
+        self.t_xy = t_xy
         self.t_x = t_x
         self.t_y = t_y
         self.c = c
 
     def __add__(self, other):
         d = self.d + other.d
-        t = self.t + other.t
+        t_xy = self.t_xy + other.t_xy
         t_x = self.t_x + other.t_x
         t_y = self.t_y + other.t_y
         c = self.c + other.c
-        return Concordance(d, t, t_x, t_y, c)
+        return Concordance(d, t_xy, t_x, t_y, c)
 
 
 def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
@@ -112,7 +112,7 @@ def __get_concordance(x, y):
         x_j, y_j = p2
 
         d = 0
-        t = 0
+        t_xy = 0
         t_x = 0
         t_y = 0
         c = 0
@@ -124,15 +124,14 @@ def __get_concordance(x, y):
         elif r < 0:
             d = 1
         else:
-            t = 1
+            if x_i == x_j and y_i == y_j:
+                t_xy = 1
+            elif x_i == x_j:
+                t_x = 1
+            elif y_i == y_j:
+                t_y = 1
 
-        if x_i == x_j:
-            t_x = 1
-
-        if y_i == y_j:
-            t_y = 1
-
-        return Concordance(d, t, t_x, t_y, c)
+        return Concordance(d, t_xy, t_x, t_y, c)
 
     is_valid = lambda a, b: a is not None and b is not None
     data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
@@ -223,6 +222,6 @@ def goodman_kruskal_gamma(x, y):
     :return: :math:`\\gamma`.
     """
     c, n = __get_concordance(x, y)
-    p_d, p_t, p_c = c.d / n, c.t / n, c.c / n
+    p_d, p_t, p_c = c.d / n, (c.t_xy + c.t_x + c.t_y) / n, c.c / n
     gamma = (p_c - p_d) / (1 - p_t)
     return gamma
