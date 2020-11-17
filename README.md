@@ -1,31 +1,13 @@
+![One-Off Coder Logo](logo.png "One-Off Coder")
+
 # PyPair
 
-PyPair is a statistical library to compute pairwise association between any two variables. A [reasonable taxonomy](https://cyfar.org/types-variables) of variable types in statistics is as follows.
+PyPair is a statistical library to compute pairwise association between any two variables. 
 
-* categorical
-  * binary
-  * nominal
-  * ordinal
-* continuous
-  * interval
-  * ratio
-  
- # Citation
+# Software Copyright
 
 ```
-@misc{oneoffcoder_2020, 
-title={PyPair}, 
-url={https://github.com/oneoffcoder/py-pair/}, 
-journal={GitHub},
-author={Vang, Jee}, 
-year={2020}, 
-month={Nov}}
-```
-
-# Copyright Stuff
-
-```
-Copyright 2020 One-Off Coder
+Copyright 2017 Jee Vang
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,4 +20,23 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+```
+
+# Book Copyright
+
+Copyright 2020 One-Off Coder
+
+This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/) by [One-Off Coder](https://www.oneoffcoder.com).
+
+![Creative Commons Attribution 4.0 International License](https://i.creativecommons.org/l/by/4.0/88x31.png "Creative Commons Attribution 4.0 International License")
+  
+ # Citation
+
+```
+@misc{oneoffcoder_pypair_2020,
+title={PyPair, A Statistical API for Bivariate Association Measures},
+url={https://github.com/oneoffcoder/py-pair},
+author={Jee Vang},
+year={2020},
+month={Nov}}
 ```
