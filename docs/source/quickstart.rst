@@ -1,6 +1,15 @@
 Quickstart
 ==========
 
+Installation
+------------
+
+Use PyPi to install the `package <https://pypi.org/project/pypair>`_.
+
+.. code:: bash
+
+    pip install pypair
+
 Confusion Matrix
 ----------------
 
