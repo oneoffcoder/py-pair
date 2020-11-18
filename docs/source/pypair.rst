@@ -71,3 +71,14 @@ These are utility functions.
     :undoc-members:
     :show-inheritance:
     :special-members: __init__
+
+Spark
+-----
+
+These are functions that you can use in a Spark.
+
+.. automodule:: pypair.spark
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :special-members: __init__
