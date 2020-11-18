@@ -20,6 +20,112 @@ class ContingencyTable(MeasureMixin, ABC):
         pass
 
 
+class CategoricalMeasures(MeasureMixin, object):
+    def __init__(self, table):
+        self.__r_margs = [sum(table[r]) for r in range(len(table))]
+        self.__c_margs = [sum([table[r][c] for r in range(len(table))]) for c in range(len(table[0]))]
+        self.__n = sum(self.__r_margs)
+        self.__r = len(self.__r_margs)
+        self.__c = len(self.__c_margs)
+        self.__table = table
+
+    @property
+    @lru_cache(maxsize=None)
+    def chisq(self):
+        n = self.__n
+        r = self.__r
+        c = self.__c
+        row_marginals = self.__r_margs
+        col_marginals = self.__c_margs
+
+        get_expected = lambda i, j: row_marginals[i] * col_marginals[j] / n
+        expected = [[get_expected(i, j) for j in range(c)] for i in range(r)]
+
+        chisq = sum([(o - e) ** 2 / e for o, e in zip(chain(*self.__table), chain(*expected))])
+        return chisq
+
+    @property
+    @lru_cache(maxsize=None)
+    def chisq_dof(self):
+        return (self.__r - 1) * (self.__c - 1)
+
+    @property
+    @lru_cache(maxsize=None)
+    def phi(self):
+        return sqrt(self.chisq / self.__n)
+
+    @property
+    @lru_cache(maxsize=None)
+    def uncertainty_coefficient(self):
+        n = self.__n
+
+        h_b = map(lambda j: self.__c_margs[j] / n, range(self.__c))
+        h_b = map(lambda p: p * log(p), h_b)
+        h_b = -reduce(lambda x, y: x + y, h_b)
+
+        i_ab = self.mutual_information
+
+        e = i_ab / h_b
+
+        return e
+
+    @property
+    @lru_cache(maxsize=None)
+    def uncertainty_coefficient_reversed(self):
+        n = self.__n
+
+        h_b = map(lambda i: self.__r_margs[i] / n, range(self.__r))
+        h_b = map(lambda p: p * log(p), h_b)
+        h_b = -reduce(lambda x, y: x + y, h_b)
+
+        i_ab = self.mutual_information
+
+        e = i_ab / h_b
+
+        return e
+
+    @property
+    @lru_cache(maxsize=None)
+    def mutual_information(self):
+        """
+        The `mutual information <https://en.wikipedia.org/wiki/Mutual_information>`_ between
+        two variables :math:`X` and :math:`Y` is denoted as :math:`I(X;Y)`.  :math:`I(X;Y)` is
+        unbounded and in the range :math:`[0, \\infty]`. A higher mutual information
+        value implies strong association. The formula for :math:`I(X;Y)` is defined as follows.
+
+        :math:`I(X;Y) = \\sum_y \\sum_x P(x, y) \\log \\frac{P(x, y)}{P(x) P(y)}`
+
+        :return: Mutual information.
+        """
+        n = self.__n
+
+        get_p_a = lambda i: self.__r_margs[i] / n
+        get_p_b = lambda j: self.__c_margs[j] / n
+        get_p_ab = lambda i, j: self.__table[i][j] / n
+        get_mi = lambda i, j: get_p_ab(i, j) * log(get_p_ab(i, j) / get_p_a(i) / get_p_b(i))
+        mi = sum((get_mi(i, j) for i, j in product(*[range(len(self.__r)), range(len(self.__c))])))
+        return mi
+
+    def gk_lambda(self):
+        n = self.__n
+        r = self.__r
+
+        x = sum([max(self.__table[i]) for i in range(r)])
+        y = max(self.__c_margs)
+        gkl = (x - y) / (n - y)
+        return gkl
+
+    def gk_lambda_reversed(self):
+        n = self.__n
+        r = self.__r
+        c = self.__c
+
+        x = sum([max([self.observed[r][c] for r in range(r)]) for j in range(c)])
+        y = max(self._row_marginals)
+        gkl = (x - y) / (n - y)
+        return gkl
+
+
 class CategoricalTable(ContingencyTable):
     """
     Represents a contingency table for categorical variables.
@@ -150,15 +256,6 @@ class CategoricalTable(ContingencyTable):
         :return: Phi.
         """
         return sqrt(self.chisq / self._n)
-
-    def __get_cond_entropy(self, a, b, n, reversed=False):
-        p_ab = self._df.query(f'a=="{a}" and b=="{b}"').shape[0] / n
-        if not reversed:
-            p_a = self._df.query(f'a=="{a}"').shape[0] / n
-        else:
-            p_a = self._df.query(f'b=="{b}"').shape[0] / n
-        c_ba = p_ab / p_a
-        return p_ab * log(c_ba)
 
     @property
     @lru_cache(maxsize=None)
