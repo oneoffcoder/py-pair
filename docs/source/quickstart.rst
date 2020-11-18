@@ -46,8 +46,8 @@ Association measures for binary-continuous variables are computed using ``binary
    :language: python
    :linenos:
 
-Concordance
------------
+Ordinal-Ordinal, Concordance
+----------------------------
 Concordance measures are used for ordinal-ordinal or continuous-continuous variables using ``concordance()`` or ``Concordance()``.
 
 .. literalinclude:: _code/concordance-demo.py
@@ -65,7 +65,7 @@ Categorical-continuous association measures are computed using ``categorical_con
 Continuous-Continuous
 ---------------------
 
-Association measures for continuous-continuous variables are computed using ``continuous_continuous()`` and ``Continuous``.
+Association measures for continuous-continuous variables are computed using ``continuous_continuous()`` or ``Continuous``.
 
 .. literalinclude:: _code/continuous-demo.py
    :language: python
