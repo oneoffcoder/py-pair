@@ -1,10 +1,12 @@
 import logging
 import unittest
+import random
+from random import choice
 
 import pandas as pd
 from pyspark.sql import SparkSession
 
-from pypair.spark import binary_binary, confusion
+from pypair.spark import binary_binary, confusion, categorical_categorical
 
 
 class PySparkTest(unittest.TestCase):
@@ -43,6 +45,7 @@ class PySparkTest(unittest.TestCase):
         """
         cls.supress_py4j_logging()
         cls.spark = cls.create_pyspark_session()
+        random.seed(37)
 
     @classmethod
     def tearDownClass(cls):
@@ -80,6 +83,23 @@ class PySparkTest(unittest.TestCase):
         sdf = self.spark.createDataFrame(pdf)
         return sdf
 
+    def _get_categorical_categorical_data(self):
+        """
+        Gets dummy categorical-categorical data in Spark dataframe.
+
+        :return: Spark dataframe.
+        """
+        x_domain = ['a', 'b', 'c']
+        y_domain = ['a', 'b']
+
+        get_x = lambda: choice(x_domain)
+        get_y = lambda: choice(y_domain)
+        get_data = lambda: {f'x{i}': v for i, v in enumerate((get_x(), get_y(), get_x(), get_y()))}
+
+        pdf = pd.DataFrame([get_data() for _ in range(100)])
+        sdf = self.spark.createDataFrame(pdf)
+        return sdf
+
 
 class SparkTest(PySparkTest):
     """
@@ -109,3 +129,8 @@ class SparkTest(PySparkTest):
 
         import json
         print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in result.items()}, indent=1))
+
+    def test_categorical_categorical(self):
+        sdf = self._get_categorical_categorical_data()
+        results = categorical_categorical(sdf).collect()
+        print(results)
