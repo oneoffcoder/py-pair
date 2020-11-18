@@ -11,7 +11,7 @@ These are the basic contingency tables used to analyze categorical data.
 - ConfusionMatrix
 - AgreementTable
 
-.. automodule:: pypair.contigency
+.. automodule:: pypair.contingency
     :members:
     :undoc-members:
     :show-inheritance:
