@@ -87,6 +87,12 @@ def binary_binary(sdf):
     """
 
     def to_results(counts):
+        """
+        Converts the result of the contingency table counts to a dictionary of association measures.
+
+        :param counts: Tuple of tuples: (x1, x2), (a, b, c, d).
+        :return: (x1, x2), {'measure1': val1, 'measure2': val2, ...}.
+        """
         (x1, x2), (a, b, c, d) = counts
 
         a = max(1, a)
@@ -116,6 +122,12 @@ def confusion(sdf):
     """
 
     def to_results(counts):
+        """
+        Converts the result of the contingency table counts to a dictionary of association measures.
+
+        :param counts: Tuple of tuples: (x1, x2), (tp, fn, fp, tn).
+        :return: (x1, x2), {'metric1': val1, 'metric2': val2, ...}.
+        """
         (x1, x2), (tp, fn, fp, tn) = counts
 
         tp = max(1, tp)
