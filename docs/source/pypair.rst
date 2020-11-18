@@ -1,8 +1,8 @@
 PyPair
 ======
 
-Contigency Table Analysis
--------------------------
+Contingency Table Analysis
+--------------------------
 
 These are the basic contingency tables used to analyze categorical data.
 
