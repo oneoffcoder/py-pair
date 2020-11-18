@@ -288,7 +288,7 @@ class CategoricalTable(ContingencyTable):
             b_vals = sorted(list(df.b.unique()))
 
         table = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] for y in b_vals] for x in a_vals]
-        self.__measures = CategoricalMeasures(table)
+        self._categorical_measures = CategoricalMeasures(table)
 
     @staticmethod
     def measures():
@@ -306,7 +306,7 @@ class CategoricalTable(ContingencyTable):
         :param measure: Name of statistic (association measure).
         :return: Measure.
         """
-        return self.__measures.get(measure)
+        return self._categorical_measures.get(measure)
 
 
 class AgreementTable(CategoricalTable):
@@ -1703,7 +1703,7 @@ class BinaryTable(CategoricalTable):
         self._b = counts[1]
         self._c = counts[2]
         self._d = counts[3]
-        self.__measures = BinaryMeasures(self._a, self._b, self._c, self._d)
+        self.__binary_measures = BinaryMeasures(self._a, self._b, self._c, self._d)
 
     @staticmethod
     def measures():
@@ -1712,7 +1712,7 @@ class BinaryTable(CategoricalTable):
 
         :return: List of association measures.
         """
-        return BinaryMeasures.measures()
+        return BinaryMeasures.measures() + CategoricalMeasures.measures()
 
     def get(self, measure):
         """
@@ -1721,7 +1721,9 @@ class BinaryTable(CategoricalTable):
         :param measure: Name of statistic (association measure).
         :return: Measure.
         """
-        return self.__measures.get(measure)
+        if measure in self.__binary_measures.measures():
+            return self.__binary_measures.get(measure)
+        return self._categorical_measures.get(measure)
 
 
 class CmMeasures(MeasureMixin, object):
