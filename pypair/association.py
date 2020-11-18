@@ -1,5 +1,5 @@
 from pypair.biserial import Biserial
-from pypair.contigency import BinaryTable, CategoricalTable, ConfusionMatrix, AgreementTable
+from pypair.contingency import BinaryTable, CategoricalTable, ConfusionMatrix, AgreementTable
 from pypair.continuous import Concordance, CorrelationRatio, Continuous
 
 

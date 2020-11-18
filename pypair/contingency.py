@@ -1671,10 +1671,31 @@ class BinaryTable(CategoricalTable):
         """
         super().__init__(a, b, a_vals=[a_0, a_1], b_vals=[b_0, b_1])
 
-        self._a = self._count(a_1, b_1)
-        self._b = self._count(a_1, b_0)
-        self._c = self._count(a_0, b_1)
-        self._d = self._count(a_0, b_0)
+        def to_count(x, y):
+            _a, _b, _c, _d = 0, 0, 0, 0
+
+            if x == a_1 and y == b_1:
+                _a = 1
+            elif x == a_1 and y == b_0:
+                _b = 1
+            elif x == a_0 and y == b_1:
+                _c = 1
+            else:
+                _d = 1
+            return _a, _b, _c, _d
+
+        def add_count(x, y):
+            return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3]
+
+        is_valid = lambda x, y: x is not None and y is not None
+
+        counts = (to_count(x, y) for x, y in zip(a, b) if is_valid(x, y))
+        counts = reduce(lambda a, b: add_count(a, b), counts)
+
+        self._a = counts[0]
+        self._b = counts[1]
+        self._c = counts[2]
+        self._d = counts[3]
         self.__measures = BinaryMeasures(self._a, self._b, self._c, self._d)
 
     @staticmethod

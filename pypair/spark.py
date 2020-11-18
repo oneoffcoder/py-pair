@@ -1,6 +1,6 @@
 from itertools import combinations
 
-from pypair.contigency import BinaryMeasures, CmMeasures
+from pypair.contingency import BinaryMeasures, CmMeasures
 
 
 def __to_abcd_counts(d):
@@ -163,6 +163,7 @@ def __get_contigency_table(sdf):
     :param sdf: Spark dataframe.
     :return: Spark pair-RDD.
     """
+
     def to_count(d):
         def count(k1, k2):
             tups = [(k1, d[k1]), (k2, d[k2])]
@@ -181,7 +182,7 @@ def __get_contigency_table(sdf):
 
     def to_contigency_table(tup):
         key, (d, v1, v2) = tup
-        table = [[d[(a, b)]for b in v2] for a in v1]
+        table = [[d[(a, b)] for b in v2] for a in v1]
         r_mar = [sum(table[r]) for r in range(len(v1))]
         c_mar = [sum([table[r][c] for r in range(len(v1))]) for c in range(len(v2))]
 
