@@ -89,6 +89,13 @@ class CategoricalMeasures(MeasureMixin, object):
     @property
     @lru_cache(maxsize=None)
     def phi(self):
+        """
+        Gets :math:`\\phi`.
+
+        :math:`\\phi = \\sqrt{\\frac{\\chi^2}{N}}`
+
+        :return: :math:`\\phi`.
+        """
         return sqrt(self.chisq / self.__n)
 
     @property
