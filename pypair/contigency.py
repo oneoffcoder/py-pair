@@ -21,7 +21,16 @@ class ContingencyTable(MeasureMixin, ABC):
 
 
 class CategoricalMeasures(MeasureMixin, object):
+    """
+    Categorical measures based off a contingency table.
+    """
+
     def __init__(self, table):
+        """
+        ctor.
+
+        :param table: A table of counts (list of lists).
+        """
         self.__r_margs = [sum(table[r]) for r in range(len(table))]
         self.__c_margs = [sum([table[r][c] for r in range(len(table))]) for c in range(len(table[0]))]
         self.__n = sum(self.__r_margs)
@@ -32,6 +41,27 @@ class CategoricalMeasures(MeasureMixin, object):
     @property
     @lru_cache(maxsize=None)
     def chisq(self):
+        """
+        The `chi-square statistic <https://en.wikipedia.org/wiki/Chi-square_distribution>`_ :math:`\\chi^2`,
+        is defined as follows.
+
+        :math:`\\sum_i \\sum_j \\frac{(O_{ij} - E_{ij})^2}{E_{ij}}`
+
+        In a contingency table, :math:`O_ij` is the observed cell count corresponding to the :math:`i` row
+        and :math:`j` column. :math:`E_ij` is the expected cell count corresponding to the :math:`i` row and
+        :math:`j` column.
+
+        :math:`E_i = \\frac{N_{i*} N_{*j}}{N}`
+
+        Where :math:`N_{i*}` is the i-th row marginal, :math:`N_{*j}` is the j-th column marginal and
+        :math:`N` is the sum of all the values in the contingency cells (or the total size of the data).
+
+        References
+
+        - `Chi-Square (χ2) Statistic Definition <https://www.investopedia.com/terms/c/chi-square-statistic.asp>`_
+
+        :return: Chi-square statistic.
+        """
         n = self.__n
         r = self.__r
         c = self.__c
@@ -47,6 +77,13 @@ class CategoricalMeasures(MeasureMixin, object):
     @property
     @lru_cache(maxsize=None)
     def chisq_dof(self):
+        """
+        Returns the degrees of freedom form :math:`\\chi^2`, which is defined as :math:`(R - 1)(C - 1)`,
+        where :math:`R` is the number of rows and :math:`C` is the number of columns in a contingency
+        table induced by two categorical variables.
+
+        :return: Degrees of freedom.
+        """
         return (self.__r - 1) * (self.__c - 1)
 
     @property
@@ -57,6 +94,24 @@ class CategoricalMeasures(MeasureMixin, object):
     @property
     @lru_cache(maxsize=None)
     def uncertainty_coefficient(self):
+        """
+        The `uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_ :math:`U(X|Y)`
+        for two variables :math:`X` and :math:`Y` is defined as follows.
+
+        :math:`U(X|Y) = \\frac{I(X;Y)}{H(X)}`
+
+        Where,
+
+        - :math:`H(X) = -\\sum_x P(x) \\log P(x)`
+        - :math:`I(X;Y) = \\sum_y \\sum_x P(x, y) \\log \\frac{P(x, y)}{P(x) P(y)}`
+
+        :math:`H(X)` is called the entropy of :math:`X` and :math:`I(X;Y)` is the mutual information
+        between :math:`X` and :math:`Y`. Note that :math:`I(X;Y) < H(X)` and both values are positive.
+        As such, the uncertainty coefficient may be viewed as the normalized mutual information
+        between :math:`X` and :math:`Y` and in the range :math:`[0, 1]`.
+
+        :return: Uncertainty coefficient.
+        """
         n = self.__n
 
         h_b = map(lambda j: self.__c_margs[j] / n, range(self.__c))
@@ -72,6 +127,11 @@ class CategoricalMeasures(MeasureMixin, object):
     @property
     @lru_cache(maxsize=None)
     def uncertainty_coefficient_reversed(self):
+        """
+        `Uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_.
+
+        :return: Uncertainty coefficient.
+        """
         n = self.__n
 
         h_b = map(lambda i: self.__r_margs[i] / n, range(self.__r))
@@ -106,7 +166,37 @@ class CategoricalMeasures(MeasureMixin, object):
         mi = sum((get_mi(i, j) for i, j in product(*[range(len(self.__r)), range(len(self.__c))])))
         return mi
 
+    @property
+    @lru_cache(maxsize=None)
     def gk_lambda(self):
+        """
+        Goodman-Kruskal's lambda is the `proportional reduction in error`
+        of predicting one variable `b` given another `a`: :math:`\\lambda_{B|A}`.
+
+        - The probability of an error in predicting the column category: :math:`P_e = 1 - \\frac{\\max_{c} N_{* c}}{N}`
+        - The probability of an error in predicting the column category given the row category: :math:`P_{e|r} = 1 - \\frac{\\sum_r \\max_{c} N_{r c}}{N}`
+
+        Where,
+
+        - :math:`\\max_{c} N_{* c}` is the maximum of the column marginals
+        - :math:`\\sum_r \\max_{c} N_{r c}` is the sum over the maximum value per row
+        - :math:`N` is the total
+
+        Thus, :math:`\\lambda_{B|A} = \\frac{P_e - P_{e|r}}{P_e}`.
+
+        The way the contingency table is setup by default is that `a` is on
+        the rows and `b` is on the columns. Note that Goodman-Kruskal's lambda
+        is not symmetric: :math:`\\lambda_{B|A}` does not necessarily equal
+        :math:`\\lambda_{A|B}`. By default, :math:`\\lambda_{B|A}` is computed, but
+        if you desire the reverse, use `goodman_kruskal_lambda_reversed()`.
+
+        References
+
+        - `Goodman-Kruskal's lambda <https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda>`_.
+        - `Correlation <http://cda.psych.uiuc.edu/web_407_spring_2014/correlation_week4.pdf>`_.
+
+        :return: Goodman-Kruskal's lambda.
+        """
         n = self.__n
         r = self.__r
 
@@ -115,15 +205,51 @@ class CategoricalMeasures(MeasureMixin, object):
         gkl = (x - y) / (n - y)
         return gkl
 
+    @property
+    @lru_cache(maxsize=None)
     def gk_lambda_reversed(self):
+        """
+        Computes :math:`\\lambda_{A|B}`.
+
+        :return: Goodman-Kruskal's lambda.
+        """
         n = self.__n
         r = self.__r
         c = self.__c
 
-        x = sum([max([self.observed[r][c] for r in range(r)]) for j in range(c)])
-        y = max(self._row_marginals)
+        x = sum([max([self.__table[i][j] for i in range(r)]) for j in range(c)])
+        y = max(self.__r_margs)
         gkl = (x - y) / (n - y)
         return gkl
+
+    @property
+    @lru_cache(maxsize=None)
+    def adjusted_rand_index(self):
+        """
+        The Adjusted Rand Index (ARI) should yield a value between
+        [0, 1], however, negative values can also arise when the index
+        is less than the expected value. This function uses `binom()`
+        from `scipy.special`, and when n >= 300, the results are too
+        large and may cause overflow.
+
+        TODO: use a different way to compute binomial coefficient
+
+        References
+
+        - `Adjusted Rand Index <https://en.wikipedia.org/wiki/Rand_index#Adjusted_Rand_index>`_.
+        - `Python binomial coefficient <https://stackoverflow.com/questions/26560726/python-binomial-coefficient>`_.
+
+        :return: Adjusted Rand Index.
+        """
+        a_i = sum([int(binom(a, 2)) for a in self.__r_margs])
+        b_j = sum([int(binom(b, 2)) for b in self.__c_margs])
+        n_ij = sum([int(binom(n, 2)) for n in chain(*self.__table)])
+        n = binom(self.__n, 2)
+
+        top = (n_ij - (a_i * b_j) / n)
+        bot = 0.5 * (a_i + b_j) - (a_i * b_j) / n
+        s = top / bot
+        return s
 
 
 class CategoricalTable(ContingencyTable):
@@ -154,270 +280,26 @@ class CategoricalTable(ContingencyTable):
         if b_vals is None:
             b_vals = sorted(list(df.b.unique()))
 
-        observed = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] for y in b_vals] for x in a_vals]
+        table = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] for y in b_vals] for x in a_vals]
+        self.__measures = CategoricalMeasures(table)
 
-        n_rows = len(a_vals)
-        n_cols = len(b_vals)
-
-        row_marginals = [sum(r) for r in observed]
-        col_marginals = [sum([observed[r][c] for r in range(n_rows)]) for c in range(n_cols)]
-
-        n = sum([sum(o) for o in observed])
-        get_expected = lambda r, c: r * c / n
-        expected = [[get_expected(row_marginals[i], col_marginals[j]) for j, _ in enumerate(b_vals)] for i, _ in
-                    enumerate(a_vals)]
-
-        chisq = sum([(o - e) ** 2 / e for o, e in zip(chain(*observed), chain(*expected))])
-
-        p_observed = [[c / n for c in r] for r in observed]
-        p_r_marginals = [sum(r) for r in p_observed]
-        p_c_marginals = [sum([p_observed[r][c] for r in range(n_rows)]) for c in range(n_cols)]
-
-        self.observed = observed
-        self.expected = expected
-        self._df = df
-        self._chisq = chisq
-        self._n = n
-        self._a_map = {v: i for i, v in enumerate(a_vals)}
-        self._b_map = {v: i for i, v in enumerate(b_vals)}
-        self._n_cols = n_cols
-        self._n_rows = n_rows
-        self._row_marginals = row_marginals
-        self._col_marginals = col_marginals
-        self._p_observed = p_observed
-        self._p_r_marginals = p_r_marginals
-        self._p_c_marginals = p_c_marginals
-
-    @lru_cache(maxsize=None)
-    def _count(self, a=None, b=None):
-        if a is not None and b is not None:
-            q = f'a=="{a}" and b=="{b}"'
-        elif a is not None and b is None:
-            q = f'a=="{a}"'
-        elif a is None and b is not None:
-            q = f'b=="{b}"'
-        else:
-            return self._df.shape[0]
-
-        return self._df.query(q).shape[0]
-
-    @property
-    @lru_cache(maxsize=None)
-    def chisq(self):
+    @staticmethod
+    def measures():
         """
-        The `chi-square statistic <https://en.wikipedia.org/wiki/Chi-square_distribution>`_ :math:`\\chi^2`,
-        is defined as follows.
+        Gets a (sorted) list of all association measures available.
 
-        :math:`\\sum_i \\sum_j \\frac{(O_{ij} - E_{ij})^2}{E_{ij}}`
-
-        In a contingency table, :math:`O_ij` is the observed cell count corresponding to the :math:`i` row
-        and :math:`j` column. :math:`E_ij` is the expected cell count corresponding to the :math:`i` row and
-        :math:`j` column.
-
-        :math:`E_i = \\frac{N_{i*} N_{*j}}{N}`
-
-        Where :math:`N_{i*}` is the i-th row marginal, :math:`N_{*j}` is the j-th column marginal and
-        :math:`N` is the sum of all the values in the contingency cells (or the total size of the data).
-
-        References
-
-        - `Chi-Square (χ2) Statistic Definition <https://www.investopedia.com/terms/c/chi-square-statistic.asp>`_
-
-        :return: Chi-square statistic.
+        :return: List of association measures.
         """
-        return self._chisq
+        return CmMeasures.measures()
 
-    @property
-    @lru_cache(maxsize=None)
-    def chisq_dof(self):
+    def get(self, measure):
         """
-        Returns the degrees of freedom form :math:`\\chi^2`, which is defined as :math:`(R - 1)(C - 1)`,
-        where :math:`R` is the number of rows and :math:`C` is the number of columns in a contingency
-        table induced by two categorical variables.
+        Gets the specified statistic.
 
-        :return: Degrees of freedom.
+        :param measure: Name of statistic (association measure).
+        :return: Measure.
         """
-        return (self._n_rows - 1) * (self._n_cols - 1)
-
-    @property
-    @lru_cache(maxsize=None)
-    def phi(self):
-        """
-        The `phi coefficient <https://en.wikipedia.org/wiki/Phi_coefficient>`_ :math:`\\phi` is defined
-        as :math:`\\sqrt \\frac{\\chi^2}{N}`. For two binary variables, the range will be like canonical
-        Pearson :math:`[-1, 1]`, where -1 indicates perfect disagreement, 1 indicates perfect agreement and
-        0 indicates no relationship. When at least one variable is not binary (has more than 2 values possible),
-        then the upper-bound of :math:`\\phi`` is determined by the distribution of the two variables.
-
-        References
-
-        - `Matthews correlation coefficient <https://en.wikipedia.org/wiki/Matthews_correlation_coefficient>`_
-
-        :return: Phi.
-        """
-        return sqrt(self.chisq / self._n)
-
-    @property
-    @lru_cache(maxsize=None)
-    def uncertainty_coefficient(self):
-        """
-        The `uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_ :math:`U(X|Y)`
-        for two variables :math:`X` and :math:`Y` is defined as follows.
-
-        :math:`U(X|Y) = \\frac{I(X;Y)}{H(X)}`
-
-        Where,
-
-        - :math:`H(X) = -\\sum_x P(x) \\log P(x)`
-        - :math:`I(X;Y) = \\sum_y \\sum_x P(x, y) \\log \\frac{P(x, y)}{P(x) P(y)}`
-
-        :math:`H(X)` is called the entropy of :math:`X` and :math:`I(X;Y)` is the mutual information
-        between :math:`X` and :math:`Y`. Note that :math:`I(X;Y) < H(X)` and both values are positive.
-        As such, the uncertainty coefficient may be viewed as the normalized mutual information
-        between :math:`X` and :math:`Y` and in the range :math:`[0, 1]`.
-
-        :return: Uncertainty coefficient.
-        """
-        b_keys = list(self._b_map.keys())
-        df = self._df[self._df.b.isin(b_keys)]
-        n = df.shape[0]
-
-        h_b = map(lambda b: df.query(f'b=="{b}"').shape[0] / n, b_keys)
-        h_b = map(lambda p: p * log(p), h_b)
-        h_b = -reduce(lambda x, y: x + y, h_b)
-
-        i_ab = self.mutual_information
-
-        e = i_ab / h_b
-
-        return e
-
-    @property
-    @lru_cache(maxsize=None)
-    def uncertainty_coefficient_reversed(self):
-        """
-        `Uncertainty coefficient <https://en.wikipedia.org/wiki/Uncertainty_coefficient>`_.
-
-        :return: Uncertainty coefficient.
-        """
-        a_keys = list(self._a_map.keys())
-        df = self._df[self._df.a.isin(a_keys)]
-        n = df.shape[0]
-
-        h_a = map(lambda a: df.query(f'a=="{a}"').shape[0] / n, a_keys)
-        h_a = map(lambda p: p * log(p), h_a)
-        h_a = -reduce(lambda x, y: x + y, h_a)
-
-        i_ab = self.mutual_information
-
-        e = i_ab / h_a
-
-        return e
-
-    @property
-    @lru_cache(maxsize=None)
-    def mutual_information(self):
-        """
-        The `mutual information <https://en.wikipedia.org/wiki/Mutual_information>`_ between
-        two variables :math:`X` and :math:`Y` is denoted as :math:`I(X;Y)`.  :math:`I(X;Y)` is
-        unbounded and in the range :math:`[0, \\infty]`. A higher mutual information
-        value implies strong association. The formula for :math:`I(X;Y)` is defined as follows.
-
-        :math:`I(X;Y) = \\sum_y \\sum_x P(x, y) \\log \\frac{P(x, y)}{P(x) P(y)}`
-
-        :return: Mutual information.
-        """
-        a_keys = list(self._a_map.keys())
-        b_keys = list(self._b_map.keys())
-        df = self._df[self._df.a.isin(a_keys) & self._df.b.isin(b_keys)]
-        n = df.shape[0]
-
-        get_p_a = lambda a: df.query(f'a=="{a}"').shape[0] / n
-        get_p_b = lambda b: df.query(f'b=="{b}"').shape[0] / n
-        get_p_ab = lambda a, b: df.query(f'a=="{a}" and b=="{b}"').shape[0] / n
-        get_sub_i = lambda a, b: get_p_ab(a, b) * log(get_p_ab(a, b) / get_p_a(a) / get_p_b(b))
-        mi = sum((get_sub_i(a, b) for a, b in product(*[a_keys, b_keys])))
-        return mi
-
-    @property
-    @lru_cache(maxsize=None)
-    def goodman_kruskal_lambda(self):
-        """
-        Goodman-Kruskal's lambda is the `proportional reduction in error`
-        of predicting one variable `b` given another `a`: :math:`\\lambda_{B|A}`.
-
-        - The probability of an error in predicting the column category: :math:`P_e = 1 - \\frac{\\max_{c} N_{* c}}{N}`
-        - The probability of an error in predicting the column category given the row category: :math:`P_{e|r} = 1 - \\frac{\\sum_r \\max_{c} N_{r c}}{N}`
-
-        Where,
-
-        - :math:`\\max_{c} N_{* c}` is the maximum of the column marginals
-        - :math:`\\sum_r \\max_{c} N_{r c}` is the sum over the maximum value per row
-        - :math:`N` is the total
-
-        Thus, :math:`\\lambda_{B|A} = \\frac{P_e - P_{e|r}}{P_e}`.
-
-        The way the contingency table is setup by default is that `a` is on
-        the rows and `b` is on the columns. Note that Goodman-Kruskal's lambda
-        is not symmetric: :math:`\\lambda_{B|A}` does not necessarily equal
-        :math:`\\lambda_{A|B}`. By default, :math:`\\lambda_{B|A}` is computed, but
-        if you desire the reverse, use `goodman_kruskal_lambda_reversed()`.
-
-        References
-
-        - `Goodman-Kruskal's lambda <https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_lambda>`_.
-        - `Correlation <http://cda.psych.uiuc.edu/web_407_spring_2014/correlation_week4.pdf>`_.
-
-        :return: Goodman-Kruskal's lambda.
-        """
-        n = self._n
-        x = sum([max(self.observed[r]) for r in range(self._n_rows)])
-        y = max(self._col_marginals)
-        gkl = (x - y) / (n - y)
-        return gkl
-
-    @property
-    @lru_cache(maxsize=None)
-    def goodman_kruskal_lambda_reversed(self):
-        """
-        Computes :math:`\\lambda_{A|B}`.
-
-        :return: Goodman-Kruskal's lambda.
-        """
-        n = self._n
-        x = sum([max([self.observed[r][c] for r in range(self._n_rows)]) for c in range(self._n_cols)])
-        y = max(self._row_marginals)
-        gkl = (x - y) / (n - y)
-        return gkl
-
-    @property
-    @lru_cache(maxsize=None)
-    def adjusted_rand_index(self):
-        """
-        The Adjusted Rand Index (ARI) should yield a value between
-        [0, 1], however, negative values can also arise when the index
-        is less than the expected value. This function uses `binom()`
-        from `scipy.special`, and when n >= 300, the results are too
-        large and may cause overflow.
-
-        TODO: use a different way to compute binomial coefficient
-
-        References
-
-        - `Adjusted Rand Index <https://en.wikipedia.org/wiki/Rand_index#Adjusted_Rand_index>`_.
-        - `Python binomial coefficient <https://stackoverflow.com/questions/26560726/python-binomial-coefficient>`_.
-
-        :return: Adjusted Rand Index.
-        """
-        a_i = sum([int(binom(a, 2)) for a in self._row_marginals])
-        b_j = sum([int(binom(b, 2)) for b in self._col_marginals])
-        n_ij = sum([int(binom(n, 2)) for n in chain(*self.observed)])
-        n = binom(self._n, 2)
-
-        top = (n_ij - (a_i * b_j) / n)
-        bot = 0.5 * (a_i + b_j) - (a_i * b_j) / n
-        s = top / bot
-        return s
+        return self.__measures.get(measure)
 
 
 class AgreementTable(CategoricalTable):

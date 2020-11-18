@@ -75,7 +75,5 @@ def test_categorical_table_creation():
     b = [0, 0, 0, 1, 1, 0, 0, 1, 1, 1]
 
     table = CategoricalTable(a, b)
-    assert_array_equal(table.observed, [[3, 2], [2, 3]])
-    assert_array_equal(table.expected, [[2.5, 2.5], [2.5, 2.5]])
-    assert 0.4 == table.chisq
-    assert 0.2 == table.phi
+    assert 0.4 == table.get('chisq')
+    assert 0.2 == table.get('phi')
