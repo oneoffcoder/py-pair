@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 from nose import with_setup
-from pypair.contigency import BinaryTable, CategoricalTable, ConfusionMatrix
+from pypair.contingency import BinaryTable, CategoricalTable, ConfusionMatrix
 
 from pypair.association import binary_binary, categorical_categorical, \
     binary_continuous, concordance, categorical_continuous, continuous_continuous, confusion
