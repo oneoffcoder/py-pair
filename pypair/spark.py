@@ -85,6 +85,7 @@ def binary_binary(sdf):
     :param sdf: Spark dataframe.
     :return: Spark pair-RDD.
     """
+
     def to_results(counts):
         (x1, x2), (a, b, c, d) = counts
 
@@ -113,6 +114,7 @@ def confusion(sdf):
     :param sdf: Spark dataframe.
     :return: Spark pair-RDD.
     """
+
     def to_results(counts):
         (x1, x2), (tp, fn, fp, tn) = counts
 
