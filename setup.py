@@ -14,7 +14,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/oneoffcoder/py-pair',
     keywords=' '.join(['statistics', 'pairwise', 'association', 'correlation', 'measurement', 'strength']),
-    install_requires=['scipy', 'numpy', 'pandas', 'scikit-learn'],
+    install_requires=['scipy', 'numpy', 'pandas', 'scikit-learn', 'pyspark'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: Apache Software License',
