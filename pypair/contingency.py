@@ -315,7 +315,8 @@ class AgreementTable(CategoricalTable):
     """
     Represents a contingency table for agreement data against one variable. The variable is typically
     a rating variable (e.g. dislike, neutral, like), and the data is a pairing of ratings over
-    the same set of items.
+    the same set of items. The agreement table that is induced by the data is typically squared,
+    where the number of rows and columns are equal.
     """
 
     def __init__(self, a, b, a_vals=None, b_vals=None):
