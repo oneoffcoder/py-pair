@@ -5,7 +5,7 @@ with open('INFO.md', 'r') as fh:
 
 setup(
     name='pypair',
-    version='1.0.0',
+    version='2.0.0',
     author='Jee Vang',
     author_email='vangjee@gmail.com',
     packages=find_packages(exclude=('*.tests', '*.tests.*', 'tests.*', 'tests')),
@@ -13,7 +13,8 @@ setup(
     long_description=long_desc,
     long_description_content_type='text/markdown',
     url='https://github.com/oneoffcoder/py-pair',
-    keywords=' '.join(['statistics', 'pairwise', 'association', 'correlation', 'measurement', 'strength']),
+    keywords=' '.join(
+        ['statistics', 'pairwise', 'association', 'correlation', 'concordance', 'measurement', 'strength', 'pyspark']),
     install_requires=['scipy', 'numpy', 'pandas', 'scikit-learn', 'pyspark'],
     classifiers=[
         'Programming Language :: Python :: 3',
