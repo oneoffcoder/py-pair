@@ -9,6 +9,36 @@ from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bo
 from pypair.util import MeasureMixin
 
 
+class Counts(object):
+    """
+    Stores the concordance, discordant and tie counts.
+    """
+
+    def __init__(self, d, t_xy, t_x, t_y, c):
+        """
+        ctor.
+
+        :param d: Discordant.
+        :param t_xy: Tie.
+        :param t_x: Tie on X.
+        :param t_y: Tie on Y.
+        :param c: Concordant.
+        """
+        self.d = d
+        self.t_xy = t_xy
+        self.t_x = t_x
+        self.t_y = t_y
+        self.c = c
+
+    def __add__(self, other):
+        d = self.d + other.d
+        t_xy = self.t_xy + other.t_xy
+        t_x = self.t_x + other.t_x
+        t_y = self.t_y + other.t_y
+        c = self.c + other.c
+        return Counts(d, t_xy, t_x, t_y, c)
+
+
 class Continuous(MeasureMixin, object):
     def __init__(self, a, b):
         """
@@ -203,36 +233,6 @@ class CorrelationRatio(MeasureMixin, object):
         labels = self.__df.x
         X = self.__df[['y']]
         return calinski_harabasz_score(X, labels)
-
-
-class Counts(object):
-    """
-    Stores the concordance, discordant and tie counts.
-    """
-
-    def __init__(self, d, t_xy, t_x, t_y, c):
-        """
-        ctor.
-
-        :param d: Discordant.
-        :param t_xy: Tie.
-        :param t_x: Tie on X.
-        :param t_y: Tie on Y.
-        :param c: Concordant.
-        """
-        self.d = d
-        self.t_xy = t_xy
-        self.t_x = t_x
-        self.t_y = t_y
-        self.c = c
-
-    def __add__(self, other):
-        d = self.d + other.d
-        t_xy = self.t_xy + other.t_xy
-        t_x = self.t_x + other.t_x
-        t_y = self.t_y + other.t_y
-        c = self.c + other.c
-        return Counts(d, t_xy, t_x, t_y, c)
 
 
 class Concordance(MeasureMixin, object):
