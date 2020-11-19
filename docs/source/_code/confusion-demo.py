@@ -1,5 +1,5 @@
 from pypair.association import confusion
-from pypair.contigency import ConfusionMatrix
+from pypair.contingency import ConfusionMatrix
 
 
 def get_data():

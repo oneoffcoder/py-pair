@@ -1,5 +1,5 @@
 from pypair.association import categorical_categorical
-from pypair.contigency import CategoricalTable
+from pypair.contingency import CategoricalTable
 
 get_data = lambda x, y, n: [(x, y) for _ in range(n)]
 data = get_data(1, 1, 207) + get_data(1, 0, 282) + get_data(0, 1, 231) + get_data(0, 0, 242)
