@@ -1,14 +1,35 @@
-from pypair.contingency import BinaryMeasures
+from pypair.contingency import CategoricalTable, BinaryTable, ConfusionMatrix, AgreementTable
 
-bm = BinaryMeasures(20, 10, 10, 30)
-measures = bm.measures()
-for m in measures:
-    r = bm.get(m)
-    print(f'{m}: {r}')
+a = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+b = [0, 0, 0, 1, 1, 0, 0, 1, 1, 1]
 
+cat = CategoricalTable(a, b)
+bin = BinaryTable(a, b)
+con = ConfusionMatrix(a, b)
+agr = AgreementTable(a, b)
+
+print(cat.measures())
+print(CategoricalTable.measures())
 print('-' * 15)
-print(bm.gk_lambda)
-print(bm.gk_lambda_reversed)
-print(bm.mutual_information)
-print(bm.uncertainty_coefficient)
-print(bm.uncertainty_coefficient_reversed)
+print(bin.measures())
+print(BinaryTable.measures())
+print('-' * 15)
+print(con.measures())
+print(ConfusionMatrix.measures())
+print('-' * 15)
+print(agr.measures())
+print(AgreementTable.measures())
+
+print('~' * 15)
+print('~' * 15)
+
+
+def print_measures(computer):
+    r = {m: computer.get(m) for m in computer.measures()}
+    print(r)
+
+
+print_measures(cat)
+print_measures(bin)
+print_measures(con)
+print_measures(agr)

@@ -6,7 +6,7 @@ from random import choice
 import pandas as pd
 from pyspark.sql import SparkSession
 
-from pypair.spark import binary_binary, confusion, categorical_categorical
+from pypair.spark import binary_binary, confusion, categorical_categorical, agreement
 
 
 class PySparkTest(unittest.TestCase):
@@ -138,4 +138,14 @@ class SparkTest(PySparkTest):
         """
         sdf = self._get_categorical_categorical_data()
         results = categorical_categorical(sdf).collect()
+        print(results)
+
+    def test_agreement(self):
+        """
+        Tests agreement Spark operation.
+
+        :return: None.
+        """
+        sdf = self._get_confusion_data()
+        results = agreement(sdf).collect()
         print(results)

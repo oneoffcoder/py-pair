@@ -3,7 +3,7 @@ import random
 import numpy as np
 from nose import with_setup
 
-from pypair.contingency import BinaryTable, CategoricalTable, ConfusionMatrix, CategoricalMeasures
+from pypair.contingency import BinaryTable, CategoricalTable, ConfusionMatrix
 
 
 def setup():
@@ -76,22 +76,3 @@ def test_categorical_table_creation():
     table = CategoricalTable(a, b)
     assert 0.4 == table.get('chisq')
     assert 0.2 == table.get('phi')
-
-
-@with_setup(setup, teardown)
-def test_categorical_measures():
-    """
-    Tests categorical measures.
-
-    :return: None.
-    """
-    data = [(('x0', 'x1'), [[21, 9], [17, 23], [16, 14]]), (('x0', 'x2'), [[8, 12, 10], [16, 7, 17], [6, 11, 13]]),
-            (('x0', 'x3'), [[21, 9], [25, 15], [13, 17]]), (('x1', 'x2'), [[16, 19, 19], [14, 11, 21]]),
-            (('x1', 'x3'), [[35, 19], [24, 22]]), (('x2', 'x3'), [[19, 11], [16, 14], [24, 16]])]
-
-    for (x1, x2), table in data:
-        print(x1, x2, table)
-        computer = CategoricalMeasures(table)
-        for m in computer.measures():
-            print(m, computer.get(m))
-        print('-' * 15)

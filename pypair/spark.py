@@ -1,6 +1,7 @@
 from itertools import combinations
 
-from pypair.contingency import BinaryMeasures, CmMeasures, CategoricalMeasures
+from pypair.contingency import ConfusionStats, CategoricalStats, \
+    BinaryStats, AgreementStats
 
 
 def __to_abcd_counts(d):
@@ -102,7 +103,7 @@ def binary_binary(sdf):
         c = max(1, c)
         d = max(1, d)
 
-        computer = BinaryMeasures(a, b, c, d)
+        computer = BinaryStats([[a, b], [c, d]])
         measures = {m: computer.get(m) for m in computer.measures()}
         return (x1, x2), measures
 
@@ -140,7 +141,7 @@ def confusion(sdf):
         fp = max(1, fp)
         tn = max(1, tn)
 
-        computer = CmMeasures(tp, fn, fp, tn)
+        computer = ConfusionStats([[tp, fp], [fp, tn]])
         measures = {m: computer.get(m) for m in computer.measures()}
         return (x1, x2), measures
 
@@ -216,7 +217,30 @@ def categorical_categorical(sdf):
 
     def to_results(tup):
         key, table = tup
-        computer = CategoricalMeasures(table)
+        computer = CategoricalStats(table)
+        measures = {m: computer.get(m) for m in computer.measures()}
+        return key, measures
+
+    return __get_contingency_table(sdf) \
+        .map(lambda tup: to_results(tup)) \
+        .sortByKey()
+
+
+def agreement(sdf):
+    """
+    Gets all pairwise categorical-categorical `agreement` association measures. The result is a Spark pair-RDD,
+    where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
+    association names and metrics e.g. {‘kappa’: 0.9, ‘delta’: 0.2}. Each record in the pair-RDD is of the form.
+
+    - (k1, k2), {‘kappa’: 0.9, ‘delta’: 0.2, ...}
+
+    :param sdf: Spark dataframe. Should be strings or whole numbers to represent the values.
+    :return: Spark pair-RDD.
+    """
+
+    def to_results(tup):
+        key, table = tup
+        computer = AgreementStats(table)
         measures = {m: computer.get(m) for m in computer.measures()}
         return key, measures
 

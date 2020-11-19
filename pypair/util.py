@@ -34,25 +34,7 @@ class MeasureMixin(ABC):
 
         :return: List of all the measures.
         """
-        return get_measures(self.__clazz)
-
-    @property
-    def __name(self):
-        """
-        Gets the clazz name.
-
-        :return: Clazz name.
-        """
-        return type(self).__name__
-
-    @property
-    def __clazz(self):
-        """
-        Gets the clazz.
-
-        :return: Clazz.
-        """
-        return self.__class__
+        return get_measures(self.__class__)
 
 
 def get_measures(clazz):

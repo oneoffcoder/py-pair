@@ -11,46 +11,10 @@ from pypair.decorator import timeit, similarity, distance
 from pypair.util import MeasureMixin
 
 
-class ContingencyTable(MeasureMixin, ABC):
-    """
-    Abstract contingency table. All other tables inherit from this one.
-    """
-
-    def __init__(self):
-        pass
-
-
-class BaseMeasures(MeasureMixin, object):
-    """
-    Base measures.
-    """
-
-    def __init__(self, table):
-        """
-        ctor.
-
-        :param table: A table of counts (list of lists).
-        """
-        self._r_margs = [sum(table[r]) for r in range(len(table))]
-        self._c_margs = [sum([table[r][c] for r in range(len(table))]) for c in range(len(table[0]))]
-        self._n = sum(self._r_margs)
-        self._r = len(self._r_margs)
-        self._c = len(self._c_margs)
-        self._table = table
-
-
-class CategoricalMeasures(BaseMeasures):
+class CategoricalMixin(object):
     """
     Categorical measures based off a contingency table.
     """
-
-    def __init__(self, table):
-        """
-        ctor.
-
-        :param table: A table of counts (list of lists).
-        """
-        super().__init__(table)
 
     @property
     @lru_cache(maxsize=None)
@@ -78,9 +42,9 @@ class CategoricalMeasures(BaseMeasures):
         """
         n = self._n
         r = self._r
-        c = self._c
+        c = self._k
         row_marginals = self._r_margs
-        col_marginals = self._c_margs
+        col_marginals = self._k_margs
 
         get_expected = lambda i, j: row_marginals[i] * col_marginals[j] / n
         expected = [[get_expected(i, j) for j in range(c)] for i in range(r)]
@@ -98,7 +62,7 @@ class CategoricalMeasures(BaseMeasures):
 
         :return: Degrees of freedom.
         """
-        return (self._r - 1) * (self._c - 1)
+        return (self._r - 1) * (self._k - 1)
 
     @property
     @lru_cache(maxsize=None)
@@ -135,7 +99,7 @@ class CategoricalMeasures(BaseMeasures):
         """
         n = self._n
 
-        h_b = map(lambda j: self._c_margs[j] / n, range(self._c))
+        h_b = map(lambda j: self._k_margs[j] / n, range(self._k))
         h_b = map(lambda p: p * log(p), h_b)
         h_b = -reduce(lambda x, y: x + y, h_b)
 
@@ -181,11 +145,11 @@ class CategoricalMeasures(BaseMeasures):
         n = self._n
 
         get_p_a = lambda i: self._r_margs[i] / n
-        get_p_b = lambda j: self._c_margs[j] / n
+        get_p_b = lambda j: self._k_margs[j] / n
         get_p_ab = lambda i, j: self._table[i][j] / n
         get_mi = lambda i, j: get_p_ab(i, j) * log(get_p_ab(i, j) / get_p_a(i) / get_p_b(j))
 
-        mi = sum((get_mi(i, j) for i, j in product(*[range(self._r), range(self._c)])))
+        mi = sum((get_mi(i, j) for i, j in product(*[range(self._r), range(self._k)])))
 
         return mi
 
@@ -224,7 +188,7 @@ class CategoricalMeasures(BaseMeasures):
         r = self._r
 
         x = sum([max(self._table[i]) for i in range(r)])
-        y = max(self._c_margs)
+        y = max(self._k_margs)
         gkl = (x - y) / (n - y)
         return gkl
 
@@ -238,7 +202,7 @@ class CategoricalMeasures(BaseMeasures):
         """
         n = self._n
         r = self._r
-        c = self._c
+        c = self._k
 
         x = sum([max([self._table[i][j] for i in range(r)]) for j in range(c)])
         y = max(self._r_margs)
@@ -265,7 +229,7 @@ class CategoricalMeasures(BaseMeasures):
         :return: Adjusted Rand Index.
         """
         a_i = sum([int(binom(a, 2)) for a in self._r_margs])
-        b_j = sum([int(binom(b, 2)) for b in self._c_margs])
+        b_j = sum([int(binom(b, 2)) for b in self._k_margs])
         n_ij = sum([int(binom(n, 2)) for n in chain(*self._table)])
         n = binom(self._n, 2)
 
@@ -275,144 +239,10 @@ class CategoricalMeasures(BaseMeasures):
         return s
 
 
-class CategoricalTable(ContingencyTable):
-    """
-    Represents a contingency table for categorical variables.
-
-    References
-
-    - `Contingency table <https://en.wikipedia.org/wiki/Contingency_table>`_
-    - `More Correlation Coefficients <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_
-    """
-
-    def __init__(self, a, b, a_vals=None, b_vals=None):
-        """
-        ctor. If `a_vals` or `b_vals` are `None`, then the possible
-        values will be determined empirically from the data.
-
-        :param a: Iterable list.
-        :param b: Iterable list.
-        :param a_vals: All possible values in a. Defaults to `None`.
-        :param b_vals: All possible values in b. Defaults to `None`.
-        """
-        df = pd.DataFrame([(x, y) for x, y in zip(a, b)], columns=['a', 'b'])
-
-        if a_vals is None:
-            a_vals = sorted(list(df.a.unique()))
-
-        if b_vals is None:
-            b_vals = sorted(list(df.b.unique()))
-
-        table = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] for y in b_vals] for x in a_vals]
-        self._categorical_measures = CategoricalMeasures(table)
-
-    @staticmethod
-    def measures():
-        """
-        Gets a (sorted) list of all association measures available.
-
-        :return: List of association measures.
-        """
-        return CategoricalMeasures.measures()
-
-    def get(self, measure):
-        """
-        Gets the specified statistic.
-
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
-        """
-        return self._categorical_measures.get(measure)
-
-
-class AgreementTable(CategoricalTable):
-    """
-    Represents a contingency table for agreement data against one variable. The variable is typically
-    a rating variable (e.g. dislike, neutral, like), and the data is a pairing of ratings over
-    the same set of items. The agreement table that is induced by the data is typically squared,
-    where the number of rows and columns are equal.
-    """
-
-    def __init__(self, a, b, a_vals=None, b_vals=None):
-        """
-        ctor.
-
-        :param a: Categorical variable.
-        :param b: Categorical variable.
-        :param a_vals: Values in `a`. Default `None`; figure out empirically.
-        :param b_vals: Values in `b`. Default `None`; figure out empirically.
-        """
-        super().__init__(a, b, a_vals=a_vals, b_vals=b_vals)
-        if self._n_cols != self._n_rows:
-            raise ValueError(f'Table not symmetric: rows={self._n_rows}, cols={self._n_cols}')
-
-        a_set = set(self._a_map.keys())
-        b_set = set(self._b_map.keys())
-        if len(a_set) != len(b_set):
-            raise ValueError(f'Table not symmetric: rows={len(a_set)}, cols={len(b_set)}')
-        if len(a_set & b_set) != len(a_set):
-            raise ValueError(f'Rating value mismatches: {a_set ^ b_set}')
-
-    @property
-    @lru_cache(maxsize=None)
-    def chohen_k(self):
-        """
-        Computes Cohen's :math:`\\kappa`.
-
-        - :math:`\\kappa = \\frac{\\theta_1 - \\theta_2}{1 - \\theta_2}`
-        - :math:`\\theta_1 = \\sum_i p_{ii}`
-        - :math:`\\theta_2 = \\sum_i p_{i+}p_{+i}`
-
-        :return: :math:`\\kappa`.
-        """
-        n = len(self._a_map.keys())
-        theta_1 = sum([self._p_observed[i][i] for i in range(n)])
-        theta_2 = sum([self._p_r_marginals[i] * self._p_c_marginals[i] for i in range(n)])
-        k = (theta_1 - theta_2) / (1 - theta_2)
-        return k
-
-    @property
-    @lru_cache(maxsize=None)
-    def cohen_light_k(self):
-        """
-        Cohen-Light :math:`\\kappa`. :math:`\\kappa` is a measure of conditional agreement.
-        Several :math:`\\kappa`, one for each unique value, will be computed and returned.
-
-        - :math:`\\kappa = \\frac{\\theta_1 - \\theta_2}{1 - \\theta_2}`
-        - :math:`\\theta_1 = \\frac{p_{ii}}{p_{i+}}`
-        - :math:`\\theta_2 = p_{+i}`
-
-        :return: A list of :math:`\\kappa`.
-        """
-        theta_1 = lambda i: self._p_observed[i][i] / self._p_r_marginals[i]
-        theta_2 = lambda i: self._p_c_marginals[i]
-        kappa = lambda t_1, t_2: (t_1 - t_2) / (1 - t_2)
-
-        n = len(self._a_map.keys())
-        kappas = [kappa(theta_1(i), theta_2(i)) for i in range(n)]
-        return kappas
-
-
-class BinaryMeasures(CategoricalMeasures):
+class BinaryMixin(object):
     """
     Binary measures based off of `a`, `b`, `c` and `d` from a 2x2 contingency table.
     """
-
-    def __init__(self, a, b, c, d):
-        """
-        ctor.
-
-        :param a: Count of :math:`N_{11}`.
-        :param b: Count of :math:`N_{10}`.
-        :param c: Count of :math:`N_{01}`.
-        :param d: Count of :math:`N_{00}`.
-        """
-        super().__init__([[a, b], [c, d]])
-        self.__a = a
-        self.__b = b
-        self.__c = c
-        self.__d = d
-        self.__n = a + b + c + d
 
     @property
     @lru_cache(maxsize=None)
@@ -422,7 +252,7 @@ class BinaryMeasures(CategoricalMeasures):
 
         :returns: a, b, c, d, n
         """
-        return self.__a, self.__b, self.__c, self.__d, self.__n
+        return self._a, self._b, self._c, self._d, self._n
 
     @property
     @timeit
@@ -1678,89 +1508,10 @@ class BinaryMeasures(CategoricalMeasures):
         return a / (a + theta * b + phi * c)
 
 
-class BinaryTable(CategoricalTable):
-    """
-    Represents a contingency table for binary variables.
-    """
-
-    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
-        """
-        ctor.
-
-        :param a: Iterable list.
-        :param b: Iterable list.
-        :param a_0: The zero value for a. Defaults to 0.
-        :param a_1: The one value for a. Defaults to 1.
-        :param b_0: The zero value for b. Defaults to 0.
-        :param b_1: The zero value for b. Defaults to 1.
-        """
-        super().__init__(a, b, a_vals=[a_0, a_1], b_vals=[b_0, b_1])
-
-        def to_count(x, y):
-            _a, _b, _c, _d = 0, 0, 0, 0
-
-            if x == a_1 and y == b_1:
-                _a = 1
-            elif x == a_1 and y == b_0:
-                _b = 1
-            elif x == a_0 and y == b_1:
-                _c = 1
-            else:
-                _d = 1
-            return _a, _b, _c, _d
-
-        def add_count(x, y):
-            return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3]
-
-        is_valid = lambda x, y: x is not None and y is not None
-
-        counts = (to_count(x, y) for x, y in zip(a, b) if is_valid(x, y))
-        counts = reduce(lambda a, b: add_count(a, b), counts)
-
-        self._a = counts[0]
-        self._b = counts[1]
-        self._c = counts[2]
-        self._d = counts[3]
-        self.__binary_measures = BinaryMeasures(self._a, self._b, self._c, self._d)
-
-    @staticmethod
-    def measures():
-        """
-        Gets a (sorted) list of all association measures available.
-
-        :return: List of association measures.
-        """
-        return BinaryMeasures.measures()
-
-    def get(self, measure):
-        """
-        Gets the specified statistic.
-
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
-        """
-        return self.__binary_measures.get(measure)
-
-
-class CmMeasures(BinaryMeasures):
+class ConfusionMixin(object):
     """
     Confusion matrix measures.
     """
-
-    def __init__(self, tp, fn, fp, tn):
-        """
-        ctor.
-
-        :param tp: True positive ``TP`` count.
-        :param fn: False negative ``FN`` count.
-        :param fp: False positive ``FP`` count.
-        :param tn: True negative ``TN`` count.
-        """
-        self.__tp = tp
-        self.__fn = fn
-        self.__fp = fp
-        self.__tn = tn
-        self.__n = tp + fn + fp + tn
 
     @property
     def tp(self):
@@ -1769,7 +1520,7 @@ class CmMeasures(BinaryMeasures):
 
         :return: TP.
         """
-        return self.__tp
+        return self._tp
 
     @property
     def fn(self):
@@ -1778,7 +1529,7 @@ class CmMeasures(BinaryMeasures):
 
         :return: FN.
         """
-        return self.__fn
+        return self._fn
 
     @property
     def fp(self):
@@ -1787,7 +1538,7 @@ class CmMeasures(BinaryMeasures):
 
         :return: FP.
         """
-        return self.__fp
+        return self._fp
 
     @property
     def tn(self):
@@ -1796,7 +1547,7 @@ class CmMeasures(BinaryMeasures):
 
         :return: TN.
         """
-        return self.__tn
+        return self._tn
 
     @property
     def n(self):
@@ -1805,7 +1556,7 @@ class CmMeasures(BinaryMeasures):
 
         :return: N.
         """
-        return self.__n
+        return self._n
 
     @property
     def __counts(self):
@@ -1814,7 +1565,7 @@ class CmMeasures(BinaryMeasures):
 
         :return: TP, FN, FP, TN, N.
         """
-        return self.__tp, self.__fn, self.__fp, self.__tn, self.__n
+        return self._tp, self._fn, self._fp, self._tn, self._n
 
     @property
     @lru_cache(maxsize=None)
@@ -2155,7 +1906,150 @@ class CmMeasures(BinaryMeasures):
         return self.plr / self.nlr
 
 
-class ConfusionMatrix(BinaryTable):
+class AgreementMixin(object):
+    @property
+    @lru_cache(maxsize=None)
+    def chohen_k(self):
+        """
+        Computes Cohen's :math:`\\kappa`.
+
+        - :math:`\\kappa = \\frac{\\theta_1 - \\theta_2}{1 - \\theta_2}`
+        - :math:`\\theta_1 = \\sum_i p_{ii}`
+        - :math:`\\theta_2 = \\sum_i p_{i+}p_{+i}`
+
+        :return: :math:`\\kappa`.
+        """
+        theta_1 = sum([self._table[i][i] for i in range(self._r)])
+        theta_2 = sum([self._r_margs[i] * self._k_margs[i] for i in range(self._r)])
+        k = (theta_1 - theta_2) / (1 - theta_2)
+        return k
+
+    @property
+    @lru_cache(maxsize=None)
+    def cohen_light_k(self):
+        """
+        Cohen-Light :math:`\\kappa`. :math:`\\kappa` is a measure of conditional agreement.
+        Several :math:`\\kappa`, one for each unique value, will be computed and returned.
+
+        - :math:`\\kappa = \\frac{\\theta_1 - \\theta_2}{1 - \\theta_2}`
+        - :math:`\\theta_1 = \\frac{p_{ii}}{p_{i+}}`
+        - :math:`\\theta_2 = p_{+i}`
+
+        :return: A list of :math:`\\kappa`.
+        """
+        theta_1 = lambda i: self._table[i][i] / self._r_margs[i]
+        theta_2 = lambda i: self._k_margs[i]
+        kappa = lambda t_1, t_2: (t_1 - t_2) / (1 - t_2)
+
+        kappas = [kappa(theta_1(i), theta_2(i)) for i in range(self._r)]
+        return kappas
+
+
+class ContingencyTable(MeasureMixin, ABC):
+    """
+    Abstract contingency table. All other tables inherit from this one.
+    """
+
+    def __init__(self, table):
+        """
+        ctor.
+
+        :param table: A table of counts (list of lists).
+        """
+        self._r_margs = [sum(table[r]) for r in range(len(table))]
+        self._k_margs = [sum([table[r][c] for r in range(len(table))]) for c in range(len(table[0]))]
+        self._n = sum(self._r_margs)
+        self._r = len(self._r_margs)
+        self._k = len(self._k_margs)
+        self._table = table
+
+    @staticmethod
+    def _to_binary_counts(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
+        def to_count(x, y):
+            _a, _b, _c, _d = 0, 0, 0, 0
+
+            if x == a_1 and y == b_1:
+                _a = 1
+            elif x == a_1 and y == b_0:
+                _b = 1
+            elif x == a_0 and y == b_1:
+                _c = 1
+            else:
+                _d = 1
+            return _a, _b, _c, _d
+
+        def add_count(x, y):
+            return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3]
+
+        is_valid = lambda x, y: x is not None and y is not None
+
+        counts = (to_count(x, y) for x, y in zip(a, b) if is_valid(x, y))
+        counts = reduce(lambda x, y: add_count(x, y), counts)
+        return counts
+
+    @staticmethod
+    def _to_categorical_counts(a, b, a_vals=None, b_vals=None):
+        df = pd.DataFrame([(x, y) for x, y in zip(a, b)], columns=['a', 'b'])
+
+        if a_vals is None:
+            a_vals = sorted(list(df.a.unique()))
+
+        if b_vals is None:
+            b_vals = sorted(list(df.b.unique()))
+
+        table = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] for y in b_vals] for x in a_vals]
+        return table
+
+
+class CategoricalTable(CategoricalMixin, ContingencyTable):
+    """
+    Represents a contingency table for categorical variables.
+
+    References
+
+    - `Contingency table <https://en.wikipedia.org/wiki/Contingency_table>`_
+    - `More Correlation Coefficients <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_
+    """
+
+    def __init__(self, a, b, a_vals=None, b_vals=None):
+        """
+        ctor. If `a_vals` or `b_vals` are `None`, then the possible
+        values will be determined empirically from the data.
+
+        :param a: Iterable list.
+        :param b: Iterable list.
+        :param a_vals: All possible values in a. Defaults to `None`.
+        :param b_vals: All possible values in b. Defaults to `None`.
+        """
+        table = ContingencyTable._to_categorical_counts(a, b, a_vals=a_vals, b_vals=b_vals)
+        super().__init__(table)
+
+
+class BinaryTable(CategoricalMixin, BinaryMixin, ContingencyTable):
+    """
+    Represents a contingency table for binary variables.
+    """
+
+    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
+        """
+        ctor.
+
+        :param a: Iterable list.
+        :param b: Iterable list.
+        :param a_0: The zero value for a. Defaults to 0.
+        :param a_1: The one value for a. Defaults to 1.
+        :param b_0: The zero value for b. Defaults to 0.
+        :param b_1: The zero value for b. Defaults to 1.
+        """
+        a, b, c, d = ContingencyTable._to_binary_counts(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1)
+        super().__init__([[a, b], [c, d]])
+        self._a = a
+        self._b = b
+        self._c = c
+        self._d = d
+
+
+class ConfusionMatrix(ConfusionMixin, ContingencyTable):
     """
     Represents a `confusion matrix <https://en.wikipedia.org/wiki/Confusion_matrix>`_. The confusion
     matrix looks like what is shown below for two binary variables `a` and `b`;
@@ -2187,29 +2081,99 @@ class ConfusionMatrix(BinaryTable):
         :param b_0: The zero value for b. Defaults to 0.
         :param b_1: The zero value for b. Defaults to 1.
         """
-        super().__init__(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1)
+        tp, fn, fp, tn = ContingencyTable._to_binary_counts(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1)
+        super().__init__([[tp, fn], [fp, tn]])
+        self._tp = tp
+        self._fn = fn
+        self._fp = fp
+        self._tn = tn
 
-        tp = self._a
-        fn = self._b
-        fp = self._c
-        tn = self._d
 
-        self.__measures = CmMeasures(tp, fn, fp, tn)
+class AgreementTable(AgreementMixin, ContingencyTable):
+    """
+    Represents a contingency table for agreement data against one variable. The variable is typically
+    a rating variable (e.g. dislike, neutral, like), and the data is a pairing of ratings over
+    the same set of items. The agreement table that is induced by the data is typically squared,
+    where the number of rows and columns are equal.
+    """
 
-    @staticmethod
-    def measures():
+    def __init__(self, a, b, a_vals=None, b_vals=None):
         """
-        Gets a (sorted) list of all association measures available.
+        ctor.
 
-        :return: List of association measures.
+        :param a: Categorical variable.
+        :param b: Categorical variable.
+        :param a_vals: Values in `a`. Default `None`; figure out empirically.
+        :param b_vals: Values in `b`. Default `None`; figure out empirically.
         """
-        return CmMeasures.measures()
+        table = ContingencyTable._to_categorical_counts(a, b, a_vals=a_vals, b_vals=b_vals)
+        super().__init__(table)
 
-    def get(self, measure):
-        """
-        Gets the specified statistic.
+        if self._k != self._r:
+            raise ValueError(f'Table not symmetric: rows={self._r}, cols={self._k}')
 
-        :param measure: Name of statistic (association measure).
-        :return: Measure.
+
+class CategoricalStats(CategoricalMixin, ContingencyTable):
+    """
+    Computes categorical stats.
+    """
+
+    def __init__(self, table):
         """
-        return self.__measures.get(measure)
+        ctor.
+
+        :param table: Contingency table.
+        """
+        super().__init__(table)
+
+
+class BinaryStats(CategoricalMixin, BinaryMixin, ContingencyTable):
+    """
+    Computes binary stats.
+    """
+
+    def __init__(self, table):
+        """
+        ctor.
+
+        :param table: Contingency table.
+        """
+        super().__init__(table)
+        self._a = table[0][0]
+        self._b = table[0][1]
+        self._c = table[1][0]
+        self._d = table[1][1]
+
+
+class ConfusionStats(ConfusionMixin, ContingencyTable):
+    """
+    Computes confusion matrix stats.
+    """
+
+    def __init__(self, table):
+        """
+        ctor.
+
+        :param table: Contingency table.
+        """
+        super().__init__(table)
+        self._tp = table[0][0]
+        self._fn = table[0][1]
+        self._fp = table[1][0]
+        self._tn = table[1][1]
+
+
+class AgreementStats(AgreementMixin, ContingencyTable):
+    """
+    Computes agreement stats.
+    """
+
+    def __init__(self, table):
+        """
+        ctor.
+
+        :param table: Contingency table.
+        """
+        super().__init__(table)
+        if self._k != self._r:
+            raise ValueError(f'Table not symmetric: rows={self._r}, cols={self._k}')
