@@ -353,6 +353,32 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
         .sortByKey()
 
 
+def categorical_continuous(sdf, categorical, continuous):
+    def to_pair1(d):
+        """
+        Creates a list of tuples.
+
+        :param d: Dictionary of data.
+        :return: List of (b, c, b_val), (sum_c, sum_c_sq, sum_b).
+        """
+        return [((cat, con, d[cat]), (d[con], d[con] ** 2, 1)) for cat, con in product(*[categorical, continuous])]
+
+    def to_pair2(tup):
+        """
+        Makes a new pair.
+
+        :param tup: (b, c, b_val), (sum_c, sum_c_sq, sum_b)
+        :return: (b, c), (b_val, sum_c, sum_c_sq, sum_b)
+        """
+        (b, c, b_val), (sum_c, sum_c_sq, sum_b) = tup
+        return (b, c), (b_val, sum_c, sum_c_sq, sum_b)
+
+    return sdf.rdd \
+        .flatMap(lambda r: to_pair1(r.asDict())) \
+        .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2])) \
+        .map(lambda tup: to_pair2(tup))
+
+
 def concordance(sdf):
     """
     Gets all the pairwise ordinal-ordinal concordance measures. The result is a Spark pair-RDD,
