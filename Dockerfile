@@ -1,5 +1,6 @@
 FROM continuumio/anaconda3
-LABEL Jee Vang, Ph.D. "vangjee@gmail.com"
+LABEL author="Jee Vang, Ph.D."
+LABEL email="vangjee@gmail.com"
 ARG AAPI_VERSION
 ARG APYPI_REPO
 ENV API_VERSION=$AAPI_VERSION
@@ -9,5 +10,5 @@ RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install build-essential -y
 COPY . /py-pair
-RUN conda install -c conda-forge --file /py-pair/requirements.txt -y
+RUN pip install -r /py-pair/requirements.txt
 RUN /py-pair/publish.sh
