@@ -12,6 +12,7 @@ class BiserialMixin(object):
     Biserial computations based off of :math:`n, p, q, y_0, y_1, \\sigma`.
 
     """
+
     @property
     @lru_cache(maxsize=None)
     def __params(self):
@@ -163,4 +164,3 @@ class BiserialStats(MeasureMixin, BiserialMixin, object):
         self._y_0 = y_0
         self._y_1 = y_1
         self._std = std
-

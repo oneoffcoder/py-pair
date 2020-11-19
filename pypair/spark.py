@@ -1,5 +1,4 @@
 from itertools import combinations, product
-from functools import reduce
 from math import sqrt
 
 from pypair.biserial import BiserialStats
@@ -28,6 +27,7 @@ def __to_abcd_counts(d):
     :param d: A dictionary. Names are variable names. Values are 0 or 1.
     :return: A list of tuples of the form: (k1, k2), (a, b, c, d).
     """
+
     def as_count(v1, v2):
         """
         Maps the specified values to a (TP or 11), b (FN or 10), c (FP or 01) and d (TN or 00).
@@ -281,6 +281,7 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
     :param b_1: One value for binary field.
     :return: Spark pair-RDD.
     """
+
     def to_pair1(d):
         """
         Creates a list of tuples.
@@ -288,7 +289,7 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
         :param d: Dictionary of data.
         :return: List of (b, c, b_val), (sum_c, sum_c_sq, sum_b).
         """
-        return [((b, c, d[b]), (d[c], d[c]**2, 1)) for b, c in product(*[binary, continuous])]
+        return [((b, c, d[b]), (d[c], d[c] ** 2, 1)) for b, c in product(*[binary, continuous])]
 
     def to_pair2(tup):
         """
@@ -324,7 +325,7 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
         p = sum_b_1 / n
         y_0 = sum_c_0 / sum_b_0
         y_1 = sum_c_1 / sum_b_1
-        ss = (sum_c_sq_0 + sum_c_sq_1) - ((sum_c_0 + sum_c_1)**2 / n)
+        ss = (sum_c_sq_0 + sum_c_sq_1) - ((sum_c_0 + sum_c_1) ** 2 / n)
         v = ss / (n - 1)
         std = sqrt(v)
 
