@@ -169,8 +169,10 @@ class CategoricalMeasures(MeasureMixin, object):
         get_p_a = lambda i: self.__r_margs[i] / n
         get_p_b = lambda j: self.__c_margs[j] / n
         get_p_ab = lambda i, j: self.__table[i][j] / n
-        get_mi = lambda i, j: get_p_ab(i, j) * log(get_p_ab(i, j) / get_p_a(i) / get_p_b(i))
+        get_mi = lambda i, j: get_p_ab(i, j) * log(get_p_ab(i, j) / get_p_a(i) / get_p_b(j))
+
         mi = sum((get_mi(i, j) for i, j in product(*[range(self.__r), range(self.__c)])))
+
         return mi
 
     @property

@@ -1,6 +1,6 @@
 from itertools import combinations
 
-from pypair.contingency import BinaryMeasures, CmMeasures
+from pypair.contingency import BinaryMeasures, CmMeasures, CategoricalMeasures
 
 
 def __to_abcd_counts(d):
@@ -146,7 +146,7 @@ def confusion(sdf):
         .map(lambda counts: to_results(counts))
 
 
-def __get_contigency_table(sdf):
+def __get_contingency_table(sdf):
     """
     Gets the pairwise contingency tables. Each record in the pair-RDD returns has the following form.
 
@@ -183,10 +183,8 @@ def __get_contigency_table(sdf):
     def to_contigency_table(tup):
         key, (d, v1, v2) = tup
         table = [[d[(a, b)] for b in v2] for a in v1]
-        r_mar = [sum(table[r]) for r in range(len(v1))]
-        c_mar = [sum([table[r][c] for r in range(len(v1))]) for c in range(len(v2))]
 
-        return key, (table, r_mar, c_mar, v1, v2)
+        return key, table
 
     return sdf.rdd \
         .flatMap(lambda r: to_count(r.asDict())) \
@@ -200,4 +198,12 @@ def __get_contigency_table(sdf):
 
 
 def categorical_categorical(sdf):
-    return __get_contigency_table(sdf)
+    def to_results(tup):
+        key, table = tup
+        computer = CategoricalMeasures(table)
+        measures = {m: computer.get(m) for m in computer.measures()}
+        return key, measures
+
+    return __get_contingency_table(sdf) \
+        .map(lambda tup: to_results(tup)) \
+        .sortByKey()

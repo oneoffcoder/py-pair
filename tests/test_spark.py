@@ -131,6 +131,11 @@ class SparkTest(PySparkTest):
         print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in result.items()}, indent=1))
 
     def test_categorical_categorical(self):
+        """
+        Tests categorical-categorical Spark operation.
+
+        :return: None.
+        """
         sdf = self._get_categorical_categorical_data()
         results = categorical_categorical(sdf).collect()
         print(results)
