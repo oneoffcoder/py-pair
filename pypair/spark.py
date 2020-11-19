@@ -80,7 +80,9 @@ def binary_binary(sdf):
     """
     Gets all the pairwise binary-binary association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
-    of association names and measures e.g. {'phi': 1, 'lambda': 0.8}.
+    of association names and measures e.g. {'phi': 1, 'lambda': 0.8}. Each record in the pair-RDD is of the form.
+
+    - (k1, k2), {'phi': 1, 'lambda': 0.8, ...}
 
     :param sdf: Spark dataframe.
     :return: Spark pair-RDD.
@@ -116,6 +118,9 @@ def confusion(sdf):
     Gets all the pairwise confusion matrix metrics. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
     of association names and metrics e.g. {'acc': 0.9, 'fpr': 0.2}.
+    Each record in the pair-RDD is of the form.
+
+    - (k1, k2), {'acc': 0.9, 'fpr': 0.2, ...}
 
     :param sdf: Spark dataframe.
     :return: Spark pair-RDD.
@@ -199,9 +204,11 @@ def __get_contingency_table(sdf):
 
 def categorical_categorical(sdf):
     """
-    Gets all pairwise categorical-categorical association measures. Each record in the pair-RDD is of the form.
+    Gets all pairwise categorical-categorical association measures. The result is a Spark pair-RDD,
+    where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
+    association names and metrics e.g. {‘phi’: 0.9, ‘chisq’: 0.2}. Each record in the pair-RDD is of the form.
 
-    - (k1, k2), {'measure1': 1.5, 'measure2': 0.8, ...}
+    - (k1, k2), {‘phi’: 0.9, ‘chisq’: 0.2, ...}
 
     :param sdf: Spark dataframe.
     :return: Spark pair-RDD.
