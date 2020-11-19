@@ -31,12 +31,12 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :param table: A table of counts (list of lists).
         """
-        self.__r_margs = [sum(table[r]) for r in range(len(table))]
-        self.__c_margs = [sum([table[r][c] for r in range(len(table))]) for c in range(len(table[0]))]
-        self.__n = sum(self.__r_margs)
-        self.__r = len(self.__r_margs)
-        self.__c = len(self.__c_margs)
-        self.__table = table
+        self._r_margs = [sum(table[r]) for r in range(len(table))]
+        self._c_margs = [sum([table[r][c] for r in range(len(table))]) for c in range(len(table[0]))]
+        self._n = sum(self._r_margs)
+        self._r = len(self._r_margs)
+        self._c = len(self._c_margs)
+        self._table = table
 
     @property
     @lru_cache(maxsize=None)
@@ -62,16 +62,16 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: Chi-square statistic.
         """
-        n = self.__n
-        r = self.__r
-        c = self.__c
-        row_marginals = self.__r_margs
-        col_marginals = self.__c_margs
+        n = self._n
+        r = self._r
+        c = self._c
+        row_marginals = self._r_margs
+        col_marginals = self._c_margs
 
         get_expected = lambda i, j: row_marginals[i] * col_marginals[j] / n
         expected = [[get_expected(i, j) for j in range(c)] for i in range(r)]
 
-        chisq = sum([(o - e) ** 2 / e for o, e in zip(chain(*self.__table), chain(*expected))])
+        chisq = sum([(o - e) ** 2 / e for o, e in zip(chain(*self._table), chain(*expected))])
         return chisq
 
     @property
@@ -84,7 +84,7 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: Degrees of freedom.
         """
-        return (self.__r - 1) * (self.__c - 1)
+        return (self._r - 1) * (self._c - 1)
 
     @property
     @lru_cache(maxsize=None)
@@ -96,7 +96,7 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: :math:`\\phi`.
         """
-        return sqrt(self.chisq / self.__n)
+        return sqrt(self.chisq / self._n)
 
     @property
     @lru_cache(maxsize=None)
@@ -119,9 +119,9 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: Uncertainty coefficient.
         """
-        n = self.__n
+        n = self._n
 
-        h_b = map(lambda j: self.__c_margs[j] / n, range(self.__c))
+        h_b = map(lambda j: self._c_margs[j] / n, range(self._c))
         h_b = map(lambda p: p * log(p), h_b)
         h_b = -reduce(lambda x, y: x + y, h_b)
 
@@ -139,9 +139,9 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: Uncertainty coefficient.
         """
-        n = self.__n
+        n = self._n
 
-        h_b = map(lambda i: self.__r_margs[i] / n, range(self.__r))
+        h_b = map(lambda i: self._r_margs[i] / n, range(self._r))
         h_b = map(lambda p: p * log(p), h_b)
         h_b = -reduce(lambda x, y: x + y, h_b)
 
@@ -164,14 +164,14 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: Mutual information.
         """
-        n = self.__n
+        n = self._n
 
-        get_p_a = lambda i: self.__r_margs[i] / n
-        get_p_b = lambda j: self.__c_margs[j] / n
-        get_p_ab = lambda i, j: self.__table[i][j] / n
+        get_p_a = lambda i: self._r_margs[i] / n
+        get_p_b = lambda j: self._c_margs[j] / n
+        get_p_ab = lambda i, j: self._table[i][j] / n
         get_mi = lambda i, j: get_p_ab(i, j) * log(get_p_ab(i, j) / get_p_a(i) / get_p_b(j))
 
-        mi = sum((get_mi(i, j) for i, j in product(*[range(self.__r), range(self.__c)])))
+        mi = sum((get_mi(i, j) for i, j in product(*[range(self._r), range(self._c)])))
 
         return mi
 
@@ -206,11 +206,11 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: Goodman-Kruskal's lambda.
         """
-        n = self.__n
-        r = self.__r
+        n = self._n
+        r = self._r
 
-        x = sum([max(self.__table[i]) for i in range(r)])
-        y = max(self.__c_margs)
+        x = sum([max(self._table[i]) for i in range(r)])
+        y = max(self._c_margs)
         gkl = (x - y) / (n - y)
         return gkl
 
@@ -222,12 +222,12 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: Goodman-Kruskal's lambda.
         """
-        n = self.__n
-        r = self.__r
-        c = self.__c
+        n = self._n
+        r = self._r
+        c = self._c
 
-        x = sum([max([self.__table[i][j] for i in range(r)]) for j in range(c)])
-        y = max(self.__r_margs)
+        x = sum([max([self._table[i][j] for i in range(r)]) for j in range(c)])
+        y = max(self._r_margs)
         gkl = (x - y) / (n - y)
         return gkl
 
@@ -250,10 +250,10 @@ class CategoricalMeasures(MeasureMixin, object):
 
         :return: Adjusted Rand Index.
         """
-        a_i = sum([int(binom(a, 2)) for a in self.__r_margs])
-        b_j = sum([int(binom(b, 2)) for b in self.__c_margs])
-        n_ij = sum([int(binom(n, 2)) for n in chain(*self.__table)])
-        n = binom(self.__n, 2)
+        a_i = sum([int(binom(a, 2)) for a in self._r_margs])
+        b_j = sum([int(binom(b, 2)) for b in self._c_margs])
+        n_ij = sum([int(binom(n, 2)) for n in chain(*self._table)])
+        n = binom(self._n, 2)
 
         top = (n_ij - (a_i * b_j) / n)
         bot = 0.5 * (a_i + b_j) - (a_i * b_j) / n
