@@ -198,6 +198,14 @@ def __get_contingency_table(sdf):
 
 
 def categorical_categorical(sdf):
+    """
+    Gets all pairwise categorical-categorical association measures. Each record in the pair-RDD is of the form.
+
+    - (k1, k2), {'measure1': 1.5, 'measure2': 0.8, ...}
+
+    :param sdf: Spark dataframe.
+    :return: Spark pair-RDD.
+    """
     def to_results(tup):
         key, table = tup
         computer = CategoricalMeasures(table)
