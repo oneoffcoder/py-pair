@@ -20,9 +20,9 @@ class ContingencyTable(MeasureMixin, ABC):
         pass
 
 
-class CategoricalMeasures(MeasureMixin, object):
+class BaseMeasures(MeasureMixin, object):
     """
-    Categorical measures based off a contingency table.
+    Base measures.
     """
 
     def __init__(self, table):
@@ -37,6 +37,20 @@ class CategoricalMeasures(MeasureMixin, object):
         self._r = len(self._r_margs)
         self._c = len(self._c_margs)
         self._table = table
+
+
+class CategoricalMeasures(BaseMeasures):
+    """
+    Categorical measures based off a contingency table.
+    """
+
+    def __init__(self, table):
+        """
+        ctor.
+
+        :param table: A table of counts (list of lists).
+        """
+        super().__init__(table)
 
     @property
     @lru_cache(maxsize=None)
@@ -379,7 +393,7 @@ class AgreementTable(CategoricalTable):
         return kappas
 
 
-class BinaryMeasures(MeasureMixin, object):
+class BinaryMeasures(CategoricalMeasures):
     """
     Binary measures based off of `a`, `b`, `c` and `d` from a 2x2 contingency table.
     """
@@ -393,6 +407,7 @@ class BinaryMeasures(MeasureMixin, object):
         :param c: Count of :math:`N_{01}`.
         :param d: Count of :math:`N_{00}`.
         """
+        super().__init__([[a, b], [c, d]])
         self.__a = a
         self.__b = b
         self.__c = c
@@ -1715,7 +1730,7 @@ class BinaryTable(CategoricalTable):
 
         :return: List of association measures.
         """
-        return BinaryMeasures.measures() + CategoricalMeasures.measures()
+        return BinaryMeasures.measures()
 
     def get(self, measure):
         """
@@ -1724,12 +1739,10 @@ class BinaryTable(CategoricalTable):
         :param measure: Name of statistic (association measure).
         :return: Measure.
         """
-        if measure in self.__binary_measures.measures():
-            return self.__binary_measures.get(measure)
-        return self._categorical_measures.get(measure)
+        return self.__binary_measures.get(measure)
 
 
-class CmMeasures(MeasureMixin, object):
+class CmMeasures(BinaryMeasures):
     """
     Confusion matrix measures.
     """
