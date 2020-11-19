@@ -213,6 +213,7 @@ def categorical_categorical(sdf):
     :param sdf: Spark dataframe.
     :return: Spark pair-RDD.
     """
+
     def to_results(tup):
         key, table = tup
         computer = CategoricalMeasures(table)
