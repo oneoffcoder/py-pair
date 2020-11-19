@@ -79,6 +79,57 @@ def __add_abcd_counts(x, y):
     return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3]
 
 
+def __get_contingency_table(sdf):
+    """
+    Gets the pairwise contingency tables. Each record in the pair-RDD returns has the following form.
+
+    `(k1, k2), (table, row_marginals, col_marginals, domain1, domain2)`
+
+    - k1 is the name of a variable
+    - k2 is the name of a variable
+    - table is a list of list (a table, matrix) of counts
+    - row_marginals contain the row marginals
+    - col_marginals contain the column marginals
+    - domain1 is a list of all the values of variable 1
+    - domain2 is a list of all the values of variable 2
+
+    :param sdf: Spark dataframe.
+    :return: Spark pair-RDD.
+    """
+
+    def to_count(d):
+        def count(k1, k2):
+            tups = [(k1, d[k1]), (k2, d[k2])]
+            tups = sorted(tups, key=lambda t: t[0])
+
+            return (tups[0][0], tups[1][0], tups[0][1], tups[1][1]), 1
+
+        return [count(k1, k2) for k1, k2 in combinations(d.keys(), 2)]
+
+    def attach_domains(tup):
+        key, d = tup
+        v1 = sorted(list({k[0] for k, _ in d.items()}))
+        v2 = sorted(list({k[1] for k, _ in d.items()}))
+
+        return key, (d, v1, v2)
+
+    def to_contingency_table(tup):
+        key, (d, v1, v2) = tup
+        table = [[d[(a, b)] if (a, b) in d else 0 for b in v2] for a in v1]
+
+        return key, table
+
+    return sdf.rdd \
+        .flatMap(lambda r: to_count(r.asDict())) \
+        .reduceByKey(lambda a, b: a + b) \
+        .map(lambda tup: ((tup[0][0], tup[0][1]), (tup[0][2], tup[0][3], tup[1]))) \
+        .map(lambda tup: (tup[0], {(tup[1][0], tup[1][1]): tup[1][2]})) \
+        .reduceByKey(lambda a, b: {**a, **b}) \
+        .map(lambda tup: attach_domains(tup)) \
+        .map(lambda tup: to_contingency_table(tup)) \
+        .sortByKey()
+
+
 def binary_binary(sdf):
     """
     Gets all the pairwise binary-binary association measures. The result is a Spark pair-RDD,
@@ -152,57 +203,6 @@ def confusion(sdf):
         .reduceByKey(lambda a, b: __add_abcd_counts(a, b)) \
         .sortByKey() \
         .map(lambda counts: to_results(counts))
-
-
-def __get_contingency_table(sdf):
-    """
-    Gets the pairwise contingency tables. Each record in the pair-RDD returns has the following form.
-
-    `(k1, k2), (table, row_marginals, col_marginals, domain1, domain2)`
-
-    - k1 is the name of a variable
-    - k2 is the name of a variable
-    - table is a list of list (a table, matrix) of counts
-    - row_marginals contain the row marginals
-    - col_marginals contain the column marginals
-    - domain1 is a list of all the values of variable 1
-    - domain2 is a list of all the values of variable 2
-
-    :param sdf: Spark dataframe.
-    :return: Spark pair-RDD.
-    """
-
-    def to_count(d):
-        def count(k1, k2):
-            tups = [(k1, d[k1]), (k2, d[k2])]
-            tups = sorted(tups, key=lambda t: t[0])
-
-            return (tups[0][0], tups[1][0], tups[0][1], tups[1][1]), 1
-
-        return [count(k1, k2) for k1, k2 in combinations(d.keys(), 2)]
-
-    def attach_domains(tup):
-        key, d = tup
-        v1 = sorted(list({k[0] for k, _ in d.items()}))
-        v2 = sorted(list({k[1] for k, _ in d.items()}))
-
-        return key, (d, v1, v2)
-
-    def to_contingency_table(tup):
-        key, (d, v1, v2) = tup
-        table = [[d[(a, b)] if (a, b) in d else 0 for b in v2] for a in v1]
-
-        return key, table
-
-    return sdf.rdd \
-        .flatMap(lambda r: to_count(r.asDict())) \
-        .reduceByKey(lambda a, b: a + b) \
-        .map(lambda tup: ((tup[0][0], tup[0][1]), (tup[0][2], tup[0][3], tup[1]))) \
-        .map(lambda tup: (tup[0], {(tup[1][0], tup[1][1]): tup[1][2]})) \
-        .reduceByKey(lambda a, b: {**a, **b}) \
-        .map(lambda tup: attach_domains(tup)) \
-        .map(lambda tup: to_contingency_table(tup)) \
-        .sortByKey()
 
 
 def categorical_categorical(sdf):
