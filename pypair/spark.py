@@ -141,7 +141,7 @@ def confusion(sdf):
         fp = max(1, fp)
         tn = max(1, tn)
 
-        computer = ConfusionStats([[tp, fp], [fp, tn]])
+        computer = ConfusionStats([[tp, fn], [fp, tn]])
         measures = {m: computer.get(m) for m in computer.measures()}
         return (x1, x2), measures
 
@@ -186,9 +186,9 @@ def __get_contingency_table(sdf):
 
         return key, (d, v1, v2)
 
-    def to_contigency_table(tup):
+    def to_contingency_table(tup):
         key, (d, v1, v2) = tup
-        table = [[d[(a, b)] for b in v2] for a in v1]
+        table = [[d[(a, b)] if (a, b) in d else 0 for b in v2] for a in v1]
 
         return key, table
 
@@ -199,7 +199,7 @@ def __get_contingency_table(sdf):
         .map(lambda tup: (tup[0], {(tup[1][0], tup[1][1]): tup[1][2]})) \
         .reduceByKey(lambda a, b: {**a, **b}) \
         .map(lambda tup: attach_domains(tup)) \
-        .map(lambda tup: to_contigency_table(tup)) \
+        .map(lambda tup: to_contingency_table(tup)) \
         .sortByKey()
 
 

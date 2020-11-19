@@ -13,7 +13,7 @@ from pypair.util import MeasureMixin
 
 class CategoricalMixin(object):
     """
-    Categorical measures based off a contingency table.
+    Categorical computations based off a contingency table.
     """
 
     @property
@@ -241,7 +241,7 @@ class CategoricalMixin(object):
 
 class BinaryMixin(object):
     """
-    Binary measures based off of `a`, `b`, `c` and `d` from a 2x2 contingency table.
+    Binary computations based off of `a`, `b`, `c` and `d` from a 2x2 contingency table.
     """
 
     @property
@@ -1510,7 +1510,7 @@ class BinaryMixin(object):
 
 class ConfusionMixin(object):
     """
-    Confusion matrix measures.
+    Confusion matrix computations.
     """
 
     @property
@@ -1907,6 +1907,10 @@ class ConfusionMixin(object):
 
 
 class AgreementMixin(object):
+    """
+    Agreement computations.
+    """
+
     @property
     @lru_cache(maxsize=None)
     def chohen_k(self):

@@ -146,6 +146,6 @@ class SparkTest(PySparkTest):
 
         :return: None.
         """
-        sdf = self._get_confusion_data()
+        sdf = self._get_binary_binary_data()
         results = agreement(sdf).collect()
         print(results)
