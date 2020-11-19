@@ -9,7 +9,7 @@ from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bo
 from pypair.util import MeasureMixin
 
 
-class Counts(object):
+class ConcordantCounts(object):
     """
     Stores the concordance, discordant and tie counts.
     """
@@ -36,7 +36,7 @@ class Counts(object):
         t_x = self.t_x + other.t_x
         t_y = self.t_y + other.t_y
         c = self.c + other.c
-        return Counts(d, t_xy, t_x, t_y, c)
+        return ConcordantCounts(d, t_xy, t_x, t_y, c)
 
 
 class Continuous(MeasureMixin, object):
@@ -235,7 +235,100 @@ class CorrelationRatio(MeasureMixin, object):
         return calinski_harabasz_score(X, labels)
 
 
-class Concordance(MeasureMixin, object):
+class ConcordanceMixin(object):
+
+    @property
+    @lru_cache(maxsize=None)
+    def __counts(self):
+        return self._d, self._t_xy, self._t_x, self._t_y, self._c, self._n
+
+    @property
+    @lru_cache(maxsize=None)
+    def __probs(self):
+        n = self._n
+        return self._d / n, self._t_xy / n, self._t_x / n, self._t_y / n, self._c / n, n
+
+    @property
+    @lru_cache(maxsize=None)
+    def kendall_tau(self):
+        """
+        Kendall's :math:`\\tau` is defined as follows.
+
+        :math:`\\tau = \\frac{C - D}{{{n}\\choose{2}}}`
+
+        Where
+
+        - :math:`C` is the number of concordant pairs
+        - :math:`D` is the number of discordant pairs
+        - :math:`n` is the sample size
+
+        :return: :math:`\\tau`.
+        """
+        d, t_xy, t_x, t_y, c, n = self.__counts
+        t = (c - d) / (n * (n - 1) / 2)
+        return t
+
+    @property
+    @lru_cache(maxsize=None)
+    def somers_d(self):
+        """
+        Computes `Somers' d <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
+        variables. Note that Somers' d is defined for :math:`d_{X \\cdot Y}` and :math:`d_{Y \\cdot X}`
+        and in general :math:`d_{X \\cdot Y} \\neq d_{Y \\cdot X}`.
+
+        - :math:`d_{Y \\cdot X} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^Y}`
+        - :math:`d_{X \\cdot Y} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^X}`
+
+        Where
+
+        - :math:`\\pi_c = \\frac{C}{n}`
+        - :math:`\\pi_d = \\frac{D}{n}`
+        - :math:`\\pi_t^X = \\frac{T^X}{n}`
+        - :math:`\\pi_t^Y = \\frac{T^Y}{n}`
+        - :math:`C` is the number of concordant pairs
+        - :math:`D` is the number of discordant pairs
+        - :math:`T^X` is the number of ties on :math:`X`
+        - :math:`T^Y` is the number of ties on :math:`Y`
+        - :math:`n` is the sample size
+
+        :return: :math:`d_{X \\cdot Y}`, :math:`d_{Y \\cdot X}`.
+        """
+        p_d, p_txy, p_tx, p_ty, p_c, n = self.__probs
+
+        d_yx = (p_c - p_d) / (p_c + p_d + p_ty)
+        d_xy = (p_c - p_d) / (p_c + p_d + p_tx)
+
+        return d_yx, d_xy
+
+    @property
+    @lru_cache(maxsize=None)
+    def goodman_kruskal_gamma(self):
+        """
+        Goodman-Kruskal :math:`\\gamma` is like Somer's D. It is defined as follows.
+
+        :math:`\\gamma = \\frac{\\pi_c - \\pi_d}{1 - \\pi_t}`
+
+        Where
+
+        - :math:`\\pi_c = \\frac{C}{n}`
+        - :math:`\\pi_d = \\frac{D}{n}`
+        - :math:`\\pi_t = \\frac{T}{n}`
+        - :math:`C` is the number of concordant pairs
+        - :math:`D` is the number of discordant pairs
+        - :math:`T` is the number of ties
+        - :math:`n` is the sample size
+
+        :return: :math:`\\gamma`.
+        """
+        p_d, p_txy, p_tx, p_ty, p_c, n = self.__probs
+        p_t = p_txy + p_tx + p_ty
+
+        gamma = (p_c - p_d) / (1 - p_t)
+
+        return gamma
+
+
+class Concordance(MeasureMixin, ConcordanceMixin, object):
     """
     Concordance for continuous and ordinal data.
     """
@@ -247,12 +340,16 @@ class Concordance(MeasureMixin, object):
         :param x: Continuous or ordinal data (iterable).
         :param y: Continuous or ordinal data (iterable).
         """
-        self.__x = x
-        self.__y = y
+        d, t_xy, t_x, t_y, c, n = Concordance.__to_counts(x, y)
+        self._d = d
+        self._t_xy = t_xy
+        self._t_x = t_x
+        self._t_y = t_y
+        self._c = c
+        self._n = n
 
-    @property
-    @lru_cache(maxsize=None)
-    def __counts(self):
+    @staticmethod
+    def __to_counts(x, y):
         """
         Gets the count of concordance, discordance or tie. Two pairs of variables :math:`(X_i, Y_i)`
         and :math:`(X_j, Y_j)` are
@@ -296,98 +393,36 @@ class Concordance(MeasureMixin, object):
                 elif y_i == y_j:
                     t_y = 1
 
-            return Counts(d, t_xy, t_x, t_y, c)
+            return ConcordantCounts(d, t_xy, t_x, t_y, c)
 
         is_valid = lambda a, b: a is not None and b is not None
-        data = [(a, b) for a, b in zip(self.__x, self.__y) if is_valid(a, b)]
+        data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
         results = combinations(data, 2)
         results = map(lambda tup: get_concordance(tup[0], tup[1]), results)
-        concordance = reduce(lambda c1, c2: c1 + c2, results)
+        c = reduce(lambda c1, c2: c1 + c2, results)
         n = len(data)
-        return concordance, n
+        return c.d, c.t_xy, c.t_x, c.t_y, c.c, n
 
-    @property
-    @lru_cache(maxsize=None)
-    def kendall_tau(self):
+
+class ConcordanceStats(ConcordanceMixin):
+    """
+    Computes concordance stats.
+    """
+
+    def __init__(self, d, t_xy, t_x, t_y, c, n):
         """
-        Kendall's :math:`\\tau` is defined as follows.
+        ctor.
 
-        :math:`\\tau = \\frac{C - D}{{{n}\\choose{2}}}`
-
-        Where
-
-        - :math:`C` is the number of concordant pairs
-        - :math:`D` is the number of discordant pairs
-        - :math:`n` is the sample size
-
-        :param x: Continuous data (iterable).
-        :param y: Continuous data (iterable).
-        :return: :math:`\\tau`.
+        :param d: Number of discordant pairs.
+        :param t_xy: Number of ties on XY pairs.
+        :param t_x: Number of ties on X pairs.
+        :param t_y: Number of ties on Y pairs.
+        :param c: Number of concordant pairs.
+        :param n: Total number of pairs.
         """
-        c, n = self.__counts
-        t = (c.c - c.d) / (n * (n - 1) / 2)
-        return t
-
-    @property
-    @lru_cache(maxsize=None)
-    def somers_d(self):
-        """
-        Computes `Somers' d <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
-        variables. Note that Somers' d is defined for :math:`d_{X \\cdot Y}` and :math:`d_{Y \\cdot X}`
-        and in general :math:`d_{X \\cdot Y} \\neq d_{Y \\cdot X}`.
-
-        - :math:`d_{Y \\cdot X} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^Y}`
-        - :math:`d_{X \\cdot Y} = \\frac{\\pi_c - \\pi_d}{\\pi_c + \\pi_d + \\pi_t^X}`
-
-        Where
-
-        - :math:`\\pi_c = \\frac{C}{n}`
-        - :math:`\\pi_d = \\frac{D}{n}`
-        - :math:`\\pi_t^X = \\frac{T^X}{n}`
-        - :math:`\\pi_t^Y = \\frac{T^Y}{n}`
-        - :math:`C` is the number of concordant pairs
-        - :math:`D` is the number of discordant pairs
-        - :math:`T^X` is the number of ties on :math:`X`
-        - :math:`T^Y` is the number of ties on :math:`Y`
-        - :math:`n` is the sample size
-
-        :return: :math:`d_{X \\cdot Y}`, :math:`d_{Y \\cdot X}`.
-        """
-        c, n = self.__counts
-
-        p_d = c.d / n
-        p_tx = c.t_x / n
-        p_ty = c.t_y / n
-        p_c = c.c / n
-
-        d_yx = (p_c - p_d) / (p_c + p_d + p_ty)
-        d_xy = (p_c - p_d) / (p_c + p_d + p_tx)
-
-        return d_yx, d_xy
-
-    @property
-    @lru_cache(maxsize=None)
-    def goodman_kruskal_gamma(self):
-        """
-        Goodman-Kruskal :math:`\\gamma` is like Somer's D. It is defined as follows.
-
-        :math:`\\gamma = \\frac{\\pi_c - \\pi_d}{1 - \\pi_t}`
-
-        Where
-
-        - :math:`\\pi_c = \\frac{C}{n}`
-        - :math:`\\pi_d = \\frac{D}{n}`
-        - :math:`\\pi_t = \\frac{T}{n}`
-        - :math:`C` is the number of concordant pairs
-        - :math:`D` is the number of discordant pairs
-        - :math:`T` is the number of ties
-        - :math:`n` is the sample size
-
-        :param x: Continuous data (iterable).
-        :param y: Continuous data (iterable).
-        :return: :math:`\\gamma`.
-        """
-        c, n = self.__counts
-        p_d, p_t, p_c = c.d / n, (c.t_xy + c.t_x + c.t_y) / n, c.c / n
-        gamma = (p_c - p_d) / (1 - p_t)
-        return gamma
+        self._d = d
+        self._t_xy = t_xy
+        self._t_x = t_x
+        self._t_y = t_y
+        self._t_c = c
+        self._n = n
