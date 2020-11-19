@@ -1,9 +1,24 @@
 from itertools import combinations, product
+from functools import reduce
 from math import sqrt
 
 from pypair.biserial import BiserialStats
 from pypair.contingency import ConfusionStats, CategoricalStats, \
     BinaryStats, AgreementStats
+from pypair.continuous import ConcordanceStats
+
+
+def __as_key(k1, k2):
+    """
+    Creates a key (tuple) out of the two specified. The key is always ordered.
+    If k2 < k1, then (k2, k1), else, (k1, k2).
+
+    :param k1: Key (string).
+    :param k2: Key (string).
+    :return: (k1, k2) or (k2, k1).
+    """
+    keys = sorted([k1, k2])
+    return keys[0], keys[1]
 
 
 def __to_abcd_counts(d):
@@ -13,19 +28,6 @@ def __to_abcd_counts(d):
     :param d: A dictionary. Names are variable names. Values are 0 or 1.
     :return: A list of tuples of the form: (k1, k2), (a, b, c, d).
     """
-
-    def as_key(k1, k2):
-        """
-        Creates a key (tuple) out of the two specified. The key is always ordered.
-        If k2 < k1, then (k2, k1), else, (k1, k2).
-
-        :param k1: Key (string).
-        :param k2: Key (string).
-        :return: (k1, k2) or (k2, k1).
-        """
-        keys = sorted([k1, k2])
-        return keys[0], keys[1]
-
     def as_count(v1, v2):
         """
         Maps the specified values to a (TP or 11), b (FN or 10), c (FP or 01) and d (TN or 00).
@@ -61,7 +63,7 @@ def __to_abcd_counts(d):
         :return: (k1, k2), (a, b, c, d)
         """
         v1, v2 = d[k1], d[k2]
-        return as_key(k1, k2), as_count(v1, v2)
+        return __as_key(k1, k2), as_count(v1, v2)
 
     return [transform(k1, k2) for k1, k2 in combinations(d.keys(), 2)]
 
@@ -77,6 +79,19 @@ def __add_abcd_counts(x, y):
     :return: Tuple (a, b, c, d).
     """
     return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3]
+
+
+def __add_concordance_counts(x, y):
+    """
+    Adds two tuples. For example.
+
+    :math:`x + y = (x_d + y_d, x_t_{xy} + y_t_{xy}, x_t_x + y_t_x, x_t_y + y_t_y, x_c + y_c, x_n + y_n)`
+
+    :param x: Tuple (d, t_xy, t_x, t_y, c, n).
+    :param y: Tuple (d, t_xy, t_x, t_y, c, n).
+    :return: Tuple (d, t_xy, t_x, t_y, c, n).
+    """
+    return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3], x[4] + y[4], x[5] + y[5]
 
 
 def __get_contingency_table(sdf):
@@ -146,17 +161,12 @@ def binary_binary(sdf):
         """
         Converts the result of the contingency table counts to a dictionary of association measures.
 
-        :param counts: Tuple of tuples: (x1, x2), (a, b, c, d).
+        :param counts: Tuple of tuples: (k1, k2), (a, b, c, d).
         :return: (x1, x2), {'measure1': val1, 'measure2': val2, ...}.
         """
         (x1, x2), (a, b, c, d) = counts
 
-        a = max(1, a)
-        b = max(1, b)
-        c = max(1, c)
-        d = max(1, d)
-
-        computer = BinaryStats([[a, b], [c, d]])
+        computer = BinaryStats([[a + 1, b + 1], [c + 1, d + 1]])
         measures = {m: computer.get(m) for m in computer.measures()}
         return (x1, x2), measures
 
@@ -201,8 +211,8 @@ def confusion(sdf):
     return sdf.rdd \
         .flatMap(lambda r: __to_abcd_counts(r.asDict())) \
         .reduceByKey(lambda a, b: __add_abcd_counts(a, b)) \
-        .sortByKey() \
-        .map(lambda counts: to_results(counts))
+        .map(lambda counts: to_results(counts)) \
+        .sortByKey()
 
 
 def categorical_categorical(sdf):
@@ -332,11 +342,138 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
         measures = {m: computer.get(m) for m in computer.measures()}
         return key, measures
 
-    result = sdf.rdd \
+    return sdf.rdd \
         .flatMap(lambda r: to_pair1(r.asDict())) \
         .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2])) \
         .map(lambda tup: to_pair2(tup)) \
         .groupByKey() \
         .map(lambda tup: compute_stats(tup)) \
-        .map(lambda tup: to_results(tup))
-    return result
+        .map(lambda tup: to_results(tup)) \
+        .sortByKey()
+
+
+def concordance(sdf):
+    """
+    Gets all the pairwise ordinal-ordinal concordance measures. The result is a Spark pair-RDD,
+    where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
+    of association names and measures e.g. {'kendall': 1, 'gamma': 0.8}. Each record in the pair-RDD is of the form.
+
+    - (k1, k2), {'kendall': 1, 'gamma': 0.8, ...}
+
+    :param sdf: Spark dataframe. Should be all ordinal data (numeric).
+    :return: Spark pair-RDD.
+    """
+
+    def as_pair1(n1, n2, v1, v2):
+        """
+        Creates a pair of the form (n1, n2), (v1, v2) where the first tuple are sorted and the second
+        tuple have corresponding values to the elements of the first tuple.
+
+        :param n1: String (variable name).
+        :param n2: String (Variable name).
+        :param v1: Value.
+        :param v2: Value.
+        :return: (n1, n2), (v1, v2).
+        """
+        tups = sorted([(n1, v1), (n2, v2)], key=lambda t: t[0])
+
+        k1, j1 = tups[0]
+        k2, j2 = tups[1]
+
+        return (k1, k2), (j1, j2)
+
+    def to_pair1(d):
+        """
+        Creates a list of pairs of variables and values. Keys are names of variables and values are values of
+        those variables.
+
+        :param d: Dictionary.
+        :return: List of (k1, k2), (v1, v2).
+        """
+        return [as_pair1(n1, n2, d[n1], d[n2]) for n1, n2 in combinations(d.keys(), 2)]
+
+    def as_count(v1, v2):
+        """
+        Maps the specified pairs of values to concordance status. Concordance status can be the follow.
+
+        - discordant: :math:`(y_j - y_i)(x_j - x_i) < 0`
+        - tied: :math:`(y_j - y_i)(x_j - x_i) = 0`
+        - concordant: :math:`(y_j - y_i)(x_j - x_i) > 0`
+
+        Ties are differentiated as follows.
+
+        - tied on ``x``: `x_i = x_j`
+        - tied on ``y``: `y_i = y_j`
+        - tied on ``xy``: `x_i = x_j \\land y_i = y_j`
+
+        A tuple that looks like the following will be mapped from the concordance status.
+
+        - discordant: (1, 0, 0, 0, 0, 1)
+        - tie on ``x`` and ``y``: (0, 1, 0, 0, 0, 1)
+        - tie on ``x``: (0, 0, 1, 0, 0, 1)
+        - tie on ``y``: (0, 0, 0, 1, 0, 1)
+        - concordant: (0, 0, 0, 0, 1, 1)
+
+        :param v1: Pair (x_i, y_i).
+        :param v2: Pair (x_j, y_j).
+        :return: d, t_xy, t_x, t_y, c, n
+        """
+        d, t_xy, t_x, t_y, c, n = 0, 0, 0, 0, 0, 1
+
+        if v1 is not None and v2 is not None:
+            x_i, y_i = v1
+            x_j, y_j = v2
+            r = (y_j - y_i) * (x_j - x_i)
+
+            if r > 0:
+                c = 1
+            elif r < 0:
+                d = 1
+            else:
+                if x_i == x_j and y_i == y_j:
+                    t_xy = 1
+                elif x_i == x_j:
+                    t_x = 1
+                else:
+                    t_y = 1
+
+        return d, t_xy, t_x, t_y, c, n
+
+    def to_pair2(tup):
+        """
+        Creates concordant status counts for each pair of observations.
+
+        :param tup: (key, iterable).
+        :return: Generator of (k1, k2), (d, t_xy, t_x, t_y, c, n).
+        """
+        key, data = tup
+
+        return ((key, as_count(v1, v2)) for v1, v2 in combinations(data, 2))
+
+    def to_results(counts):
+        """
+        Converts the results of concordance to a dictionary of measures.
+
+        :param counts: Tuple of tuples: (x1, x2), (a, b, c, d).
+        :return: (x1, x2), {'measure1': val1, 'measure2': val2, ...}.
+        """
+        (x1, x2), (d, t_xy, t_x, t_y, c, n) = counts
+
+        d += 1
+        t_xy += 1
+        t_x += 1
+        t_y += 1
+        c += 1
+        n += 5
+
+        computer = ConcordanceStats(d, t_xy, t_x, t_y, c, n)
+        measures = {m: computer.get(m) for m in computer.measures()}
+        return (x1, x2), measures
+
+    return sdf.rdd \
+        .flatMap(lambda r: to_pair1(r.asDict())) \
+        .groupByKey() \
+        .flatMap(lambda tup: to_pair2(tup)) \
+        .reduceByKey(lambda x, y: __add_concordance_counts(x, y)) \
+        .map(lambda tup: to_results(tup)) \
+        .sortByKey()

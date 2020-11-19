@@ -7,7 +7,7 @@ from random import choice
 import pandas as pd
 from pyspark.sql import SparkSession
 
-from pypair.spark import binary_binary, confusion, categorical_categorical, agreement, binary_continuous
+from pypair.spark import binary_binary, confusion, categorical_categorical, agreement, binary_continuous, concordance
 
 
 class PySparkTest(unittest.TestCase):
@@ -115,6 +115,18 @@ class PySparkTest(unittest.TestCase):
         sdf = self.spark.createDataFrame(pdf)
         return sdf
 
+    def _get_concordance_data(self):
+        """
+        Gets dummy concordance data.
+
+        :return: Spark dataframe.
+        """
+        a = [1, 2, 3]
+        b = [3, 2, 1]
+        pdf = pd.DataFrame({'a': a, 'b': b, 'c': a, 'd': b})
+        sdf = self.spark.createDataFrame(pdf)
+        return sdf
+
 
 class SparkTest(PySparkTest):
     """
@@ -150,8 +162,9 @@ class SparkTest(PySparkTest):
         :return: None.
         """
         sdf = self._get_categorical_categorical_data()
-        results = categorical_categorical(sdf).collect()
-        print(results)
+        results = {tup[0]: tup[1] for tup in categorical_categorical(sdf).collect()}
+
+        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
 
     def test_agreement(self):
         """
@@ -160,8 +173,9 @@ class SparkTest(PySparkTest):
         :return: None.
         """
         sdf = self._get_binary_binary_data()
-        results = agreement(sdf).collect()
-        print(results)
+        results = {tup[0]: tup[1] for tup in agreement(sdf).collect()}
+
+        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
 
     def test_biserial(self):
         """
@@ -170,5 +184,17 @@ class SparkTest(PySparkTest):
         :return: None.
         """
         sdf = self._get_binary_continuous_data()
-        results = binary_continuous(sdf, binary=['gender'], continuous=['years']).collect()
-        print(results)
+        results = {tup[0]: tup[1] for tup in binary_continuous(sdf, binary=['gender'], continuous=['years']).collect()}
+
+        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
+
+    def test_concordance(self):
+        """
+        Tests concordance Spark operation.
+
+        :return: None.
+        """
+        sdf = self._get_concordance_data()
+        results = {tup[0]: tup[1] for tup in concordance(sdf).collect()}
+
+        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))

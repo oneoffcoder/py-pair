@@ -404,7 +404,7 @@ class Concordance(MeasureMixin, ConcordanceMixin, object):
         return c.d, c.t_xy, c.t_x, c.t_y, c.c, n
 
 
-class ConcordanceStats(ConcordanceMixin):
+class ConcordanceStats(MeasureMixin, ConcordanceMixin):
     """
     Computes concordance stats.
     """
@@ -425,4 +425,5 @@ class ConcordanceStats(ConcordanceMixin):
         self._t_x = t_x
         self._t_y = t_y
         self._t_c = c
+        self._c = c
         self._n = n
