@@ -7,24 +7,11 @@ from scipy.stats import norm
 from pypair.util import MeasureMixin
 
 
-class Biserial(MeasureMixin, object):
+class BiserialMixin(object):
     """
-    Biserial association between a binary and continuous variable.
+    Biserial computations based off of :math:`n, p, q, y_0, y_1, \\sigma`.
+
     """
-
-    def __init__(self, b, c, b_0=0, b_1=1):
-        """
-        ctor.
-
-        :param b: Binary variable (iterable).
-        :param c: Continuous variable (iterable).
-        :param b_0: Value for b is zero. Default 0.
-        :param b_1: Value for b is one. Default 1.
-        """
-        self.__df = pd.DataFrame([(x, y) for x, y in zip(b, c) if pd.notna(x)], columns=['b', 'c'])
-        self.__b_0 = b_0
-        self.__b_1 = b_1
-
     @property
     @lru_cache(maxsize=None)
     def __params(self):
@@ -40,14 +27,7 @@ class Biserial(MeasureMixin, object):
 
         :return: n, p, q, y_0, y_1, std
         """
-        n = self.__df.shape[0]
-        p = self.__df[self.__df.b == self.__b_1].shape[0] / n
-        q = 1.0 - p
-
-        y_0 = self.__df[self.__df.b == self.__b_0].c.mean()
-        y_1 = self.__df[self.__df.b == self.__b_1].c.mean()
-        std = self.__df.c.std()
-        return n, p, q, y_0, y_1, std
+        return self._n, self._p, self._q, self._y_0, self._y_1, self._std
 
     @property
     @lru_cache(maxsize=None)
@@ -128,3 +108,59 @@ class Biserial(MeasureMixin, object):
 
         r = 2 * (y_1 - y_0) / n
         return r
+
+
+class Biserial(MeasureMixin, BiserialMixin, object):
+    """
+    Biserial association between a binary and continuous variable.
+    """
+
+    def __init__(self, b, c, b_0=0, b_1=1):
+        """
+        ctor.
+
+        :param b: Binary variable (iterable).
+        :param c: Continuous variable (iterable).
+        :param b_0: Value for b is zero. Default 0.
+        :param b_1: Value for b is one. Default 1.
+        """
+        df = pd.DataFrame([(x, y) for x, y in zip(b, c) if pd.notna(x)], columns=['b', 'c'])
+
+        n = df.shape[0]
+        p = df[df.b == b_1].shape[0] / n
+        q = 1.0 - p
+
+        y_0 = df[df.b == b_0].c.mean()
+        y_1 = df[df.b == b_1].c.mean()
+        std = df.c.std()
+
+        self._n = n
+        self._p = p
+        self._q = q
+        self._y_0 = y_0
+        self._y_1 = y_1
+        self._std = std
+
+
+class BiserialStats(MeasureMixin, BiserialMixin, object):
+    """
+    Computes biserial stats.
+    """
+
+    def __init__(self, n, p, y_0, y_1, std):
+        """
+        ctor.
+
+        :param n: Total number of samples.
+        :param p: :math:`P(Y|X=0)`.
+        :param y_0: Average of :math:`Y` when :math:`X=0`. :math:`\\bar{Y}_0`
+        :param y_1: Average of :math:`Y` when :math:`X=1`. :math:`\\bar{Y}_1`
+        :param std: Standard deviation of :math:`Y`, :math:`\\sigma`.
+        """
+        self._n = n
+        self._p = p
+        self._q = 1.0 - p
+        self._y_0 = y_0
+        self._y_1 = y_1
+        self._std = std
+
