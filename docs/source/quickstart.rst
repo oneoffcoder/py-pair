@@ -70,3 +70,12 @@ Association measures for continuous-continuous variables are computed using ``co
 .. literalinclude:: _code/continuous-demo.py
    :language: python
    :linenos:
+
+Apache Spark
+------------
+
+Spark is supported for some of the association measures. `Active support <https://www.patreon.com/vangj>`_ is appreciated. Below are some code samples to get you started.
+
+.. literalinclude:: _code/spark-demo.py
+   :language: python
+   :linenos:
