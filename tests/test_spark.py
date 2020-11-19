@@ -1,3 +1,4 @@
+import json
 import logging
 import random
 import unittest
@@ -6,7 +7,7 @@ from random import choice
 import pandas as pd
 from pyspark.sql import SparkSession
 
-from pypair.spark import binary_binary, confusion, categorical_categorical, agreement
+from pypair.spark import binary_binary, confusion, categorical_categorical, agreement, binary_continuous
 
 
 class PySparkTest(unittest.TestCase):
@@ -100,6 +101,20 @@ class PySparkTest(unittest.TestCase):
         sdf = self.spark.createDataFrame(pdf)
         return sdf
 
+    def _get_binary_continuous_data(self):
+        """
+        Gets dummy `binary-continuous data <https://www.slideshare.net/MuhammadKhalil66/point-biserial-correlation-example>`_.
+
+        :return: Spark dataframe.
+        """
+        data = [
+            (1, 10), (1, 11), (1, 6), (1, 11), (0, 4),
+            (0, 3), (1, 12), (0, 2), (0, 2), (0, 1)
+        ]
+        pdf = pd.DataFrame(data, columns=['gender', 'years'])
+        sdf = self.spark.createDataFrame(pdf)
+        return sdf
+
 
 class SparkTest(PySparkTest):
     """
@@ -113,10 +128,9 @@ class SparkTest(PySparkTest):
         :return: None.
         """
         sdf = self._get_binary_binary_data()
-        result = {tup[0]: tup[1] for tup in binary_binary(sdf).collect()}
+        results = {tup[0]: tup[1] for tup in binary_binary(sdf).collect()}
 
-        import json
-        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in result.items()}, indent=1))
+        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
 
     def test_confusion(self):
         """
@@ -125,10 +139,9 @@ class SparkTest(PySparkTest):
         :return: None.
         """
         sdf = self._get_confusion_data()
-        result = {tup[0]: tup[1] for tup in confusion(sdf).collect()}
+        results = {tup[0]: tup[1] for tup in confusion(sdf).collect()}
 
-        import json
-        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in result.items()}, indent=1))
+        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
 
     def test_categorical_categorical(self):
         """
@@ -148,4 +161,14 @@ class SparkTest(PySparkTest):
         """
         sdf = self._get_binary_binary_data()
         results = agreement(sdf).collect()
+        print(results)
+
+    def test_biserial(self):
+        """
+        Tests binary-continuous Spark operation.
+
+        :return: None.
+        """
+        sdf = self._get_binary_continuous_data()
+        results = binary_continuous(sdf, binary=['gender'], continuous=['years']).collect()
         print(results)

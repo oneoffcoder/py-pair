@@ -1,5 +1,7 @@
-from itertools import combinations
+from itertools import combinations, product
+from math import sqrt
 
+from pypair.biserial import BiserialStats
 from pypair.contingency import ConfusionStats, CategoricalStats, \
     BinaryStats, AgreementStats
 
@@ -247,3 +249,94 @@ def agreement(sdf):
     return __get_contingency_table(sdf) \
         .map(lambda tup: to_results(tup)) \
         .sortByKey()
+
+
+def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
+    """
+    Gets all pairwise binary-continuous association measures. The result is a Spark pair-RDD,
+    where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
+    association names and metrics e.g. {‘biserial’: 0.9, ‘point_biserial’: 0.2}. Each record
+    in the pair-RDD is of the form.
+
+    - (k1, k2), {‘biserial’: 0.9, ‘point_biserial’: 0.2, ...}
+
+    All the binary fields/columns should be encoded in the same way. For example, if you
+    are using 1 and 0, then all binary fields should only have those values, not a mixture
+    of 1 and 0, True and False, -1 and 1, etc.
+
+    :param sdf: Spark dataframe.
+    :param binary: List of fields that are binary.
+    :param continuous: List of fields that are continuous.
+    :param b_0: Zero value for binary field.
+    :param b_1: One value for binary field.
+    :return: Spark pair-RDD.
+    """
+    def to_pair1(d):
+        """
+        Creates a list of tuples.
+
+        :param d: Dictionary of data.
+        :return: List of (b, c, b_val), (sum_c, sum_c_sq, sum_b).
+        """
+        return [((b, c, d[b]), (d[c], d[c]**2, 1)) for b, c in product(*[binary, continuous])]
+
+    def to_pair2(tup):
+        """
+        Makes a new pair.
+
+        :param tup: (b, c, b_val), (sum_c, sum_c_sq, sum_b)
+        :return: (b, c), (b_val, sum_c, sum_c_sq, sum_b)
+        """
+        (b, c, b_val), (sum_c, sum_c_sq, sum_b) = tup
+        return (b, c), (b_val, sum_c, sum_c_sq, sum_b)
+
+    def compute_stats(tup):
+        """
+        `Computational formula for variance and standard deviation <http://www.ablongman.com/graziano6e/text_site/MATERIAL/Stats/manvar.htm>`_.
+
+        - :math:`SS = \\sum (X - \\bar{X})^2 = \\sum X^2 - \\frac{\\left(\\sum X\\right)^2}{N}`
+        - :math:`\\sigma^2 = \\frac{SS}{N - 1}`
+        - :math:`\\sigma = \\sqrt{\\sigma^2}`
+
+        :param tup: (b, c), [(b_val, sum_c, sum_c_sq, sum_b), (b_val, sum_c, sum_c_sq, sum_b)]
+        :return: (b, c), (n, p, y_0, y_1, std)
+        """
+        (b, c), data = tup
+
+        data = list(data)
+        data_0 = data[0] if data[0][0] == b_0 else data[1]
+        data_1 = data[0] if data[0][0] == b_1 else data[0]
+
+        _, sum_c_0, sum_c_sq_0, sum_b_0 = data_0
+        _, sum_c_1, sum_c_sq_1, sum_b_1 = data_1
+
+        n = sum_b_0 + sum_b_1
+        p = sum_b_1 / n
+        y_0 = sum_c_0 / sum_b_0
+        y_1 = sum_c_1 / sum_b_1
+        ss = (sum_c_sq_0 + sum_c_sq_1) - ((sum_c_0 + sum_c_1)**2 / n)
+        v = ss / (n - 1)
+        std = sqrt(v)
+
+        return (b, c), (n, p, y_0, y_1, std)
+
+    def to_results(tup):
+        """
+        Computes the results.
+
+        :param tup: (b, c), (n, p, y_0, y_1, std)
+        :return: (b, c), {'measure1': val1, 'measure2': val2, ...}
+        """
+        key, (n, p, y_0, y_1, std) = tup
+        computer = BiserialStats(n, p, y_0, y_1, std)
+        measures = {m: computer.get(m) for m in computer.measures()}
+        return key, measures
+
+    result = sdf.rdd \
+        .flatMap(lambda r: to_pair1(r.asDict())) \
+        .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2])) \
+        .map(lambda tup: to_pair2(tup)) \
+        .groupByKey() \
+        .map(lambda tup: compute_stats(tup)) \
+        .map(lambda tup: to_results(tup))
+    return result
