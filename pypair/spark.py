@@ -84,7 +84,7 @@ def binary_binary(sdf):
 
     - (k1, k2), {'phi': 1, 'lambda': 0.8, ...}
 
-    :param sdf: Spark dataframe.
+    :param sdf: Spark dataframe. Should be all 1's and 0's.
     :return: Spark pair-RDD.
     """
 
@@ -122,7 +122,7 @@ def confusion(sdf):
 
     - (k1, k2), {'acc': 0.9, 'fpr': 0.2, ...}
 
-    :param sdf: Spark dataframe.
+    :param sdf: Spark dataframe. Should be all 1's and 0's.
     :return: Spark pair-RDD.
     """
 
@@ -210,7 +210,7 @@ def categorical_categorical(sdf):
 
     - (k1, k2), {‘phi’: 0.9, ‘chisq’: 0.2, ...}
 
-    :param sdf: Spark dataframe.
+    :param sdf: Spark dataframe. Should be strings or whole numbers to represent the values.
     :return: Spark pair-RDD.
     """
 

@@ -75,7 +75,12 @@ These are utility functions.
 Spark
 -----
 
-These are functions that you can use in a Spark.
+These are functions that you can use in a Spark. You must pass in a Spark dataframe and you will get a ``pair-RDD`` as output. The pair-RDD will have the following as its keys and values.
+
+- key: in the form of a tuple of strings ``(k1, k2)`` where k1 and k2 are names of variables (column names)
+- value: a dictionary ``{'acc': 0.8, 'tpr': 0.9, 'fpr': 0.8, ...}`` where keys are association measure names and values are the corresponding association values
+
+
 
 .. automodule:: pypair.spark
     :members:
