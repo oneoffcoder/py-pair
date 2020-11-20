@@ -7,7 +7,8 @@ from random import choice
 import pandas as pd
 from pyspark.sql import SparkSession
 
-from pypair.spark import binary_binary, confusion, categorical_categorical, agreement, binary_continuous, concordance
+from pypair.spark import binary_binary, confusion, categorical_categorical, agreement, binary_continuous, concordance, \
+    categorical_continuous
 
 
 class PySparkTest(unittest.TestCase):
@@ -127,6 +128,17 @@ class PySparkTest(unittest.TestCase):
         sdf = self.spark.createDataFrame(pdf)
         return sdf
 
+    def _get_categorical_continuous_data(self):
+        data = [
+            ('a', 45), ('a', 70), ('a', 29), ('a', 15), ('a', 21),
+            ('g', 40), ('g', 20), ('g', 30), ('g', 42),
+            ('s', 65), ('s', 95), ('s', 80), ('s', 70), ('s', 85), ('s', 73)
+        ]
+        data = [tup * 2 for tup in data]
+        pdf = pd.DataFrame(data, columns=['x1', 'x2', 'x3', 'x4'])
+        sdf = self.spark.createDataFrame(pdf)
+        return sdf
+
 
 class SparkTest(PySparkTest):
     """
@@ -196,5 +208,16 @@ class SparkTest(PySparkTest):
         """
         sdf = self._get_concordance_data()
         results = {tup[0]: tup[1] for tup in concordance(sdf).collect()}
+
+        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
+
+    def test_concordance(self):
+        """
+        Tests categorical-continuous Spark operation.
+
+        :return: None.
+        """
+        sdf = self._get_categorical_continuous_data()
+        results = {tup[0]: tup[1] for tup in categorical_continuous(sdf, ['x1', 'x3'], ['x2', 'x4']).collect()}
 
         print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))

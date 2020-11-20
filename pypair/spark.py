@@ -1,4 +1,4 @@
-from itertools import combinations, product
+from itertools import combinations, product, chain
 from math import sqrt
 
 from pypair.biserial import BiserialStats
@@ -354,6 +354,21 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
 
 
 def categorical_continuous(sdf, categorical, continuous):
+    """
+    Gets all pairwise categorical-continuous association measures. The result is a Spark pair-RDD,
+    where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
+    association names and metrics e.g. {‘eta’: 0.9}. Each record
+    in the pair-RDD is of the form.
+
+    - (k1, k2), {‘eta’: 0.9}
+
+    For now, only ``eta`` :math:`\\eta` is supported.
+
+    :param sdf: Spark dataframe.
+    :param categorical: List of categorical variables.
+    :param continuous: List of continuous variables.
+    :return: Spark pair-RDD.
+    """
     def to_pair1(d):
         """
         Creates a list of tuples.
@@ -361,22 +376,56 @@ def categorical_continuous(sdf, categorical, continuous):
         :param d: Dictionary of data.
         :return: List of (b, c, b_val), (sum_c, sum_c_sq, sum_b).
         """
-        return [((cat, con, d[cat]), (d[con], d[con] ** 2, 1)) for cat, con in product(*[categorical, continuous])]
+        kv_0 = lambda cat, con: ((cat, con, d[cat]), (d[con], 0, 1))
+        kv_1 = lambda cat, con: ((cat, con, '__*_avg_*__'), (d[con], 0, 1))
+        kv_2 = lambda cat, con: ((cat, con, '__*_den_*__'), (d[con], d[con]**2, 1))
+        explode = lambda cat, con: [kv_0(cat, con), kv_1(cat, con), kv_2(cat, con)]
+        return chain(*(explode(cat, con) for cat, con in product(*[categorical, continuous])))
 
     def to_pair2(tup):
         """
         Makes a new pair.
 
         :param tup: (b, c, b_val), (sum_c, sum_c_sq, sum_b)
-        :return: (b, c), (b_val, sum_c, sum_c_sq, sum_b)
+        :return: (b, c), (b_val, stats)
         """
-        (b, c, b_val), (sum_c, sum_c_sq, sum_b) = tup
-        return (b, c), (b_val, sum_c, sum_c_sq, sum_b)
+        ss = lambda x, x_sq, n: (x_sq - (x**2 / n))
+        (cat, con, flag), (sum_c, sum_c_sq, sum_b) = tup
+        key = cat, con
+
+        if flag == '__*_den_*__':
+            val = ss(sum_c, sum_c_sq, sum_b)
+        elif flag == '__*_avg_*__':
+            val = sum_c / sum_b
+        else:
+            val = sum_c / sum_b, sum_b
+
+        return key, (flag, val)
+
+    def to_results(tup):
+        """
+        Computes the results.
+
+        :param tup: (b, c), (flag, val)
+        :return: (b, c), {'measure1': val1, 'measure2': val2, ...}
+        """
+        (b, c), data = tup
+        data = {k: v for k, v in data}
+
+        y_avg = data['__*_avg_*__']
+        num = sum([v[1]*((v[0] - y_avg)**2) for k, v in data.items() if isinstance(v, tuple)])
+        den = data['__*_den_*__']
+
+        eta = num / den
+        return (b, c), {'eta': eta}
 
     return sdf.rdd \
         .flatMap(lambda r: to_pair1(r.asDict())) \
         .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2])) \
-        .map(lambda tup: to_pair2(tup))
+        .map(lambda tup: to_pair2(tup)) \
+        .groupByKey() \
+        .map(lambda tup: to_results(tup)) \
+        .sortByKey()
 
 
 def concordance(sdf):
