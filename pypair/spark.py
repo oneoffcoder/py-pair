@@ -357,12 +357,12 @@ def categorical_continuous(sdf, categorical, continuous):
     """
     Gets all pairwise categorical-continuous association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
-    association names and metrics e.g. {‘eta’: 0.9}. Each record
+    association names and metrics e.g. {‘eta_sq’: 0.9, 'eta': 0.95}. Each record
     in the pair-RDD is of the form.
 
-    - (k1, k2), {‘eta’: 0.9}
+    - (k1, k2), {‘eta_sq’: 0.9, 'eta': 0.95}
 
-    For now, only ``eta`` :math:`\\eta` is supported.
+    For now, only ``eta`` :math:`\\eta^2` is supported.
 
     :param sdf: Spark dataframe.
     :param categorical: List of categorical variables.
@@ -418,7 +418,7 @@ def categorical_continuous(sdf, categorical, continuous):
         den = data['__*_den_*__']
 
         eta = num / den
-        return (b, c), {'eta': eta}
+        return (b, c), {'eta_sq': eta, 'eta': sqrt(eta)}
 
     return sdf.rdd \
         .flatMap(lambda r: to_pair1(r.asDict())) \
