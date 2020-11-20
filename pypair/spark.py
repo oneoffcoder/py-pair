@@ -1,6 +1,6 @@
+from collections import namedtuple
 from itertools import combinations, product, chain
 from math import sqrt
-from collections import namedtuple
 
 from pypair.biserial import BiserialStats
 from pypair.contingency import ConfusionStats, CategoricalStats, \
@@ -580,7 +580,7 @@ def continuous_continuous(sdf):
         :param d: Dictionary.
         :return: (n1, n2), CorrItem.
         """
-        as_item = lambda n1, n2: CorrItem(d[n1], d[n2], d[n1]*d[n2], d[n1]**2, d[n2]**2, 1)
+        as_item = lambda n1, n2: CorrItem(d[n1], d[n2], d[n1] * d[n2], d[n1] ** 2, d[n2] ** 2, 1)
         return (((n1, n2), as_item(n1, n2)) for n1, n2 in combinations(d.keys(), 2))
 
     def add_items(a, b):
@@ -591,7 +591,7 @@ def continuous_continuous(sdf):
         :param b: CorrItem.
         :return: CorrItem.
         """
-        return CorrItem(a.x+b.x, a.y+b.y, a.xy+b.xy, a.x_sq+b.x_sq, a.y_sq+b.y_sq, a.n+b.n)
+        return CorrItem(a.x + b.x, a.y + b.y, a.xy + b.xy, a.x_sq + b.x_sq, a.y_sq + b.y_sq, a.n + b.n)
 
     def to_results(tup):
         """
@@ -602,7 +602,7 @@ def continuous_continuous(sdf):
         """
         (n1, n2), item = tup
         n = item.xy - (item.x * item.y) / item.n
-        d = sqrt(item.x_sq - (item.x**2 / item.n)) * sqrt(item.y_sq - (item.y**2 / item.n))
+        d = sqrt(item.x_sq - (item.x ** 2 / item.n)) * sqrt(item.y_sq - (item.y ** 2 / item.n))
         r = n / d
         return (n1, n2), {'pearson': r}
 
