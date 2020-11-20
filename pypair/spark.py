@@ -369,6 +369,7 @@ def categorical_continuous(sdf, categorical, continuous):
     :param continuous: List of continuous variables.
     :return: Spark pair-RDD.
     """
+
     def to_pair1(d):
         """
         Creates a list of tuples.
@@ -378,7 +379,7 @@ def categorical_continuous(sdf, categorical, continuous):
         """
         kv_0 = lambda cat, con: ((cat, con, d[cat]), (d[con], 0, 1))
         kv_1 = lambda cat, con: ((cat, con, '__*_avg_*__'), (d[con], 0, 1))
-        kv_2 = lambda cat, con: ((cat, con, '__*_den_*__'), (d[con], d[con]**2, 1))
+        kv_2 = lambda cat, con: ((cat, con, '__*_den_*__'), (d[con], d[con] ** 2, 1))
         explode = lambda cat, con: [kv_0(cat, con), kv_1(cat, con), kv_2(cat, con)]
         return chain(*(explode(cat, con) for cat, con in product(*[categorical, continuous])))
 
@@ -389,7 +390,7 @@ def categorical_continuous(sdf, categorical, continuous):
         :param tup: (b, c, b_val), (sum_c, sum_c_sq, sum_b)
         :return: (b, c), (b_val, stats)
         """
-        ss = lambda x, x_sq, n: (x_sq - (x**2 / n))
+        ss = lambda x, x_sq, n: (x_sq - (x ** 2 / n))
         (cat, con, flag), (sum_c, sum_c_sq, sum_b) = tup
         key = cat, con
 
@@ -413,7 +414,7 @@ def categorical_continuous(sdf, categorical, continuous):
         data = {k: v for k, v in data}
 
         y_avg = data['__*_avg_*__']
-        num = sum([v[1]*((v[0] - y_avg)**2) for k, v in data.items() if isinstance(v, tuple)])
+        num = sum([v[1] * ((v[0] - y_avg) ** 2) for k, v in data.items() if isinstance(v, tuple)])
         den = data['__*_den_*__']
 
         eta = num / den
