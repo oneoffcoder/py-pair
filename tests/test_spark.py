@@ -211,7 +211,7 @@ class SparkTest(PySparkTest):
 
         print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
 
-    def test_concordance(self):
+    def test_categorical_continuous(self):
         """
         Tests categorical-continuous Spark operation.
 

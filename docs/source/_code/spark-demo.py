@@ -4,7 +4,8 @@ from random import choice
 import pandas as pd
 from pyspark.sql import SparkSession
 
-from pypair.spark import binary_binary, confusion, categorical_categorical, agreement
+from pypair.spark import binary_binary, confusion, categorical_categorical, agreement, binary_continuous, concordance, \
+    categorical_continuous
 
 
 def _get_binary_binary_data(spark):
@@ -54,6 +55,46 @@ def _get_categorical_categorical_data(spark):
     return sdf
 
 
+def _get_binary_continuous_data(spark):
+    """
+    Gets dummy `binary-continuous data <https://www.slideshare.net/MuhammadKhalil66/point-biserial-correlation-example>`_.
+
+    :return: Spark dataframe.
+    """
+    data = [
+        (1, 10), (1, 11), (1, 6), (1, 11), (0, 4),
+        (0, 3), (1, 12), (0, 2), (0, 2), (0, 1)
+    ]
+    pdf = pd.DataFrame(data, columns=['gender', 'years'])
+    sdf = spark.createDataFrame(pdf)
+    return sdf
+
+
+def _get_concordance_data(spark):
+    """
+    Gets dummy concordance data.
+
+    :return: Spark dataframe.
+    """
+    a = [1, 2, 3]
+    b = [3, 2, 1]
+    pdf = pd.DataFrame({'a': a, 'b': b, 'c': a, 'd': b})
+    sdf = spark.createDataFrame(pdf)
+    return sdf
+
+
+def _get_categorical_continuous_data(spark):
+    data = [
+        ('a', 45), ('a', 70), ('a', 29), ('a', 15), ('a', 21),
+        ('g', 40), ('g', 20), ('g', 30), ('g', 42),
+        ('s', 65), ('s', 95), ('s', 80), ('s', 70), ('s', 85), ('s', 73)
+    ]
+    data = [tup * 2 for tup in data]
+    pdf = pd.DataFrame(data, columns=['x1', 'x2', 'x3', 'x4'])
+    sdf = spark.createDataFrame(pdf)
+    return sdf
+
+
 spark = None
 
 try:
@@ -67,18 +108,27 @@ try:
     bin_sdf = _get_binary_binary_data(spark)
     con_sdf = _get_confusion_data(spark)
     cat_sdf = _get_categorical_categorical_data(spark)
+    bcn_sdf = _get_binary_continuous_data(spark)
+    crd_sdf = _get_concordance_data(spark)
+    ccn_sdf = _get_categorical_continuous_data(spark)
 
     # call these methods to get the association measures
     bin_results = binary_binary(bin_sdf).collect()
     con_results = confusion(con_sdf).collect()
     cat_results = categorical_categorical(cat_sdf).collect()
     agr_results = agreement(bin_sdf).collect()
+    bcn_results = binary_continuous(bcn_sdf, binary=['gender'], continuous=['years']).collect()
+    crd_results = concordance(crd_sdf).collect()
+    ccn_results = categorical_continuous(ccn_sdf, ['x1', 'x3'], ['x2', 'x4']).collect()
 
     # convert the lists to dictionaries
     bin_results = {tup[0]: tup[1] for tup in bin_results}
     con_results = {tup[0]: tup[1] for tup in con_results}
     cat_results = {tup[0]: tup[1] for tup in cat_results}
     agr_results = {tup[0]: tup[1] for tup in agr_results}
+    bcn_results = {tup[0]: tup[1] for tup in bcn_results}
+    crd_results = {tup[0]: tup[1] for tup in crd_results}
+    ccn_results = {tup[0]: tup[1] for tup in ccn_results}
 
     # pretty print
     to_json = lambda r: json.dumps({f'{k[0]}_{k[1]}': v for k, v in r.items()}, indent=1)
@@ -89,6 +139,12 @@ try:
     print(to_json(cat_results))
     print('~' * 10)
     print(to_json(agr_results))
+    print('-' * 10)
+    print(to_json(bcn_results))
+    print('=' * 10)
+    print(to_json(crd_results))
+    print('`' * 10)
+    print(to_json(ccn_results))
 except Exception as e:
     print(e)
 finally:
