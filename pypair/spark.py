@@ -1,5 +1,6 @@
 from itertools import combinations, product, chain
 from math import sqrt
+from collections import namedtuple
 
 from pypair.biserial import BiserialStats
 from pypair.contingency import ConfusionStats, CategoricalStats, \
@@ -552,5 +553,61 @@ def concordance(sdf):
         .groupByKey() \
         .flatMap(lambda tup: to_pair2(tup)) \
         .reduceByKey(lambda x, y: __add_concordance_counts(x, y)) \
+        .map(lambda tup: to_results(tup)) \
+        .sortByKey()
+
+
+def continuous_continuous(sdf):
+    """
+    Gets all the pairwise continuous-continuous association measures. The result is a Spark pair-RDD,
+    where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
+    of association names and measures e.g. {'pearson': 1}. Each record in the pair-RDD is of the form.
+
+    - (k1, k2), {'pearson': 1}
+
+    Only pearson is supported at the moment.
+
+    :param sdf: Spark dataframe. Should be all ordinal data (numeric).
+    :return: Spark pair-RDD.
+    """
+
+    CorrItem = namedtuple('CorrItem', 'x y xy x_sq y_sq n')
+
+    def to_items(d):
+        """
+        Converts the dictionary to (n1, n2), CorrItem.
+
+        :param d: Dictionary.
+        :return: (n1, n2), CorrItem.
+        """
+        as_item = lambda n1, n2: CorrItem(d[n1], d[n2], d[n1]*d[n2], d[n1]**2, d[n2]**2, 1)
+        return (((n1, n2), as_item(n1, n2)) for n1, n2 in combinations(d.keys(), 2))
+
+    def add_items(a, b):
+        """
+        Adds two CorrItems.
+
+        :param a: CorrItem.
+        :param b: CorrItem.
+        :return: CorrItem.
+        """
+        return CorrItem(a.x+b.x, a.y+b.y, a.xy+b.xy, a.x_sq+b.x_sq, a.y_sq+b.y_sq, a.n+b.n)
+
+    def to_results(tup):
+        """
+        Converts the tup to a result.
+
+        :param tup: (n1, n2), CorrItem.
+        :return: (n1, n2), {'measure': value}.
+        """
+        (n1, n2), item = tup
+        n = item.xy - (item.x * item.y) / item.n
+        d = sqrt(item.x_sq - (item.x**2 / item.n)) * sqrt(item.y_sq - (item.y**2 / item.n))
+        r = n / d
+        return (n1, n2), {'pearson': r}
+
+    return sdf.rdd \
+        .flatMap(lambda r: to_items(r.asDict())) \
+        .reduceByKey(lambda a, b: add_items(a, b)) \
         .map(lambda tup: to_results(tup)) \
         .sortByKey()

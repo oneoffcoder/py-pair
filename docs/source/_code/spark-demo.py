@@ -5,7 +5,7 @@ import pandas as pd
 from pyspark.sql import SparkSession
 
 from pypair.spark import binary_binary, confusion, categorical_categorical, agreement, binary_continuous, concordance, \
-    categorical_continuous
+    categorical_continuous, continuous_continuous
 
 
 def _get_binary_binary_data(spark):
@@ -95,6 +95,45 @@ def _get_categorical_continuous_data(spark):
     return sdf
 
 
+def _get_continuous_continuous_data(spark):
+    """
+    Gets dummy continuous-continuous data.
+    See `site <http://onlinestatbook.com/2/describing_bivariate_data/calculation.html>`_.
+
+    :return: Spark dataframe.
+    """
+    data = [
+        (12, 9),
+        (10, 12),
+        (9, 12),
+        (14, 11),
+        (10, 8),
+        (11, 9),
+        (10, 9),
+        (10, 6),
+        (14, 12),
+        (9, 11),
+        (11, 12),
+        (10, 7),
+        (11, 13),
+        (15, 14),
+        (8, 11),
+        (11, 11),
+        (9, 8),
+        (9, 9),
+        (10, 11),
+        (12, 9),
+        (11, 12),
+        (10, 12),
+        (9, 7),
+        (7, 9),
+        (12, 14)
+    ]
+    pdf = pd.DataFrame([item * 2 for item in data], columns=['x1', 'x2', 'x3', 'x4'])
+    sdf = spark.createDataFrame(pdf)
+    return sdf
+
+
 spark = None
 
 try:
@@ -111,6 +150,7 @@ try:
     bcn_sdf = _get_binary_continuous_data(spark)
     crd_sdf = _get_concordance_data(spark)
     ccn_sdf = _get_categorical_continuous_data(spark)
+    cnt_sdf = _get_continuous_continuous_data(spark)
 
     # call these methods to get the association measures
     bin_results = binary_binary(bin_sdf).collect()
@@ -120,6 +160,7 @@ try:
     bcn_results = binary_continuous(bcn_sdf, binary=['gender'], continuous=['years']).collect()
     crd_results = concordance(crd_sdf).collect()
     ccn_results = categorical_continuous(ccn_sdf, ['x1', 'x3'], ['x2', 'x4']).collect()
+    cnt_results = continuous_continuous(cnt_sdf).collect()
 
     # convert the lists to dictionaries
     bin_results = {tup[0]: tup[1] for tup in bin_results}
@@ -129,6 +170,7 @@ try:
     bcn_results = {tup[0]: tup[1] for tup in bcn_results}
     crd_results = {tup[0]: tup[1] for tup in crd_results}
     ccn_results = {tup[0]: tup[1] for tup in ccn_results}
+    cnt_results = {tup[0]: tup[1] for tup in cnt_results}
 
     # pretty print
     to_json = lambda r: json.dumps({f'{k[0]}_{k[1]}': v for k, v in r.items()}, indent=1)
@@ -145,6 +187,8 @@ try:
     print(to_json(crd_results))
     print('`' * 10)
     print(to_json(ccn_results))
+    print('/' * 10)
+    print(to_json(cnt_results))
 except Exception as e:
     print(e)
 finally:

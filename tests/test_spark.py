@@ -8,7 +8,7 @@ import pandas as pd
 from pyspark.sql import SparkSession
 
 from pypair.spark import binary_binary, confusion, categorical_categorical, agreement, binary_continuous, concordance, \
-    categorical_continuous
+    categorical_continuous, continuous_continuous
 
 
 class PySparkTest(unittest.TestCase):
@@ -129,6 +129,12 @@ class PySparkTest(unittest.TestCase):
         return sdf
 
     def _get_categorical_continuous_data(self):
+        """
+        Gets dummy categorical-continuous data.
+        See `site <https://en.wikipedia.org/wiki/Correlation_ratio>`_.
+
+        :return: Spark dataframe.
+        """
         data = [
             ('a', 45), ('a', 70), ('a', 29), ('a', 15), ('a', 21),
             ('g', 40), ('g', 20), ('g', 30), ('g', 42),
@@ -136,6 +142,44 @@ class PySparkTest(unittest.TestCase):
         ]
         data = [tup * 2 for tup in data]
         pdf = pd.DataFrame(data, columns=['x1', 'x2', 'x3', 'x4'])
+        sdf = self.spark.createDataFrame(pdf)
+        return sdf
+
+    def _get_continuous_continuous_data(self):
+        """
+        Gets dummy continuous-continuous data.
+        See `site <http://onlinestatbook.com/2/describing_bivariate_data/calculation.html>`_.
+
+        :return: Spark dataframe.
+        """
+        data = [
+            (12, 9),
+            (10, 12),
+            (9, 12),
+            (14, 11),
+            (10, 8),
+            (11, 9),
+            (10, 9),
+            (10, 6),
+            (14, 12),
+            (9, 11),
+            (11, 12),
+            (10, 7),
+            (11, 13),
+            (15, 14),
+            (8, 11),
+            (11, 11),
+            (9, 8),
+            (9, 9),
+            (10, 11),
+            (12, 9),
+            (11, 12),
+            (10, 12),
+            (9, 7),
+            (7, 9),
+            (12, 14)
+        ]
+        pdf = pd.DataFrame([item * 2 for item in data], columns=['x1', 'x2', 'x3', 'x4'])
         sdf = self.spark.createDataFrame(pdf)
         return sdf
 
@@ -219,5 +263,16 @@ class SparkTest(PySparkTest):
         """
         sdf = self._get_categorical_continuous_data()
         results = {tup[0]: tup[1] for tup in categorical_continuous(sdf, ['x1', 'x3'], ['x2', 'x4']).collect()}
+
+        print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
+
+    def test_continuous_continuous(self):
+        """
+        Tests continuous-continuous Spark operation.
+
+        :return: None.
+        """
+        sdf = self._get_continuous_continuous_data()
+        results = {tup[0]: tup[1] for tup in continuous_continuous(sdf).collect()}
 
         print(json.dumps({f'{k[0]}_{k[1]}': v for k, v in results.items()}, indent=1))
