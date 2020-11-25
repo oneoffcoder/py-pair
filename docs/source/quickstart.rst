@@ -33,7 +33,7 @@ Categorical-Categorical
 
 Association measures for categorical-categorical variables are computed using ``categorical_categorical()`` or ``CategoricalTable``.
 
-.. literalinclude:: _code/binary-demo.py
+.. literalinclude:: _code/categorical-demo.py
    :language: python
    :linenos:
 
