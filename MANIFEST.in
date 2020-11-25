@@ -1,2 +1,2 @@
-include requirements.txt README.md
+include requirements.txt README.md INFO.md
 prune tests*
