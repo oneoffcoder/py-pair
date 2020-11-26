@@ -1960,8 +1960,11 @@ class ContingencyTable(MeasureMixin, ABC):
 
         :param table: A table of counts (list of lists).
         """
-        self._r_margs = [sum(table[r]) for r in range(len(table))]
-        self._k_margs = [sum([table[r][c] for r in range(len(table))]) for c in range(len(table[0]))]
+        n_rows = len(table)
+        n_cols = len(table[0])
+
+        self._r_margs = [sum(table[r]) for r in range(n_rows)]
+        self._k_margs = [sum([table[r][c] for r in range(len(table))]) for c in range(n_cols)]
         self._n = sum(self._r_margs)
         self._r = len(self._r_margs)
         self._k = len(self._k_margs)
@@ -1995,13 +1998,18 @@ class ContingencyTable(MeasureMixin, ABC):
     def _to_categorical_counts(a, b, a_vals=None, b_vals=None):
         df = pd.DataFrame([(x, y) for x, y in zip(a, b)], columns=['a', 'b'])
 
+        a_values = []
+        b_values = []
+
         if a_vals is None:
-            a_vals = sorted(list(df.a.unique()))
+            a_values = list(df.a.unique())
+            a_values = sorted([v for v in a_values if pd.notna(v)])
 
         if b_vals is None:
-            b_vals = sorted(list(df.b.unique()))
+            b_values = list(df.b.unique())
+            b_values = sorted([v for v in b_values if pd.notna(v)])
 
-        table = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] for y in b_vals] for x in a_vals]
+        table = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] + 1 for y in b_values] for x in a_values]
         return table
 
 
