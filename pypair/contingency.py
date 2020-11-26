@@ -1992,6 +1992,7 @@ class ContingencyTable(MeasureMixin, ABC):
 
         counts = (to_count(x, y) for x, y in zip(a, b) if is_valid(x, y))
         counts = reduce(lambda x, y: add_count(x, y), counts)
+        counts = add_count(counts, (1, 1, 1, 1))
         return counts
 
     @staticmethod
