@@ -15,7 +15,7 @@ buildCode() {
 
 updateVersion() {
   echo "replace version of software to ${API_VERSION}"
-  sed -i "s/version='0.2.3'/version='${API_VERSION}'/g" /py-bbn/setup.py
+  sed -i "s/version='0.2.3'/version='${API_VERSION}'/g" /py-pair/setup.py
 }
 
 copyCredentials() {
