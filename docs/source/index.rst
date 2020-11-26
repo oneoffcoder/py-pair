@@ -1,17 +1,17 @@
 .. meta::
    :description: A statistical API for bivariate association measures.
-   :keywords: python, statistics, bivariate, association
+   :keywords: python, statistics, bivariate, association, categorical, binary, nominal, ordinal, continuous, ratio, interval, contingency table analysis, apache spark, spark, high performance computing, massively parallel processing, hpc, mpp, causality, symmetric, asymmetric, correlation, confusion matrix, concordance, ranking
    :robots: index, follow
    :abstract: A statistical API for bivariate association measures. There are over 130 association measures identified between the product of categorical and continuous variable types.
-   :author: Jee Vang
-   :contact: info@oneoffcoder.com
+   :author: Jee Vang, Ph.D.
+   :contact: g@oneoffcoder.com
    :copyright: One-Off Coder
    :content: global
    :generator: Sphinx
    :language: English
    :rating: general
    :reply-to: info@oneoffcoder.com
-   :web_author: One-Off Coder
+   :web_author: Jee Vang, Ph.D.
    :revisit-after: 1 days
 
 .. PyPair documentation master file, created by
@@ -113,6 +113,9 @@ One-Off Coder is an educational, service and product company. Please visit us on
 Copyright
 =========
 
+Documentation
+-------------
+
 .. raw:: html
 
     <embed>
@@ -124,12 +127,31 @@ Copyright
     </a>
     <br />
     <br />
-    The full source code is available on <a href="https://github.com/oneoffcoder/py-pair" target="_blank">GitHub</a>.
-    <br />
-    <br />
     </embed>
 
-Cite this book as follows.::
+Software
+--------
+
+::
+
+    Copyright 2020 One-Off Coder
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+Citation
+========
+
+::
 
     @misc{oneoffcoder_pypair_2020,
     title={PyPair, A Statistical API for Bivariate Association Measures},
@@ -147,4 +169,18 @@ Jee Vang, Ph.D.
 
 .. |Patreon_Link| raw:: html
 
-   <a href="https://www.patreon.com/vangj" target="_blank">Patreon</a>
+   <a href="https://www.patreon.com/vangj" target="_blank">Patreon</a>: support is appreciated
+
+Help
+====
+
+- |Source_Link|
+- |Gitter_Link|
+
+.. |Source_Link| raw:: html
+
+   <a href="https://github.com/oneoffcoder/py-pair" target="_blank">GitHub</a>: source code
+
+.. |Gitter_Link| raw:: html
+
+   <a href="https://gitter.im/dataflava/py-pair" target="_blank">Gitter</a>: chat
