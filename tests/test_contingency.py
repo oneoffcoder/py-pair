@@ -26,6 +26,11 @@ def teardown():
 
 @with_setup(setup, teardown)
 def test_contingency_with_nulls():
+    """
+    Tests creating contingency table with nulls.
+
+    :return: None.
+    """
     df = pd.DataFrame([
         (0, 0),
         (0, 1),
