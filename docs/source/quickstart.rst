@@ -71,6 +71,15 @@ Association measures for continuous-continuous variables are computed using ``co
    :language: python
    :linenos:
 
+Recipe
+------
+
+Here's a recipe in using multiprocessing to compute pairwise association with binary data.
+
+.. literalinclude:: _code/multiprocessing-tip.py
+   :language: python
+   :linenos:
+
 Apache Spark
 ------------
 
