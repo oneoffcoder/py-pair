@@ -80,6 +80,12 @@ Here's a recipe in using multiprocessing to compute pairwise association with bi
    :language: python
    :linenos:
 
+Here's another way to use a pandas Dataframe ``corr()`` method to speed up pairwise association computation.
+
+.. literalinclude:: _code/dataframe-tip.py
+   :language: python
+   :linenos:
+
 Apache Spark
 ------------
 
