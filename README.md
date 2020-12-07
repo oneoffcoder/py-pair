@@ -6,6 +6,7 @@ PyPair is a statistical library to compute pairwise association between any two 
 
 - [Documentation](https://py-pair.readthedocs.io/)
 - [PyPi](https://pypi.org/project/pypair/) 
+- [Gitter](https://gitter.im/dataflava/py-pair)
 
 # Docker
 
