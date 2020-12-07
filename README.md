@@ -2,7 +2,7 @@
 
 # PyPair
 
-PyPair is a statistical library to compute pairwise association between any two variables.
+PyPair is a statistical library to compute pairwise association between any two variables. In general, statistical variable types are viewed as `categorical` or `continuous`. Categorical variables have no inherit order to their values, while continuous variables do. This API has `over 130 association measures` implemented for any combination of categorical and/or continuous variables. 
 
 - [Documentation](https://py-pair.readthedocs.io/)
 - [PyPi](https://pypi.org/project/pypair/) 
@@ -24,6 +24,23 @@ tanimoto_corr = df.corr(method=tanimoto)
 print(jaccard_corr)
 print('-' * 15)
 print(tanimoto_corr)
+```
+
+Another way to get started with PyPair is to use the `convenience` methods whose names indicate the variable pair types.
+
+```python
+from pypair.association import binary_binary, categorical_categorical, \
+    binary_continuous, concordance, categorical_continuous, continuous_continuous, confusion, agreement
+
+# assume a and b are the appropriate iterables of values for 2 variables
+jaccard = binary_binary(a, b, measure='jaccard')
+acc = confusion(a, b, measure='acc')
+phi = categorical_categorical(a, b, measure='phi')
+kappa = agreement(a, b, measure='cohen_k')
+biserial = binary_continuous(a, b, measure='biserial')
+tau = concordance(a, b, measure='kendall_tau')
+eta = categorical_continuous(a, b, measure='eta')
+pearson = continuous_continuous(a, b, measure='pearson')
 ```
 
 # Software Copyright

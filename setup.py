@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
-with open('INFO.md', 'r') as fh:
+with open('README.md', 'r') as fh:
     long_desc = fh.read()
 
 setup(
     name='pypair',
-    version='3.0.6',
+    version='3.0.7',
     author='Jee Vang',
     author_email='vangjee@gmail.com',
     packages=find_packages(exclude=('*.tests', '*.tests.*', 'tests.*', 'tests')),
