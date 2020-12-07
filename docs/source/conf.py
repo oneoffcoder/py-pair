@@ -22,7 +22,7 @@ copyright = '2020, One-Off Coder'
 author = 'Jee Vang'
 
 # The full version, including alpha/beta/rc tags
-release = '3.0.5'
+release = '3.0.6'
 
 
 # -- General configuration ---------------------------------------------------

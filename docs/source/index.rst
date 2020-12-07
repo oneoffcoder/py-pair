@@ -22,6 +22,9 @@
 PyPair
 ======
 
+.. image:: _static/images/logo.png
+   :alt: pypair logo.
+
 PyPair is a statistical library to compute pairwise association between any two types of variables. You can use the library locally on your laptop or desktop, or, you may use it on a `Spark <https://spark.apache.org/>`_ cluster.
 
 .. blockdiag::
@@ -74,7 +77,7 @@ Indices and tables
 About
 =====
 
-.. image:: _static/images/logo.png
+.. image:: _static/images/ooc-logo.png
    :alt: One-Off Coder logo.
 
 One-Off Coder is an educational, service and product company. Please visit us online to discover how we may help you achieve life-long success in your personal coding career or with your company's business goals and objectives.
@@ -147,6 +150,13 @@ Software
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+Art
+---
+
+::
+
+    Copyright 2020 Daytchia Vang
 
 Citation
 ========
