@@ -22,7 +22,7 @@ copyright = '2020, One-Off Coder'
 author = 'Jee Vang'
 
 # The full version, including alpha/beta/rc tags
-release = '3.0.7'
+release = '3.0.8'
 
 
 # -- General configuration ---------------------------------------------------
@@ -38,7 +38,8 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinxcontrib.bibtex',
-    'sphinxcontrib.blockdiag'
+    'sphinxcontrib.blockdiag',
+    'sphinx_sitemap'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
