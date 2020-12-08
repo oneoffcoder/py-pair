@@ -16,6 +16,7 @@ sphinx
 sphinx_rtd_theme
 sphinxcontrib-bibtex
 sphinxcontrib-blockdiag
+sphinx-sitemap
 # PUBLISHING
 twine
 setuptools
