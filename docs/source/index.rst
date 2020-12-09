@@ -23,6 +23,7 @@ PyPair
 ======
 
 .. image:: _static/images/logo.png
+   :align: center
    :alt: pypair logo.
 
 PyPair is a statistical library to compute pairwise association between any two types of variables. You can use the library locally on your laptop or desktop, or, you may use it on a `Spark <https://spark.apache.org/>`_ cluster.
