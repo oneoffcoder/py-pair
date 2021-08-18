@@ -4,6 +4,14 @@
 
 PyPair is a statistical library to compute pairwise association between any two variables. In general, statistical variable types are viewed as `categorical` or `continuous`. Categorical variables have no inherit order to their values, while continuous variables do. This API has `over 130 association measures` implemented for any combination of categorical and/or continuous variables. 
 
+To install.
+
+```bash
+pip install pypair
+```
+
+Additional links.
+
 - [Documentation](https://py-pair.readthedocs.io/)
 - [PyPi](https://pypi.org/project/pypair/) 
 - [Gitter](https://gitter.im/dataflava/py-pair)

@@ -52,6 +52,12 @@ PyPair is a statistical library to compute pairwise association between any two 
       A -> B, N, O
    }
 
+You may install ``py-pair`` from `pypi <https://pypi.org/project/pypair/>`_.
+
+.. code:: bash
+
+    pip install pypair
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents
