@@ -457,7 +457,7 @@ There are quite a few measures of associations using concordance as the basis fo
      - :math:`d_{Y \cdot X} = \frac{\pi_C - \pi_D}{\pi_C + \pi_D + \pi_{T^Y}}`
    * -
      - :math:`d_{X \cdot Y} = \frac{\pi_C - \pi_D}{\pi_C + \pi_D + \pi_{T^X}}`
-   * - Kendall's :math:`\\tau`
+   * - Kendall's :math:`\tau`
      - :math:`\tau = \frac{C - D}{{n \choose 2}}`
 
 .. note::
