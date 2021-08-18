@@ -372,9 +372,9 @@ All pairs of observations will evaluate categorically to one of these statuses. 
 
 In this data set, the counts are :math:`C=6`, :math:`D=5` and :math:`T=4`. If we divide these counts with the total of pairs of observations, then we get the following probabilities.
 
-- :math:`\pi_C = \frac{C}{{n}\choose{2}} = \frac{6}{15} = 0.40`
-- :math:`\pi_D = \frac{D}{{n}\choose{2}} = \frac{5}{15} = 0.33`
-- :math:`\pi_T = \frac{T}{{n}\choose{2}} = \frac{4}{15} = 0.27`
+- :math:`\pi_C = \frac{C}{{n \choose 2}} = \frac{6}{15} = 0.40`
+- :math:`\pi_D = \frac{D}{{n \choose 2}} = \frac{5}{15} = 0.33`
+- :math:`\pi_T = \frac{T}{{n \choose 2}} = \frac{4}{15} = 0.27`
 
 Sometimes, it is desirable to distinguish between the types of ties. There are three possible types of ties.
 
@@ -438,11 +438,11 @@ Note, :math:`T = T^X + T^Y + T^{XY}`. If we want to distinguish between the tie 
 
 Distinguishing between ties, in this data set, the counts are :math:`C=6`, :math:`D=5`, :math:`T^X=2`, :math:`T^Y=1` and :math:`T^{XY}=1`. The probabilities of these statuses are as follows.
 
-- :math:`\pi_C = \frac{C}{{n}\choose{2}} = \frac{6}{15} = 0.40`
-- :math:`\pi_D = \frac{D}{{n}\choose{2}} = \frac{5}{15} = 0.33`
-- :math:`\pi_{T^X} = \frac{T^X}{{n}\choose{2}} = \frac{2}{15} = 0.13`
-- :math:`\pi_{T^Y} = \frac{T^Y}{{n}\choose{2}} = \frac{1}{15} = 0.07`
-- :math:`\pi_{T^{XY}} = \frac{T^{XY}}{{n}\choose{2}} = \frac{1}{15} = 0.07`
+- :math:`\pi_C = \frac{C}{{n \choose 2}} = \frac{6}{15} = 0.40`
+- :math:`\pi_D = \frac{D}{{n \choose 2}} = \frac{5}{15} = 0.33`
+- :math:`\pi_{T^X} = \frac{T^X}{{n \choose 2}} = \frac{2}{15} = 0.13`
+- :math:`\pi_{T^Y} = \frac{T^Y}{{n \choose 2}} = \frac{1}{15} = 0.07`
+- :math:`\pi_{T^{XY}} = \frac{T^{XY}}{{n \choose 2}} = \frac{1}{15} = 0.07`
 
 There are quite a few measures of associations using concordance as the basis for strength of association.
 
@@ -458,7 +458,7 @@ There are quite a few measures of associations using concordance as the basis fo
    * -
      - :math:`d_{X \cdot Y} = \frac{\pi_C - \pi_D}{\pi_C + \pi_D + \pi_{T^X}}`
    * - Kendall's :math:`\\tau`
-     - :math:`\tau = \frac{C - D}{{n}\choose{2}}`
+     - :math:`\tau = \frac{C - D}{{n \choose 2}}`
 
 .. note::
     Sometimes `Somers' d` is written as `Somers' D`, `Somers' Delta` or even incorrectly as `Somer's D` :cite:`2017:glen,2020:wiki-somersd`. Somers' d has two versions, one that is symmetric and one that is asymmetric. The asymmetric Somers' d is the one most typically referred to :cite:`2017:glen`. The definition of Somers' d presented here is the asymmetric one, which explains :math:`d_{Y \cdot X}` and :math:`d_{X \cdot Y}`.

@@ -36,7 +36,7 @@ class CategoricalMixin(object):
 
         References
 
-        - `Chi-Square (χ2) Statistic Definition <https://www.investopedia.com/terms/c/chi-square-statistic.asp>`_
+        - `Chi-Square Statistic Definition <https://www.investopedia.com/terms/c/chi-square-statistic.asp>`_
 
         :return: Chi-square statistic.
         """
