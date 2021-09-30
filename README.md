@@ -16,18 +16,19 @@ Additional links.
 - [PyPi](https://pypi.org/project/pypair/) 
 - [Gitter](https://gitter.im/dataflava/py-pair)
 
-Here's a short and sweet snippet for using the API against a dataframe that stores strictly binary data.
+Here's a short and sweet snippet for using the API against a dataframe that stores strictly binary data. The Pandas `DataFrame.corr()` method no longer processes non-numeric fields!
 
 ```python
 from pypair.association import binary_binary
+from pypair.util import corr
 
 jaccard = lambda a, b: binary_binary(a, b, measure='jaccard')
 tanimoto = lambda a, b: binary_binary(a, b, measure='tanimoto_i')
 
 df = get_a_pandas_binary_dataframe()
 
-jaccard_corr = df.corr(method=jaccard)
-tanimoto_corr = df.corr(method=tanimoto)
+jaccard_corr = corr(df, jaccard)
+tanimoto_corr = corr(df, tanimoto)
 
 print(jaccard_corr)
 print('-' * 15)
