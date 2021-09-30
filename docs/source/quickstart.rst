@@ -80,7 +80,7 @@ Here's a recipe in using multiprocessing to compute pairwise association with bi
    :language: python
    :linenos:
 
-Here's another way to use a pandas Dataframe ``corr()`` method to speed up pairwise association computation.
+Here's a nifty utility method to create a correlation matrix. The input data frame must be all the same type and you must supply a function. Note that Pandas ``DataFrame.corr()`` no longer supports processing non-numeric data; fields that are not numeric will be simply skipped over. Why?
 
 .. literalinclude:: _code/dataframe-tip.py
    :language: python

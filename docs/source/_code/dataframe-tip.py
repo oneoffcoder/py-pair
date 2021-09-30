@@ -3,6 +3,7 @@ from random import randint
 import pandas as pd
 
 from pypair.association import binary_binary
+from pypair.util import corr
 
 
 def get_data(n_rows=1000, n_cols=5):
@@ -16,8 +17,8 @@ if __name__ == '__main__':
     tanimoto = lambda a, b: binary_binary(a, b, measure='tanimoto_i')
 
     df = get_data()
-    jaccard_corr = df.corr(method=jaccard)
-    tanimoto_corr = df.corr(method=tanimoto)
+    jaccard_corr = corr(df, jaccard)
+    tanimoto_corr = corr(df, tanimoto)
 
     print(jaccard_corr)
     print('-' * 15)
