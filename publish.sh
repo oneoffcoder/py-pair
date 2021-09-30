@@ -7,15 +7,12 @@ buildCode() {
   cd /py-pair \
     && make clean \
     && make \
-    && python setup.py sdist bdist bdist_wheel \
-    && twine check dist/* \
-    && cd /py-pair/docs \
-    && make html
+    && twine check dist/*
 }
 
 updateVersion() {
   echo "replace version of software to ${API_VERSION}"
-  sed -i "s/version='0.2.3'/version='${API_VERSION}'/g" /py-pair/setup.py
+  sed -i "s/version = 0.0.1/version = ${API_VERSION}/g" /py-pair/setup.cfg
 }
 
 copyCredentials() {

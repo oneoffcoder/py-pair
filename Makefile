@@ -11,9 +11,6 @@ test: clean lint
 	nosetests tests
 
 build: test
-	python setup.py bdist_egg
-
-build-dist: compile
 	python setup.py bdist_egg sdist bdist_wheel
 
 install: build
