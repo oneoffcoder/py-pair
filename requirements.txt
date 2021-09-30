@@ -12,7 +12,7 @@ pandas
 scikit-learn
 pyspark
 # DOCUMENTATION
-sphinx
+sphinx==3.5.1
 sphinx_rtd_theme
 sphinxcontrib-bibtex
 sphinxcontrib-blockdiag
