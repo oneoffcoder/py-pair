@@ -10,6 +10,7 @@ from pypair.association import binary_binary, categorical_categorical, \
 from pypair.biserial import Biserial
 from pypair.contingency import BinaryTable, CategoricalTable, ConfusionMatrix
 from pypair.continuous import Concordance, CorrelationRatio, Continuous
+from pypair.util import corr
 
 
 def setup():
@@ -155,6 +156,7 @@ def test_pandas_categorical():
 
     :return: None
     """
+
     # FIXME: pandas.corr() is broken; no longer supports non-numeric columns!
     def get_associations(a, b):
         d = {'x': a, 'y': b}
@@ -187,3 +189,39 @@ def test_pandas_categorical():
         o = list(a_df[field])
         for v1, v2 in zip(o, e):
             assert abs(v1 - v2) < 0.0001
+
+
+@with_setup(setup, teardown)
+def test_get_correlation_matrix():
+    """
+    Tests getting correlation matrix as Pandas dataframe.
+
+    :return: None.
+    """
+    df = pd.DataFrame({
+        'x1': ['on', 'on', 'on', 'on', 'on', 'off', 'off', 'off', 'off', 'off'],
+        'x2': ['on', 'off', 'on', 'off', 'on', 'off', 'on', 'off', 'on', 'off'],
+        'x3': ['off', 'off', 'off', 'off', 'off', 'on', 'on', 'on', 'on', 'on'],
+        'x4': ['on', 'on', 'on', 'on', 'off', 'off', 'off', 'off', 'off', 'on'],
+    })
+
+    f = lambda a, b: categorical_categorical(a, b, measure='mutual_information')
+    p = corr(df, f)
+    print(list(p.x1))
+    print(list(p.x2))
+    print(list(p.x3))
+    print(list(p.x4))
+
+    expected = {
+        'x1': [4.66486312813147e-310, 0.010239075859473604, 0.2830308622715362, 0.09487759197468806],
+        'x2': [0.010239075859473604, 0.0, 0.010239075859473604, 0.010239075859473604],
+        'x3': [0.2830308622715362, 0.010239075859473604, 0.0, 0.09487759197468805],
+        'x4': [0.09487759197468806, 0.010239075859473604, 0.09487759197468805, 0.0]
+    }
+
+    for field, e in expected.items():
+        o = list(p[field])
+
+        for v1, v2 in zip(o, e):
+            diff = abs(v1 - v2)
+            assert diff < 0.0001
