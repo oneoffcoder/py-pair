@@ -10,10 +10,14 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
 import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.abspath("../../"))
+SOURCE_DIR = Path(__file__).resolve().parent
+ROOT_DIR = SOURCE_DIR.parent.parent
+
+sys.path.insert(0, str(ROOT_DIR))
+sys.path.insert(0, str(SOURCE_DIR))
 
 
 # -- Project information -----------------------------------------------------
@@ -87,3 +91,13 @@ html_theme_options = {
     "includehidden": True,
     "titles_only": False,
 }
+
+
+def _generate_quicklist_tables(_app):
+    from _quicklist import generate_quicklist_tables
+
+    generate_quicklist_tables(SOURCE_DIR)
+
+
+def setup(app):
+    app.connect("builder-inited", _generate_quicklist_tables)
