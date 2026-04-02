@@ -6,7 +6,7 @@ PROFILE_FLAGS ?= --instrument --output .profiles/pypair.prof --memory-output .pr
 
 .DEFAULT_GOAL := help
 
-.PHONY: help venv format lint test check profile build docs compile clean clean-venv
+.PHONY: help venv format lint test coverage check profile build docs compile clean clean-venv
 
 help:
 	@printf '%s\n' \
@@ -14,6 +14,7 @@ help:
 		'make format     Run ruff format' \
 		'make lint       Run ruff check' \
 		'make test       Run pytest' \
+		'make coverage   Run pytest with coverage and write HTML report to coverage/html' \
 		'make check      Run lint and tests' \
 		'make profile    Run the built-in cProfile workload (override with PROFILE_FLAGS=...)' \
 		'make build      Build wheel and sdist with uv' \
@@ -36,6 +37,10 @@ lint: $(VENV)
 
 test: $(VENV)
 	$(UV_ENV) $(UV) run pytest
+
+coverage: $(VENV)
+	@mkdir -p coverage
+	$(UV_ENV) $(UV) run pytest --cov=pypair --cov-report=term-missing --cov-report=html:coverage/html
 
 check: lint test
 
