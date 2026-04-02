@@ -1,6 +1,6 @@
 [project]
 name = "pypair"
-version = "0.1.0"
+version = "4.0.1"
 description = "Pairwise association measures for categorical and continuous variables"
 readme = "README.md"
 requires-python = ">=3.13"

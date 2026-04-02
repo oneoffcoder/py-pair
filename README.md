@@ -19,6 +19,16 @@ Build wheel/sdist:
 uv build
 ```
 
+Publish a release:
+
+```bash
+make publish-check
+make publish
+```
+
+Put your PyPI credentials file at `./.pypirc` in the repository root. The repo already ignores `.pypirc`.
+Use `make publish-testpypi` if you want to upload to TestPyPI instead.
+
 ## Profiling
 
 Run the built-in profiling workload:

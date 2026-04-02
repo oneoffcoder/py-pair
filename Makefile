@@ -3,10 +3,13 @@ PYTHON ?= 3.13
 VENV ?= .venv
 UV_ENV = UV_PROJECT_ENVIRONMENT=$(VENV)
 PROFILE_FLAGS ?= --instrument --output .profiles/pypair.prof --memory-output .profiles/pypair.memory.txt
+PYPI_CONFIG ?= $(CURDIR)/.pypirc
+PYPI_REPOSITORY ?= pypi
+TWINE = $(UV) tool run --from twine twine
 
 .DEFAULT_GOAL := help
 
-.PHONY: help venv format lint test coverage check profile build docs compile clean clean-venv
+.PHONY: help venv format lint test coverage check profile build publish-check publish publish-testpypi docs compile clean clean-venv
 
 help:
 	@printf '%s\n' \
@@ -18,6 +21,9 @@ help:
 		'make check      Run lint and tests' \
 		'make profile    Run the built-in cProfile workload (override with PROFILE_FLAGS=...)' \
 		'make build      Build wheel and sdist with uv' \
+		'make publish-check Build artifacts and run twine validation' \
+		'make publish    Upload dist/* to PyPI using ./.pypirc (override with PYPI_CONFIG=...)' \
+		'make publish-testpypi Upload dist/* to TestPyPI using ./.pypirc' \
 		'make docs       Build Sphinx docs' \
 		'make compile    Compile Python sources' \
 		'make clean      Remove caches and build artifacts' \
@@ -50,6 +56,17 @@ profile: $(VENV)
 
 build: $(VENV)
 	$(UV_ENV) $(UV) build
+
+publish-check: $(VENV)
+	$(UV_ENV) $(UV) build --clear
+	$(TWINE) check dist/*
+
+publish: publish-check
+	@test -f "$(PYPI_CONFIG)" || (echo "Missing $(PYPI_CONFIG). Put your .pypirc in the repository root or override PYPI_CONFIG=..." >&2; exit 1)
+	$(TWINE) upload --config-file "$(PYPI_CONFIG)" --repository "$(PYPI_REPOSITORY)" dist/*
+
+publish-testpypi: PYPI_REPOSITORY = testpypi
+publish-testpypi: publish
 
 docs: $(VENV)
 	$(UV_ENV) $(UV) sync --group docs

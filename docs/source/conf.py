@@ -11,6 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import sys
+import tomllib
 from pathlib import Path
 
 SOURCE_DIR = Path(__file__).resolve().parent
@@ -27,7 +28,7 @@ copyright = "2020, One-Off Coder"
 author = "Jee Vang"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.0"
+release = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
 
 
 # -- General configuration ---------------------------------------------------
