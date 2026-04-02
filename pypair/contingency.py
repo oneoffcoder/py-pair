@@ -1997,18 +1997,26 @@ class ContingencyTable(MeasureMixin, ABC):
 
     @staticmethod
     def _to_categorical_counts(a, b, a_vals=None, b_vals=None):
-        df = pd.DataFrame({'a': a, 'b': b})
-
-        a_values = []
-        b_values = []
+        pairs = [(x, y) for x, y in zip(a, b) if x is not None and y is not None and not pd.isna(x) and not pd.isna(y)]
 
         if a_vals is None:
-            a_values = sorted([v for v in df.a.unique() if pd.notna(v)])
+            a_values = sorted({x for x, _ in pairs})
+        else:
+            a_values = list(a_vals)
 
         if b_vals is None:
-            b_values = sorted([v for v in df.b.unique() if pd.notna(v)])
+            b_values = sorted({y for _, y in pairs})
+        else:
+            b_values = list(b_vals)
 
-        table = [[df.query(f'a=="{x}" and b=="{y}"').shape[0] + 1 for y in b_values] for x in a_values]
+        i_map = {v: i for i, v in enumerate(a_values)}
+        j_map = {v: j for j, v in enumerate(b_values)}
+        table = [[1 for _ in b_values] for _ in a_values]
+
+        for x, y in pairs:
+            if x in i_map and y in j_map:
+                table[i_map[x]][j_map[y]] += 1
+
         return table
 
 

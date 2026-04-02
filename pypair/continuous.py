@@ -2,11 +2,11 @@ from functools import reduce, lru_cache
 from itertools import combinations
 from math import sqrt
 
-import pandas as pd
+import numpy as np
 from scipy.stats import pearsonr, spearmanr, kendalltau, f_oneway, kruskal, linregress
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
-from pypair.util import MeasureMixin
+from pypair.util import MeasureMixin, to_numpy
 
 
 class ConcordantCounts(object):
@@ -107,8 +107,12 @@ class CorrelationRatio(MeasureMixin, object):
         :param x: Categorical variable (iterable).
         :param y: Continuous variable (iterable).
         """
-        is_valid = lambda a, b: a is not None and b is not None
-        self.__df = pd.DataFrame([(a, b) for a, b, in zip(x, y) if is_valid(a, b)], columns=['x', 'y'])
+        x_arr = to_numpy(x)
+        y_arr = to_numpy(y, dtype=float)
+
+        mask = (~pd_isna(x_arr)) & (~np.isnan(y_arr))
+        self.__x = x_arr[mask]
+        self.__y = y_arr[mask]
 
     @property
     @lru_cache(maxsize=None)
@@ -118,7 +122,7 @@ class CorrelationRatio(MeasureMixin, object):
 
         :return: :math:`\\bar{y}`.
         """
-        return self.__df.y.mean()
+        return float(np.mean(self.__y))
 
     @property
     @lru_cache(maxsize=None)
@@ -128,13 +132,11 @@ class CorrelationRatio(MeasureMixin, object):
 
         :return: :math:`\\sigma_{\\bar{y}}^2`.
         """
-        stats = self.__df.groupby(['x']).agg(['count', 'mean']).reset_index()
-        stats.columns = stats.columns.droplevel(0)
-        stats = stats.rename(columns={'': 'x', 'count': 'n_x', 'mean': 'y_x'})
         y = self.__mean
-
-        sigma = sum([r.n_x * (r.y_x - y) ** 2 for _, r in stats.iterrows()])
-
+        sigma = 0.0
+        for value in np.unique(self.__x):
+            grp = self.__y[self.__x == value]
+            sigma += float(grp.size) * (float(np.mean(grp)) - y) ** 2
         return sigma
 
     @property
@@ -145,9 +147,7 @@ class CorrelationRatio(MeasureMixin, object):
         :return: :math:`\\sigma_{y}^2`.
         """
         y = self.__mean
-        sigma = sum((self.__df.y - y) ** 2)
-
-        return sigma
+        return float(np.sum((self.__y - y) ** 2))
 
     @property
     @lru_cache(maxsize=None)
@@ -180,8 +180,7 @@ class CorrelationRatio(MeasureMixin, object):
 
         :return: F-statistic, p-value.
         """
-        df = self.__df
-        samples = [df[df.x == x].y for x in df.x.unique()]
+        samples = [self.__y[self.__x == value] for value in np.unique(self.__x)]
         r = f_oneway(*samples)
         return r.statistic, r.pvalue
 
@@ -193,8 +192,7 @@ class CorrelationRatio(MeasureMixin, object):
 
         :return: H-statistic, p-value.
         """
-        df = self.__df
-        samples = [df[df.x == x].y for x in df.x.unique()]
+        samples = [self.__y[self.__x == value] for value in np.unique(self.__x)]
         r = kruskal(*samples)
         return r.statistic, r.pvalue
 
@@ -206,9 +204,7 @@ class CorrelationRatio(MeasureMixin, object):
 
         :return: Silhouette coefficient.
         """
-        labels = self.__df.x
-        X = self.__df[['y']]
-        return silhouette_score(X, labels)
+        return silhouette_score(self.__y.reshape(-1, 1), self.__x)
 
     @property
     @lru_cache(maxsize=None)
@@ -218,9 +214,7 @@ class CorrelationRatio(MeasureMixin, object):
 
         :return: Davies-Bouldin Index.
         """
-        labels = self.__df.x
-        X = self.__df[['y']]
-        return davies_bouldin_score(X, labels)
+        return davies_bouldin_score(self.__y.reshape(-1, 1), self.__x)
 
     @property
     @lru_cache(maxsize=None)
@@ -230,9 +224,7 @@ class CorrelationRatio(MeasureMixin, object):
 
         :return: Calinski-Harabasz Index.
         """
-        labels = self.__df.x
-        X = self.__df[['y']]
-        return calinski_harabasz_score(X, labels)
+        return calinski_harabasz_score(self.__y.reshape(-1, 1), self.__x)
 
 
 class ConcordanceMixin(object):
@@ -427,3 +419,12 @@ class ConcordanceStats(MeasureMixin, ConcordanceMixin):
         self._t_c = c
         self._c = c
         self._n = n
+
+
+
+def pd_isna(values):
+    try:
+        import pandas as pd
+        return pd.isna(values)
+    except Exception:
+        return np.equal(values, None)

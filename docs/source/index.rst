@@ -56,7 +56,7 @@ You may install ``py-pair`` from `pypi <https://pypi.org/project/pypair/>`_.
 
 .. code:: bash
 
-    pip install pypair
+    uv add pypair
 
 .. toctree::
    :maxdepth: 2
