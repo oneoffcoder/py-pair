@@ -54,7 +54,7 @@ def test_biserial_concordance_continuous_interfaces():
     b = np.array([1, 1, 1, 0, 0, 1, 0, 0, 0])
     c = np.array([10, 11, 6, 4, 3, 12, 2, 2, 1], dtype=float)
 
-    for measure in ['biserial', 'point_biserial', 'rank_biserial']:
+    for measure in ["biserial", "point_biserial", "rank_biserial"]:
         assert np.isfinite(binary_continuous(b, c, measure))
 
     x = np.arange(12, dtype=float)
@@ -78,13 +78,13 @@ def test_biserial_concordance_continuous_interfaces():
 def test_corr_matrix_for_dataframe():
     df = pd.DataFrame(
         {
-            'x1': ['on', 'on', 'off', 'off'],
-            'x2': ['on', 'off', 'on', 'off'],
-            'x3': ['off', 'off', 'on', 'on'],
+            "x1": ["on", "on", "off", "off"],
+            "x2": ["on", "off", "on", "off"],
+            "x3": ["off", "off", "on", "on"],
         }
     )
 
-    matrix = corr(df, lambda a, b: categorical_categorical(a, b, measure='mutual_information'))
+    matrix = corr(df, lambda a, b: categorical_categorical(a, b, measure="mutual_information"))
     assert matrix.shape == (3, 3)
     assert np.allclose(np.diag(matrix.values), 0.0)
     assert np.allclose(matrix.values, matrix.values.T)

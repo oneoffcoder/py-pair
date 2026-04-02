@@ -8,7 +8,7 @@ from pypair.util import MeasureMixin, to_numpy
 
 
 class BiserialMixin(object):
-    """Biserial computations based off of :math:`n, p, q, y_0, y_1, \sigma`."""
+    r"""Biserial computations based off of :math:`n, p, q, y_0, y_1, \sigma`."""
 
     @property
     @lru_cache(maxsize=None)
@@ -49,7 +49,7 @@ class Biserial(MeasureMixin, BiserialMixin, object):
 
         n = b_clean.size
         if n == 0:
-            raise ValueError('No valid samples available to compute biserial statistics.')
+            raise ValueError("No valid samples available to compute biserial statistics.")
 
         b1_mask = b_clean == b_1
         b0_mask = b_clean == b_0
@@ -83,6 +83,7 @@ def pd_isna(values):
     # lightweight NA handling without requiring pandas internally
     try:
         import pandas as pd
+
         return pd.isna(values)
     except Exception:
         return np.equal(values, None)

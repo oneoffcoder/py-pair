@@ -8,18 +8,22 @@ from pypair.util import corr
 
 def get_data(n_rows=1000, n_cols=5):
     data = [tuple([randint(0, 1) for _ in range(n_cols)]) for _ in range(n_rows)]
-    cols = [f'x{i}' for i in range(n_cols)]
+    cols = [f"x{i}" for i in range(n_cols)]
     return pd.DataFrame(data, columns=cols)
 
 
-if __name__ == '__main__':
-    jaccard = lambda a, b: binary_binary(a, b, measure='jaccard')
-    tanimoto = lambda a, b: binary_binary(a, b, measure='tanimoto_i')
+if __name__ == "__main__":
+
+    def jaccard(a, b):
+        return binary_binary(a, b, measure="jaccard")
+
+    def tanimoto(a, b):
+        return binary_binary(a, b, measure="tanimoto_i")
 
     df = get_data()
     jaccard_corr = corr(df, jaccard)
     tanimoto_corr = corr(df, tanimoto)
 
     print(jaccard_corr)
-    print('-' * 15)
+    print("-" * 15)
     print(tanimoto_corr)

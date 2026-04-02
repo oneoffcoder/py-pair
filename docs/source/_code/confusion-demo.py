@@ -22,19 +22,19 @@ def get_data():
 a, p = get_data()
 
 # if you need to quickly get just one association measure
-r = confusion(a, p, measure='acc')
+r = confusion(a, p, measure="acc")
 print(r)
 
-print('-' * 15)
+print("-" * 15)
 
 # you can also get a list of available association measures
 # and loop over to call confusion(...)
 # this is more convenient, but less fast
 for m in ConfusionMatrix.measures():
     r = confusion(a, p, m)
-    print(f'{r}: {m}')
+    print(f"{r}: {m}")
 
-print('-' * 15)
+print("-" * 15)
 
 # if you need multiple association measures, then
 # build the confusion matrix table
@@ -42,4 +42,4 @@ print('-' * 15)
 matrix = ConfusionMatrix(a, p)
 for m in matrix.measures():
     r = matrix.get(m)
-    print(f'{r}: {m}')
+    print(f"{r}: {m}")

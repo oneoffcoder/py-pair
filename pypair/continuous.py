@@ -228,7 +228,6 @@ class CorrelationRatio(MeasureMixin, object):
 
 
 class ConcordanceMixin(object):
-
     @property
     @lru_cache(maxsize=None)
     def __counts(self):
@@ -387,7 +386,9 @@ class Concordance(MeasureMixin, ConcordanceMixin, object):
 
             return ConcordantCounts(d, t_xy, t_x, t_y, c)
 
-        is_valid = lambda a, b: a is not None and b is not None
+        def is_valid(a, b):
+            return a is not None and b is not None
+
         data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
         results = combinations(data, 2)
         results = map(lambda tup: get_concordance(tup[0], tup[1]), results)
@@ -421,10 +422,10 @@ class ConcordanceStats(MeasureMixin, ConcordanceMixin):
         self._n = n
 
 
-
 def pd_isna(values):
     try:
         import pandas as pd
+
         return pd.isna(values)
     except Exception:
         return np.equal(values, None)

@@ -33,9 +33,14 @@ def get_measures(clazz):
     """Gets all the measures of a clazz."""
     from itertools import chain
 
-    is_property = lambda v: isinstance(v, property)
-    is_public = lambda n: not n.startswith('_')
-    is_valid = lambda n, v: is_public(n) and is_property(v)
+    def is_property(value):
+        return isinstance(value, property)
+
+    def is_public(name):
+        return not name.startswith("_")
+
+    def is_valid(name, value):
+        return is_public(name) and is_property(value)
 
     measures = sorted(list(chain(*[[n for n, v in vars(c).items() if is_valid(n, v)] for c in clazz.__mro__])))
     return measures
@@ -46,7 +51,7 @@ def to_numpy(values: Any, dtype=None) -> np.ndarray:
     if isinstance(values, np.ndarray):
         return values.astype(dtype) if dtype is not None else values
 
-    if hasattr(values, 'to_numpy'):
+    if hasattr(values, "to_numpy"):
         arr = values.to_numpy()
     else:
         arr = np.asarray(list(values))

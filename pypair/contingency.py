@@ -46,7 +46,9 @@ class CategoricalMixin(object):
         row_marginals = self._r_margs
         col_marginals = self._k_margs
 
-        get_expected = lambda i, j: row_marginals[i] * col_marginals[j] / n
+        def get_expected(i, j):
+            return row_marginals[i] * col_marginals[j] / n
+
         expected = [[get_expected(i, j) for j in range(c)] for i in range(r)]
 
         chisq = sum([(o - e) ** 2 / e for o, e in zip(chain(*self._table), chain(*expected))])
@@ -144,10 +146,17 @@ class CategoricalMixin(object):
         """
         n = self._n
 
-        get_p_a = lambda i: self._r_margs[i] / n
-        get_p_b = lambda j: self._k_margs[j] / n
-        get_p_ab = lambda i, j: self._table[i][j] / n
-        get_mi = lambda i, j: get_p_ab(i, j) * log(get_p_ab(i, j) / get_p_a(i) / get_p_b(j))
+        def get_p_a(i):
+            return self._r_margs[i] / n
+
+        def get_p_b(j):
+            return self._k_margs[j] / n
+
+        def get_p_ab(i, j):
+            return self._table[i][j] / n
+
+        def get_mi(i, j):
+            return get_p_ab(i, j) * log(get_p_ab(i, j) / get_p_a(i) / get_p_b(j))
 
         mi = sum((get_mi(i, j) for i, j in product(*[range(self._r), range(self._k)])))
 
@@ -233,7 +242,7 @@ class CategoricalMixin(object):
         n_ij = sum([int(binom(n, 2)) for n in chain(*self._table)])
         n = binom(self._n, 2)
 
-        top = (n_ij - (a_i * b_j) / n)
+        top = n_ij - (a_i * b_j) / n
         bot = 0.5 * (a_i + b_j) - (a_i * b_j) / n
         s = top / bot
         return s
@@ -486,7 +495,7 @@ class BinaryMixin(object):
         :return: Eyraud.
         """
         a, b, c, d, n = self.__abcdn
-        return (n ** 2 * (n * a - (a + b) * (a + c))) / ((a + b) * (a + c) * (b + d) * (c + d))
+        return (n**2 * (n * a - (a + b) * (a + c))) / ((a + b) * (a + c) * (b + d) * (c + d))
 
     @property
     @timeit
@@ -741,7 +750,7 @@ class BinaryMixin(object):
         :return: McConnaughey.
         """
         a, b, c, d, n = self.__abcdn
-        return (a ** 2 - b * c) / ((a + d) ** 2 + (b + c) ** 2)
+        return (a**2 - b * c) / ((a + d) ** 2 + (b + c) ** 2)
 
     @property
     @timeit
@@ -1061,7 +1070,7 @@ class BinaryMixin(object):
         :return: Sorgenfrei.
         """
         a, b, c, d, n = self.__abcdn
-        return a ** 2 / ((a + b) * (a + c))
+        return a**2 / ((a + b) * (a + c))
 
     @property
     @timeit
@@ -1941,9 +1950,15 @@ class AgreementMixin(object):
 
         :return: A list of :math:`\\kappa`.
         """
-        theta_1 = lambda i: self._table[i][i] / self._r_margs[i]
-        theta_2 = lambda i: self._k_margs[i]
-        kappa = lambda t_1, t_2: (t_1 - t_2) / (1 - t_2)
+
+        def theta_1(i):
+            return self._table[i][i] / self._r_margs[i]
+
+        def theta_2(i):
+            return self._k_margs[i]
+
+        def kappa(t_1, t_2):
+            return (t_1 - t_2) / (1 - t_2)
 
         kappas = [kappa(theta_1(i), theta_2(i)) for i in range(self._r)]
         return kappas
@@ -1988,7 +2003,8 @@ class ContingencyTable(MeasureMixin, ABC):
         def add_count(x, y):
             return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3]
 
-        is_valid = lambda x, y: x is not None and y is not None
+        def is_valid(x, y):
+            return x is not None and y is not None
 
         counts = (to_count(x, y) for x, y in zip(a, b) if is_valid(x, y))
         counts = reduce(lambda x, y: add_count(x, y), counts)
@@ -2129,7 +2145,7 @@ class AgreementTable(AgreementMixin, ContingencyTable):
         super().__init__(table)
 
         if self._k != self._r:
-            raise ValueError(f'Table not symmetric: rows={self._r}, cols={self._k}')
+            raise ValueError(f"Table not symmetric: rows={self._r}, cols={self._k}")
 
 
 class CategoricalStats(CategoricalMixin, ContingencyTable):
@@ -2195,4 +2211,4 @@ class AgreementStats(AgreementMixin, ContingencyTable):
         """
         super().__init__(table)
         if self._k != self._r:
-            raise ValueError(f'Table not symmetric: rows={self._r}, cols={self._k}')
+            raise ValueError(f"Table not symmetric: rows={self._r}, cols={self._k}")

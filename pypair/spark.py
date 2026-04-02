@@ -3,8 +3,7 @@ from itertools import combinations, product, chain
 from math import sqrt
 
 from pypair.biserial import BiserialStats
-from pypair.contingency import ConfusionStats, CategoricalStats, \
-    BinaryStats, AgreementStats
+from pypair.contingency import ConfusionStats, CategoricalStats, BinaryStats, AgreementStats
 from pypair.continuous import ConcordanceStats
 
 
@@ -135,15 +134,16 @@ def __get_contingency_table(sdf):
 
         return key, table
 
-    return sdf.rdd \
-        .flatMap(lambda r: to_count(r.asDict())) \
-        .reduceByKey(lambda a, b: a + b) \
-        .map(lambda tup: ((tup[0][0], tup[0][1]), (tup[0][2], tup[0][3], tup[1]))) \
-        .map(lambda tup: (tup[0], {(tup[1][0], tup[1][1]): tup[1][2]})) \
-        .reduceByKey(lambda a, b: {**a, **b}) \
-        .map(lambda tup: attach_domains(tup)) \
-        .map(lambda tup: to_contingency_table(tup)) \
+    return (
+        sdf.rdd.flatMap(lambda r: to_count(r.asDict()))
+        .reduceByKey(lambda a, b: a + b)
+        .map(lambda tup: ((tup[0][0], tup[0][1]), (tup[0][2], tup[0][3], tup[1])))
+        .map(lambda tup: (tup[0], {(tup[1][0], tup[1][1]): tup[1][2]}))
+        .reduceByKey(lambda a, b: {**a, **b})
+        .map(lambda tup: attach_domains(tup))
+        .map(lambda tup: to_contingency_table(tup))
         .sortByKey()
+    )
 
 
 def binary_binary(sdf):
@@ -171,11 +171,12 @@ def binary_binary(sdf):
         measures = {m: computer.get(m) for m in computer.measures()}
         return (x1, x2), measures
 
-    return sdf.rdd \
-        .flatMap(lambda r: __to_abcd_counts(r.asDict())) \
-        .reduceByKey(lambda a, b: __add_abcd_counts(a, b)) \
-        .sortByKey() \
+    return (
+        sdf.rdd.flatMap(lambda r: __to_abcd_counts(r.asDict()))
+        .reduceByKey(lambda a, b: __add_abcd_counts(a, b))
+        .sortByKey()
         .map(lambda counts: to_results(counts))
+    )
 
 
 def confusion(sdf):
@@ -209,11 +210,12 @@ def confusion(sdf):
         measures = {m: computer.get(m) for m in computer.measures()}
         return (x1, x2), measures
 
-    return sdf.rdd \
-        .flatMap(lambda r: __to_abcd_counts(r.asDict())) \
-        .reduceByKey(lambda a, b: __add_abcd_counts(a, b)) \
-        .map(lambda counts: to_results(counts)) \
+    return (
+        sdf.rdd.flatMap(lambda r: __to_abcd_counts(r.asDict()))
+        .reduceByKey(lambda a, b: __add_abcd_counts(a, b))
+        .map(lambda counts: to_results(counts))
         .sortByKey()
+    )
 
 
 def categorical_categorical(sdf):
@@ -234,9 +236,7 @@ def categorical_categorical(sdf):
         measures = {m: computer.get(m) for m in computer.measures()}
         return key, measures
 
-    return __get_contingency_table(sdf) \
-        .map(lambda tup: to_results(tup)) \
-        .sortByKey()
+    return __get_contingency_table(sdf).map(lambda tup: to_results(tup)).sortByKey()
 
 
 def agreement(sdf):
@@ -257,9 +257,7 @@ def agreement(sdf):
         measures = {m: computer.get(m) for m in computer.measures()}
         return key, measures
 
-    return __get_contingency_table(sdf) \
-        .map(lambda tup: to_results(tup)) \
-        .sortByKey()
+    return __get_contingency_table(sdf).map(lambda tup: to_results(tup)).sortByKey()
 
 
 def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
@@ -344,14 +342,15 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
         measures = {m: computer.get(m) for m in computer.measures()}
         return key, measures
 
-    return sdf.rdd \
-        .flatMap(lambda r: to_pair1(r.asDict())) \
-        .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2])) \
-        .map(lambda tup: to_pair2(tup)) \
-        .groupByKey() \
-        .map(lambda tup: compute_stats(tup)) \
-        .map(lambda tup: to_results(tup)) \
+    return (
+        sdf.rdd.flatMap(lambda r: to_pair1(r.asDict()))
+        .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2]))
+        .map(lambda tup: to_pair2(tup))
+        .groupByKey()
+        .map(lambda tup: compute_stats(tup))
+        .map(lambda tup: to_results(tup))
         .sortByKey()
+    )
 
 
 def categorical_continuous(sdf, categorical, continuous):
@@ -378,10 +377,19 @@ def categorical_continuous(sdf, categorical, continuous):
         :param d: Dictionary of data.
         :return: List of (b, c, b_val), (sum_c, sum_c_sq, sum_b).
         """
-        kv_0 = lambda cat, con: ((cat, con, d[cat]), (d[con], 0, 1))
-        kv_1 = lambda cat, con: ((cat, con, '__*_avg_*__'), (d[con], 0, 1))
-        kv_2 = lambda cat, con: ((cat, con, '__*_den_*__'), (d[con], d[con] ** 2, 1))
-        explode = lambda cat, con: [kv_0(cat, con), kv_1(cat, con), kv_2(cat, con)]
+
+        def kv_0(cat, con):
+            return (cat, con, d[cat]), (d[con], 0, 1)
+
+        def kv_1(cat, con):
+            return (cat, con, "__*_avg_*__"), (d[con], 0, 1)
+
+        def kv_2(cat, con):
+            return (cat, con, "__*_den_*__"), (d[con], d[con] ** 2, 1)
+
+        def explode(cat, con):
+            return [kv_0(cat, con), kv_1(cat, con), kv_2(cat, con)]
+
         return chain(*(explode(cat, con) for cat, con in product(*[categorical, continuous])))
 
     def to_pair2(tup):
@@ -391,13 +399,16 @@ def categorical_continuous(sdf, categorical, continuous):
         :param tup: (b, c, b_val), (sum_c, sum_c_sq, sum_b)
         :return: (b, c), (b_val, stats)
         """
-        ss = lambda x, x_sq, n: (x_sq - (x ** 2 / n))
+
+        def ss(x, x_sq, n):
+            return x_sq - (x**2 / n)
+
         (cat, con, flag), (sum_c, sum_c_sq, sum_b) = tup
         key = cat, con
 
-        if flag == '__*_den_*__':
+        if flag == "__*_den_*__":
             val = ss(sum_c, sum_c_sq, sum_b)
-        elif flag == '__*_avg_*__':
+        elif flag == "__*_avg_*__":
             val = sum_c / sum_b
         else:
             val = sum_c / sum_b, sum_b
@@ -414,20 +425,21 @@ def categorical_continuous(sdf, categorical, continuous):
         (b, c), data = tup
         data = {k: v for k, v in data}
 
-        y_avg = data['__*_avg_*__']
+        y_avg = data["__*_avg_*__"]
         num = sum([v[1] * ((v[0] - y_avg) ** 2) for k, v in data.items() if isinstance(v, tuple)])
-        den = data['__*_den_*__']
+        den = data["__*_den_*__"]
 
         eta = num / den
-        return (b, c), {'eta_sq': eta, 'eta': sqrt(eta)}
+        return (b, c), {"eta_sq": eta, "eta": sqrt(eta)}
 
-    return sdf.rdd \
-        .flatMap(lambda r: to_pair1(r.asDict())) \
-        .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2])) \
-        .map(lambda tup: to_pair2(tup)) \
-        .groupByKey() \
-        .map(lambda tup: to_results(tup)) \
+    return (
+        sdf.rdd.flatMap(lambda r: to_pair1(r.asDict()))
+        .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1], x[2] + y[2]))
+        .map(lambda tup: to_pair2(tup))
+        .groupByKey()
+        .map(lambda tup: to_results(tup))
         .sortByKey()
+    )
 
 
 def concordance(sdf):
@@ -548,13 +560,14 @@ def concordance(sdf):
         measures = {m: computer.get(m) for m in computer.measures()}
         return (x1, x2), measures
 
-    return sdf.rdd \
-        .flatMap(lambda r: to_pair1(r.asDict())) \
-        .groupByKey() \
-        .flatMap(lambda tup: to_pair2(tup)) \
-        .reduceByKey(lambda x, y: __add_concordance_counts(x, y)) \
-        .map(lambda tup: to_results(tup)) \
+    return (
+        sdf.rdd.flatMap(lambda r: to_pair1(r.asDict()))
+        .groupByKey()
+        .flatMap(lambda tup: to_pair2(tup))
+        .reduceByKey(lambda x, y: __add_concordance_counts(x, y))
+        .map(lambda tup: to_results(tup))
         .sortByKey()
+    )
 
 
 def continuous_continuous(sdf):
@@ -571,7 +584,7 @@ def continuous_continuous(sdf):
     :return: Spark pair-RDD.
     """
 
-    CorrItem = namedtuple('CorrItem', 'x y xy x_sq y_sq n')
+    CorrItem = namedtuple("CorrItem", "x y xy x_sq y_sq n")
 
     def to_items(d):
         """
@@ -580,7 +593,10 @@ def continuous_continuous(sdf):
         :param d: Dictionary.
         :return: (n1, n2), CorrItem.
         """
-        as_item = lambda n1, n2: CorrItem(d[n1], d[n2], d[n1] * d[n2], d[n1] ** 2, d[n2] ** 2, 1)
+
+        def as_item(n1, n2):
+            return CorrItem(d[n1], d[n2], d[n1] * d[n2], d[n1] ** 2, d[n2] ** 2, 1)
+
         return (((n1, n2), as_item(n1, n2)) for n1, n2 in combinations(d.keys(), 2))
 
     def add_items(a, b):
@@ -602,12 +618,13 @@ def continuous_continuous(sdf):
         """
         (n1, n2), item = tup
         n = item.xy - (item.x * item.y) / item.n
-        d = sqrt(item.x_sq - (item.x ** 2 / item.n)) * sqrt(item.y_sq - (item.y ** 2 / item.n))
+        d = sqrt(item.x_sq - (item.x**2 / item.n)) * sqrt(item.y_sq - (item.y**2 / item.n))
         r = n / d
-        return (n1, n2), {'pearson': r}
+        return (n1, n2), {"pearson": r}
 
-    return sdf.rdd \
-        .flatMap(lambda r: to_items(r.asDict())) \
-        .reduceByKey(lambda a, b: add_items(a, b)) \
-        .map(lambda tup: to_results(tup)) \
+    return (
+        sdf.rdd.flatMap(lambda r: to_items(r.asDict()))
+        .reduceByKey(lambda a, b: add_items(a, b))
+        .map(lambda tup: to_results(tup))
         .sortByKey()
+    )

@@ -24,7 +24,6 @@ docs = [
   "sphinx>=8.1",
   "sphinx-rtd-theme>=3.0",
   "sphinxcontrib-bibtex>=2.6",
-  "sphinxcontrib-blockdiag>=3.0",
   "sphinx-sitemap>=2.8",
 ]
 
@@ -42,7 +41,6 @@ docs = [
   "sphinx>=8.1",
   "sphinx-rtd-theme>=3.0",
   "sphinxcontrib-bibtex>=2.6",
-  "sphinxcontrib-blockdiag>=3.0",
   "sphinx-sitemap>=2.8",
 ]
 

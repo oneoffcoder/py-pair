@@ -6,11 +6,11 @@ y = [y for y in range(10)]
 
 for m in Continuous.measures():
     r = continuous_continuous(x, y, m)
-    print(f'{r}: {m}')
+    print(f"{r}: {m}")
 
-print('-' * 15)
+print("-" * 15)
 
 con = Continuous(x, y)
 for m in con.measures():
     r = con.get(m)
-    print(f'{r}: {m}')
+    print(f"{r}: {m}")

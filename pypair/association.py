@@ -3,7 +3,7 @@ from pypair.contingency import BinaryTable, CategoricalTable, ConfusionMatrix, A
 from pypair.continuous import Concordance, CorrelationRatio, Continuous
 
 
-def confusion(a, b, measure='acc', a_0=0, a_1=1, b_0=0, b_1=1):
+def confusion(a, b, measure="acc", a_0=0, a_1=1, b_0=0, b_1=1):
     """
     Gets the specified confusion matrix stats.
 
@@ -17,11 +17,11 @@ def confusion(a, b, measure='acc', a_0=0, a_1=1, b_0=0, b_1=1):
     :return: Measure.
     """
     if measure not in ConfusionMatrix.measures():
-        raise ValueError(f'{measure} is not a valid association measure.')
+        raise ValueError(f"{measure} is not a valid association measure.")
     return ConfusionMatrix(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
 
 
-def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
+def binary_binary(a, b, measure="chisq", a_0=0, a_1=1, b_0=0, b_1=1):
     """
     Gets the binary-binary association.
 
@@ -35,11 +35,11 @@ def binary_binary(a, b, measure='chisq', a_0=0, a_1=1, b_0=0, b_1=1):
     :return: Measure.
     """
     if measure not in BinaryTable.measures():
-        raise ValueError(f'{measure} is not a valid association measure.')
+        raise ValueError(f"{measure} is not a valid association measure.")
     return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
 
 
-def categorical_categorical(a, b, measure='chisq', a_vals=None, b_vals=None):
+def categorical_categorical(a, b, measure="chisq", a_vals=None, b_vals=None):
     """
     Gets the categorical-categorical association.
 
@@ -51,11 +51,11 @@ def categorical_categorical(a, b, measure='chisq', a_vals=None, b_vals=None):
     :return: Measure.
     """
     if measure not in CategoricalTable.measures():
-        raise ValueError(f'{measure} is not a valid association measure.')
+        raise ValueError(f"{measure} is not a valid association measure.")
     return CategoricalTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
 
 
-def agreement(a, b, measure='chohen_k', a_vals=None, b_vals=None):
+def agreement(a, b, measure="chohen_k", a_vals=None, b_vals=None):
     """
     Gets the agreement association.
 
@@ -67,11 +67,11 @@ def agreement(a, b, measure='chohen_k', a_vals=None, b_vals=None):
     :return: Measure.
     """
     if measure not in AgreementTable.measures():
-        raise ValueError(f'{measure} is not a valid association measure.')
+        raise ValueError(f"{measure} is not a valid association measure.")
     return AgreementTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
 
 
-def binary_continuous(b, c, measure='biserial', b_0=0, b_1=1):
+def binary_continuous(b, c, measure="biserial", b_0=0, b_1=1):
     """
     Gets the binary-continuous association.
 
@@ -83,11 +83,11 @@ def binary_continuous(b, c, measure='biserial', b_0=0, b_1=1):
     :return: Measure.
     """
     if measure not in Biserial.measures():
-        raise ValueError(f'{measure} is not a valid association measure.')
+        raise ValueError(f"{measure} is not a valid association measure.")
     return Biserial(b, c, b_0=b_0, b_1=b_1).get(measure)
 
 
-def categorical_continuous(x, y, measure='eta'):
+def categorical_continuous(x, y, measure="eta"):
     """
     Gets the categorical-continuous association.
 
@@ -97,11 +97,11 @@ def categorical_continuous(x, y, measure='eta'):
     :return: Measure.
     """
     if measure not in CorrelationRatio.measures():
-        raise ValueError(f'{measure} is not a valid association measure.')
+        raise ValueError(f"{measure} is not a valid association measure.")
     return CorrelationRatio(x, y).get(measure)
 
 
-def concordance(x, y, measure='kendall_tau'):
+def concordance(x, y, measure="kendall_tau"):
     """
     Gets the specified concordance between the two variables.
 
@@ -111,11 +111,11 @@ def concordance(x, y, measure='kendall_tau'):
     :return: Measure.
     """
     if measure not in Concordance.measures():
-        raise ValueError(f'{measure} is not a valid association measure.')
+        raise ValueError(f"{measure} is not a valid association measure.")
     return Concordance(x, y).get(measure)
 
 
-def continuous_continuous(x, y, measure='pearson'):
+def continuous_continuous(x, y, measure="pearson"):
     """
     Gets the continuous-continuous association.
 
@@ -125,5 +125,5 @@ def continuous_continuous(x, y, measure='pearson'):
     :return: Measure.
     """
     if measure not in Continuous.measures():
-        raise ValueError(f'{measure} is not a valid association measure.')
+        raise ValueError(f"{measure} is not a valid association measure.")
     return Continuous(x, y).get(measure)

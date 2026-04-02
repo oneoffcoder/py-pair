@@ -10,18 +10,18 @@ agr = AgreementTable(a, b)
 
 print(cat.measures())
 print(CategoricalTable.measures())
-print('-' * 15)
+print("-" * 15)
 print(bin.measures())
 print(BinaryTable.measures())
-print('-' * 15)
+print("-" * 15)
 print(con.measures())
 print(ConfusionMatrix.measures())
-print('-' * 15)
+print("-" * 15)
 print(agr.measures())
 print(AgreementTable.measures())
 
-print('~' * 15)
-print('~' * 15)
+print("~" * 15)
+print("~" * 15)
 
 
 def print_measures(computer):

@@ -24,5 +24,5 @@ def test_binary_and_categorical_table_creation():
     binary = BinaryTable(a, b)
     categorical = CategoricalTable(a, b)
 
-    assert binary.get('chisq') > 0
-    assert categorical.get('phi') > 0
+    assert binary.get("chisq") > 0
+    assert categorical.get("phi") > 0

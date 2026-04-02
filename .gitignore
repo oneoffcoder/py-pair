@@ -12,5 +12,7 @@ build/
 .pypircc
 joblib_memmap/
 .pytest_cache/
+.ruff_cache/
+.venv/
 .DS_store
 .vscode

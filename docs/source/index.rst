@@ -28,29 +28,15 @@ PyPair
 
 PyPair is a statistical library to compute pairwise association between any two types of variables. You can use the library locally on your laptop or desktop, or, you may use it on a `Spark <https://spark.apache.org/>`_ cluster.
 
-.. blockdiag::
+Variable families supported by PyPair:
 
-   diagram {
-      default_shape = roundedbox
-      span_width = 32
-      span_height = 20
-      default_fontsize = 11
-      edge_layout = normal
-      orientation = landscape
-
-      V [label = "Variable", color = pink]
-      C [label = "Continuous", color = "#edfa78"]
-      I [label = "Interval", color = "#def514"]
-      R [label = "Ratio", color = "#def514"]
-      A [label = "Categorical", color = "#e0e0e0"]
-      B [label = "Binary", color ="#e4ede6"]
-      N [label = "Nominal", color ="#e4ede6"]
-      O [label = "Ordinal", color ="#e4ede6"]
-
-      V -> A, C
-      C -> I, R
-      A -> B, N, O
-   }
+- Continuous variables
+- Interval variables
+- Ratio variables
+- Categorical variables
+- Binary variables
+- Nominal variables
+- Ordinal variables
 
 You may install ``py-pair`` from `pypi <https://pypi.org/project/pypair/>`_.
 
