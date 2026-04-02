@@ -1,9 +1,21 @@
+from __future__ import annotations
+
 from pypair.biserial import Biserial
 from pypair.contingency import BinaryTable, CategoricalTable, ConfusionMatrix, AgreementTable
 from pypair.continuous import Concordance, CorrelationRatio, Continuous
+from pypair.typing import ArrayLike1D, DomainValues, MeasureValue, NumericArrayLike1D
 
 
-def confusion(a, b, measure="acc", a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
+def confusion(
+    a: ArrayLike1D,
+    b: ArrayLike1D,
+    measure: str = "acc",
+    a_0: object = 0,
+    a_1: object = 1,
+    b_0: object = 0,
+    b_1: object = 1,
+    pseudocount: bool = True,
+) -> MeasureValue:
     """
     Gets the specified confusion matrix stats.
 
@@ -21,7 +33,16 @@ def confusion(a, b, measure="acc", a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True)
     return ConfusionMatrix(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1, pseudocount=pseudocount).get(measure)
 
 
-def binary_binary(a, b, measure="chisq", a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
+def binary_binary(
+    a: ArrayLike1D,
+    b: ArrayLike1D,
+    measure: str = "chisq",
+    a_0: object = 0,
+    a_1: object = 1,
+    b_0: object = 0,
+    b_1: object = 1,
+    pseudocount: bool = True,
+) -> MeasureValue:
     """
     Gets the binary-binary association.
 
@@ -39,7 +60,14 @@ def binary_binary(a, b, measure="chisq", a_0=0, a_1=1, b_0=0, b_1=1, pseudocount
     return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1, pseudocount=pseudocount).get(measure)
 
 
-def categorical_categorical(a, b, measure="chisq", a_vals=None, b_vals=None, pseudocount=True):
+def categorical_categorical(
+    a: ArrayLike1D,
+    b: ArrayLike1D,
+    measure: str = "chisq",
+    a_vals: DomainValues | None = None,
+    b_vals: DomainValues | None = None,
+    pseudocount: bool = True,
+) -> MeasureValue:
     """
     Gets the categorical-categorical association.
 
@@ -55,7 +83,14 @@ def categorical_categorical(a, b, measure="chisq", a_vals=None, b_vals=None, pse
     return CategoricalTable(a, b, a_vals=a_vals, b_vals=b_vals, pseudocount=pseudocount).get(measure)
 
 
-def agreement(a, b, measure="chohen_k", a_vals=None, b_vals=None, pseudocount=True):
+def agreement(
+    a: ArrayLike1D,
+    b: ArrayLike1D,
+    measure: str = "chohen_k",
+    a_vals: DomainValues | None = None,
+    b_vals: DomainValues | None = None,
+    pseudocount: bool = True,
+) -> MeasureValue:
     """
     Gets the agreement association.
 
@@ -71,7 +106,13 @@ def agreement(a, b, measure="chohen_k", a_vals=None, b_vals=None, pseudocount=Tr
     return AgreementTable(a, b, a_vals=a_vals, b_vals=b_vals, pseudocount=pseudocount).get(measure)
 
 
-def binary_continuous(b, c, measure="biserial", b_0=0, b_1=1):
+def binary_continuous(
+    b: ArrayLike1D,
+    c: NumericArrayLike1D,
+    measure: str = "biserial",
+    b_0: object = 0,
+    b_1: object = 1,
+) -> MeasureValue:
     """
     Gets the binary-continuous association.
 
@@ -87,7 +128,7 @@ def binary_continuous(b, c, measure="biserial", b_0=0, b_1=1):
     return Biserial(b, c, b_0=b_0, b_1=b_1).get(measure)
 
 
-def categorical_continuous(x, y, measure="eta"):
+def categorical_continuous(x: ArrayLike1D, y: NumericArrayLike1D, measure: str = "eta") -> MeasureValue:
     """
     Gets the categorical-continuous association.
 
@@ -101,7 +142,7 @@ def categorical_continuous(x, y, measure="eta"):
     return CorrelationRatio(x, y).get(measure)
 
 
-def concordance(x, y, measure="kendall_tau"):
+def concordance(x: NumericArrayLike1D, y: NumericArrayLike1D, measure: str = "kendall_tau") -> MeasureValue:
     """
     Gets the specified concordance between the two variables.
 
@@ -115,7 +156,11 @@ def concordance(x, y, measure="kendall_tau"):
     return Concordance(x, y).get(measure)
 
 
-def continuous_continuous(x, y, measure="pearson"):
+def continuous_continuous(
+    x: NumericArrayLike1D,
+    y: NumericArrayLike1D,
+    measure: str = "pearson",
+) -> MeasureValue:
     """
     Gets the continuous-continuous association.
 

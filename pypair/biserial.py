@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 from functools import lru_cache
 from math import sqrt
 
 import numpy as np
+import numpy.typing as npt
 from scipy.stats import norm
 
+from pypair.typing import ArrayLike1D, NumericArrayLike1D
 from pypair.util import MeasureMixin, to_numpy
 
 
@@ -12,12 +16,12 @@ class BiserialMixin(object):
 
     @property
     @lru_cache(maxsize=None)
-    def __params(self):
+    def __params(self) -> tuple[int, float, float, float, float, float]:
         return self._n, self._p, self._q, self._y_0, self._y_1, self._std
 
     @property
     @lru_cache(maxsize=None)
-    def biserial(self):
+    def biserial(self) -> float:
         n, p, q, y_0, y_1, std = self.__params
         r_pb = (y_1 - y_0) * sqrt(p * q) / std
         y = norm.pdf(norm.ppf(q))
@@ -25,13 +29,13 @@ class BiserialMixin(object):
 
     @property
     @lru_cache(maxsize=None)
-    def point_biserial(self):
+    def point_biserial(self) -> float:
         n, p, q, y_0, y_1, std = self.__params
         return (y_1 - y_0) * sqrt(p * q) / std
 
     @property
     @lru_cache(maxsize=None)
-    def rank_biserial(self):
+    def rank_biserial(self) -> float:
         n, p, q, y_0, y_1, std = self.__params
         return 2 * (y_1 - y_0) / n
 
@@ -39,7 +43,7 @@ class BiserialMixin(object):
 class Biserial(MeasureMixin, BiserialMixin, object):
     """Biserial association between a binary and continuous variable."""
 
-    def __init__(self, b, c, b_0=0, b_1=1):
+    def __init__(self, b: ArrayLike1D, c: NumericArrayLike1D, b_0: object = 0, b_1: object = 1) -> None:
         b_arr = to_numpy(b)
         c_arr = to_numpy(c, dtype=float)
 
@@ -70,7 +74,7 @@ class Biserial(MeasureMixin, BiserialMixin, object):
 class BiserialStats(MeasureMixin, BiserialMixin, object):
     """Computes biserial stats."""
 
-    def __init__(self, n, p, y_0, y_1, std):
+    def __init__(self, n: int, p: float, y_0: float, y_1: float, std: float) -> None:
         self._n = n
         self._p = p
         self._q = 1.0 - p
@@ -79,7 +83,7 @@ class BiserialStats(MeasureMixin, BiserialMixin, object):
         self._std = std
 
 
-def pd_isna(values):
+def pd_isna(values: ArrayLike1D) -> npt.NDArray[np.bool_]:
     # lightweight NA handling without requiring pandas internally
     try:
         import pandas as pd

@@ -178,10 +178,7 @@ def format_memory_stats(snapshot: tracemalloc.Snapshot, current_bytes: int, peak
 
     for index, stat in enumerate(stats[:limit], start=1):
         frame = stat.traceback[0]
-        lines.append(
-            f"{index:>2}. {frame.filename}:{frame.lineno} "
-            f"size={_format_bytes(stat.size)} count={stat.count}"
-        )
+        lines.append(f"{index:>2}. {frame.filename}:{frame.lineno} size={_format_bytes(stat.size)} count={stat.count}")
 
     return "\n".join(lines)
 

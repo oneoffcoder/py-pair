@@ -245,7 +245,9 @@ def test_measure_mixin_and_to_numpy_cover_all_paths():
         WarningMeasure().get("delta")
     with pytest.raises(ValueError, match="plain value error"):
         PlainValueErrorMeasure().get("epsilon")
-    with pytest.raises(UndefinedMeasureError, match=r"Measure 'theta' is undefined for MathDomainMeasure: math domain error"):
+    with pytest.raises(
+        UndefinedMeasureError, match=r"Measure 'theta' is undefined for MathDomainMeasure: math domain error"
+    ):
         MathDomainMeasure().get("theta")
     with pytest.raises(UndefinedMeasureError, match=r"Measure 'zeta' is undefined for NaNMeasure: non-finite result"):
         NaNMeasure().get("zeta")

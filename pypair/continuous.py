@@ -1,15 +1,19 @@
+from __future__ import annotations
+
 from functools import lru_cache
 from math import sqrt
 
 import numpy as np
+import numpy.typing as npt
 from scipy.stats import pearsonr, spearmanr, kendalltau, f_oneway, kruskal, linregress
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
+from pypair.typing import ArrayLike1D, ConcordanceCounts, NumericArrayLike1D
 from pypair.util import MeasureMixin, to_numpy
 
 
 class Continuous(MeasureMixin, object):
-    def __init__(self, a, b):
+    def __init__(self, a: NumericArrayLike1D, b: NumericArrayLike1D) -> None:
         """
         ctor.
 
@@ -21,7 +25,7 @@ class Continuous(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def pearson(self):
+    def pearson(self) -> tuple[float, float]:
         """
         `Pearson's r <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.pearsonr.html>`_.
 
@@ -31,7 +35,7 @@ class Continuous(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def spearman(self):
+    def spearman(self) -> tuple[float, float]:
         """
         `Spearman's r <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.spearmanr.html>`_.
 
@@ -42,7 +46,7 @@ class Continuous(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def kendall(self):
+    def kendall(self) -> tuple[float, float]:
         """
         `Kendall's tau <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.kendalltau.html>`_.
 
@@ -53,7 +57,7 @@ class Continuous(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def regression(self):
+    def regression(self) -> tuple[float, float]:
         """
         `Line regression <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.linregress.html>`_.
 
@@ -69,7 +73,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     """
 
-    def __init__(self, x, y):
+    def __init__(self, x: ArrayLike1D, y: NumericArrayLike1D) -> None:
         """
         ctor.
 
@@ -88,7 +92,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def __mean(self):
+    def __mean(self) -> float:
         """
         Gets the mean of :math:`\\bar{y}`.
 
@@ -98,7 +102,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def __sigma_cat(self):
+    def __sigma_cat(self) -> float:
         """
         Gets :math:`\\sigma_{\\bar{y}}^2`
 
@@ -112,7 +116,7 @@ class CorrelationRatio(MeasureMixin, object):
         return sigma
 
     @property
-    def __sigma_sam(self):
+    def __sigma_sam(self) -> float:
         """
         Gets :math:`\\sigma_{y}^2`
 
@@ -123,7 +127,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def eta_squared(self):
+    def eta_squared(self) -> float:
         """
         Gets :math:`\\eta^2 = \\frac{\\sigma_{\\bar{y}}^2}{\\sigma_{y}^2}`
 
@@ -136,7 +140,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def eta(self):
+    def eta(self) -> float:
         """
         Gets :math:`\\eta`.
 
@@ -146,7 +150,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def anova(self):
+    def anova(self) -> tuple[float, float]:
         """
         Computes an `ANOVA test <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.f_oneway.html>`_.
 
@@ -158,7 +162,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def kruskal(self):
+    def kruskal(self) -> tuple[float, float]:
         """
         Computes the `Kruskal-Wallis H-test <https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.kruskal.html>`_.
 
@@ -170,7 +174,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def silhouette(self):
+    def silhouette(self) -> float:
         """
         `Silhouette coefficient <https://scikit-learn.org/stable/modules/clustering.html#silhouette-coefficient>`_.
 
@@ -180,7 +184,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def davies_bouldin(self):
+    def davies_bouldin(self) -> float:
         """
         `Davies-Bouldin Index <https://scikit-learn.org/stable/modules/clustering.html#davies-bouldin-index>`_.
 
@@ -190,7 +194,7 @@ class CorrelationRatio(MeasureMixin, object):
 
     @property
     @lru_cache(maxsize=None)
-    def calinski_harabasz(self):
+    def calinski_harabasz(self) -> float:
         """
         `Calinski-Harabasz Index <https://scikit-learn.org/stable/modules/clustering.html#calinski-harabasz-index>`_.
 
@@ -202,18 +206,18 @@ class CorrelationRatio(MeasureMixin, object):
 class ConcordanceMixin(object):
     @property
     @lru_cache(maxsize=None)
-    def __counts(self):
+    def __counts(self) -> ConcordanceCounts:
         return self._d, self._t_xy, self._t_x, self._t_y, self._c, self._n
 
     @property
     @lru_cache(maxsize=None)
-    def __probs(self):
+    def __probs(self) -> tuple[float, float, float, float, float, int]:
         n = self._n
         return self._d / n, self._t_xy / n, self._t_x / n, self._t_y / n, self._c / n, n
 
     @property
     @lru_cache(maxsize=None)
-    def kendall_tau(self):
+    def kendall_tau(self) -> float:
         """
         Kendall's :math:`\\tau` is defined as follows.
 
@@ -233,7 +237,7 @@ class ConcordanceMixin(object):
 
     @property
     @lru_cache(maxsize=None)
-    def somers_d(self):
+    def somers_d(self) -> tuple[float, float]:
         """
         Computes `Somers' d <https://en.wikipedia.org/wiki/Somers%27_D>`_ for two continuous
         variables. Note that Somers' d is defined for :math:`d_{X \\cdot Y}` and :math:`d_{Y \\cdot X}`
@@ -265,7 +269,7 @@ class ConcordanceMixin(object):
 
     @property
     @lru_cache(maxsize=None)
-    def goodman_kruskal_gamma(self):
+    def goodman_kruskal_gamma(self) -> float:
         """
         Goodman-Kruskal :math:`\\gamma` is like Somer's D. It is defined as follows.
 
@@ -296,7 +300,7 @@ class Concordance(MeasureMixin, ConcordanceMixin, object):
     Concordance for continuous and ordinal data.
     """
 
-    def __init__(self, x, y):
+    def __init__(self, x: NumericArrayLike1D, y: NumericArrayLike1D) -> None:
         """
         ctor.
 
@@ -312,7 +316,7 @@ class Concordance(MeasureMixin, ConcordanceMixin, object):
         self._n = n
 
     @staticmethod
-    def __to_counts(x, y):
+    def __to_counts(x: NumericArrayLike1D, y: NumericArrayLike1D) -> ConcordanceCounts:
         """
         Gets the count of concordance, discordance or tie. Two pairs of variables :math:`(X_i, Y_i)`
         and :math:`(X_j, Y_j)` are
@@ -332,7 +336,7 @@ class Concordance(MeasureMixin, ConcordanceMixin, object):
         :return: Counts(D, T_XY, T_X, T_Y, C), n.
         """
 
-        def is_valid(a, b):
+        def is_valid(a: object, b: object) -> bool:
             return a is not None and b is not None
 
         x_vals = []
@@ -379,7 +383,7 @@ class ConcordanceStats(MeasureMixin, ConcordanceMixin):
     Computes concordance stats.
     """
 
-    def __init__(self, d, t_xy, t_x, t_y, c, n):
+    def __init__(self, d: int, t_xy: int, t_x: int, t_y: int, c: int, n: int) -> None:
         """
         ctor.
 
@@ -399,7 +403,7 @@ class ConcordanceStats(MeasureMixin, ConcordanceMixin):
         self._n = n
 
 
-def pd_isna(values):
+def pd_isna(values: ArrayLike1D) -> npt.NDArray[np.bool_]:
     try:
         import pandas as pd
 

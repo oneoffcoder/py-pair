@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC
 from functools import lru_cache, reduce
 from itertools import chain, product
@@ -9,6 +11,7 @@ from scipy import stats
 from scipy.special import binom
 
 from pypair.decorator import timeit, similarity, distance
+from pypair.typing import ArrayLike1D, BinaryCounts, CountTable, DomainValues
 from pypair.util import MeasureMixin, to_numpy
 
 
@@ -1970,7 +1973,7 @@ class ContingencyTable(MeasureMixin, ABC):
     Abstract contingency table. All other tables inherit from this one.
     """
 
-    def __init__(self, table):
+    def __init__(self, table: CountTable) -> None:
         """
         ctor.
 
@@ -1990,8 +1993,16 @@ class ContingencyTable(MeasureMixin, ABC):
         self._table = table
 
     @staticmethod
-    def _to_binary_counts(a, b, a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
-        def to_count(x, y):
+    def _to_binary_counts(
+        a: ArrayLike1D,
+        b: ArrayLike1D,
+        a_0: object = 0,
+        a_1: object = 1,
+        b_0: object = 0,
+        b_1: object = 1,
+        pseudocount: bool = True,
+    ) -> BinaryCounts:
+        def to_count(x: object, y: object) -> BinaryCounts:
             _a, _b, _c, _d = 0, 0, 0, 0
 
             if x == a_1 and y == b_1:
@@ -2004,10 +2015,10 @@ class ContingencyTable(MeasureMixin, ABC):
                 _d = 1
             return _a, _b, _c, _d
 
-        def add_count(x, y):
+        def add_count(x: BinaryCounts, y: BinaryCounts) -> BinaryCounts:
             return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3]
 
-        def is_valid(x, y):
+        def is_valid(x: object, y: object) -> bool:
             return x is not None and y is not None
 
         counts = reduce(
@@ -2020,7 +2031,13 @@ class ContingencyTable(MeasureMixin, ABC):
         return counts
 
     @staticmethod
-    def _to_categorical_counts(a, b, a_vals=None, b_vals=None, pseudocount=True):
+    def _to_categorical_counts(
+        a: ArrayLike1D,
+        b: ArrayLike1D,
+        a_vals: DomainValues | None = None,
+        b_vals: DomainValues | None = None,
+        pseudocount: bool = True,
+    ) -> list[list[int]]:
         a_arr = to_numpy(a)
         b_arr = to_numpy(b)
         mask = (~pd.isna(a_arr)) & (~pd.isna(b_arr))
@@ -2068,7 +2085,14 @@ class CategoricalTable(CategoricalMixin, ContingencyTable):
     - `More Correlation Coefficients <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_
     """
 
-    def __init__(self, a, b, a_vals=None, b_vals=None, pseudocount=True):
+    def __init__(
+        self,
+        a: ArrayLike1D,
+        b: ArrayLike1D,
+        a_vals: DomainValues | None = None,
+        b_vals: DomainValues | None = None,
+        pseudocount: bool = True,
+    ) -> None:
         """
         ctor. If `a_vals` or `b_vals` are `None`, then the possible
         values will be determined empirically from the data.
@@ -2087,7 +2111,16 @@ class BinaryTable(CategoricalMixin, BinaryMixin, ContingencyTable):
     Represents a contingency table for binary variables.
     """
 
-    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
+    def __init__(
+        self,
+        a: ArrayLike1D,
+        b: ArrayLike1D,
+        a_0: object = 0,
+        a_1: object = 1,
+        b_0: object = 0,
+        b_1: object = 1,
+        pseudocount: bool = True,
+    ) -> None:
         """
         ctor.
 
@@ -2135,7 +2168,16 @@ class ConfusionMatrix(ConfusionMixin, ContingencyTable):
          - TP
     """
 
-    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
+    def __init__(
+        self,
+        a: ArrayLike1D,
+        b: ArrayLike1D,
+        a_0: object = 0,
+        a_1: object = 1,
+        b_0: object = 0,
+        b_1: object = 1,
+        pseudocount: bool = True,
+    ) -> None:
         """
         ctor. Note that `a` is the ground truth and `b` is the prediction.
 
@@ -2170,7 +2212,14 @@ class AgreementTable(AgreementMixin, ContingencyTable):
     where the number of rows and columns are equal.
     """
 
-    def __init__(self, a, b, a_vals=None, b_vals=None, pseudocount=True):
+    def __init__(
+        self,
+        a: ArrayLike1D,
+        b: ArrayLike1D,
+        a_vals: DomainValues | None = None,
+        b_vals: DomainValues | None = None,
+        pseudocount: bool = True,
+    ) -> None:
         """
         ctor.
 
@@ -2191,7 +2240,7 @@ class CategoricalStats(CategoricalMixin, ContingencyTable):
     Computes categorical stats.
     """
 
-    def __init__(self, table):
+    def __init__(self, table: CountTable) -> None:
         """
         ctor.
 
@@ -2205,7 +2254,7 @@ class BinaryStats(CategoricalMixin, BinaryMixin, ContingencyTable):
     Computes binary stats.
     """
 
-    def __init__(self, table):
+    def __init__(self, table: CountTable) -> None:
         """
         ctor.
 
@@ -2223,7 +2272,7 @@ class ConfusionStats(ConfusionMixin, ContingencyTable):
     Computes confusion matrix stats.
     """
 
-    def __init__(self, table):
+    def __init__(self, table: CountTable) -> None:
         """
         ctor.
 
@@ -2241,7 +2290,7 @@ class AgreementStats(AgreementMixin, ContingencyTable):
     Computes agreement stats.
     """
 
-    def __init__(self, table):
+    def __init__(self, table: CountTable) -> None:
         """
         ctor.
 

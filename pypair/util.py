@@ -1,18 +1,24 @@
+from __future__ import annotations
+
 from abc import ABC
+from collections.abc import Callable
 from functools import lru_cache
 from itertools import combinations
 from typing import Any
 import warnings
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
+
+from pypair.typing import ArrayLike1D, MeasureComputer, MeasureMap, PairwiseAssociationFn
 
 
 class UndefinedMeasureError(ValueError):
     """Raised when a measure is undefined for the provided data."""
 
 
-def _has_non_finite_numeric(value) -> bool:
+def _has_non_finite_numeric(value: object) -> bool:
     if isinstance(value, (str, bytes)):
         return False
 
@@ -36,8 +42,8 @@ def raise_undefined_measure(measure: str, owner: object | str, detail: str, cont
     raise UndefinedMeasureError(_measure_error_message(measure, owner, detail, context=context))
 
 
-def compute_all_measures(computer, context: str | None = None):
-    measures = {}
+def compute_all_measures(computer: MeasureComputer, context: str | None = None) -> MeasureMap:
+    measures: MeasureMap = {}
     for measure in computer.measures():
         try:
             measures[measure] = computer.get(measure)
@@ -55,12 +61,12 @@ class MeasureMixin(ABC):
     """
 
     @classmethod
-    def measures(cls):
+    def measures(cls) -> list[str]:
         """Gets a list of all the measures."""
         return get_measures(cls)
 
     @lru_cache(maxsize=None)
-    def get(self, measure):
+    def get(self, measure: str) -> Any:
         """Gets the specified measure."""
         try:
             with warnings.catch_warnings():
@@ -87,29 +93,29 @@ class MeasureMixin(ABC):
         return value
 
     @lru_cache(maxsize=None)
-    def get_measures(self):
+    def get_measures(self) -> list[str]:
         """Gets a list of all the measures."""
         return get_measures(self.__class__)
 
 
-def get_measures(clazz):
+def get_measures(clazz: type[object]) -> list[str]:
     """Gets all the measures of a clazz."""
     from itertools import chain
 
-    def is_property(value):
+    def is_property(value: object) -> bool:
         return isinstance(value, property)
 
-    def is_public(name):
+    def is_public(name: str) -> bool:
         return not name.startswith("_")
 
-    def is_valid(name, value):
+    def is_valid(name: str, value: object) -> bool:
         return is_public(name) and is_property(value)
 
     measures = sorted(list(chain(*[[n for n, v in vars(c).items() if is_valid(n, v)] for c in clazz.__mro__])))
     return measures
 
 
-def to_numpy(values: Any, dtype=None) -> np.ndarray:
+def to_numpy(values: ArrayLike1D, dtype: npt.DTypeLike | None = None) -> npt.NDArray[Any]:
     """Converts common sequence / series inputs to a numpy array."""
     if isinstance(values, np.ndarray):
         return values.astype(dtype) if dtype is not None else values
@@ -122,7 +128,9 @@ def to_numpy(values: Any, dtype=None) -> np.ndarray:
     return arr.astype(dtype) if dtype is not None else arr
 
 
-def corr(df, f):
+def corr(
+    df: pd.DataFrame, f: PairwiseAssociationFn | Callable[[pd.Series[Any], pd.Series[Any]], float]
+) -> pd.DataFrame:
     """
     Computes the pairwise association matrix for a pandas dataframe.
 

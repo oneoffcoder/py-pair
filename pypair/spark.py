@@ -1,14 +1,27 @@
+from __future__ import annotations
+
 from collections import namedtuple
+from collections.abc import Iterable, Mapping, Sequence
 from itertools import combinations, product, chain
 from math import sqrt
+from typing import TYPE_CHECKING, Any
 
 from pypair.biserial import BiserialStats
 from pypair.contingency import ConfusionStats, CategoricalStats, BinaryStats, AgreementStats
 from pypair.continuous import ConcordanceStats
+from pypair.typing import BinaryCounts, ConcordanceCounts, MeasureMap
 from pypair.util import compute_all_measures
 
+if TYPE_CHECKING:
+    from pyspark.sql import DataFrame as SparkDataFrame
+else:
+    SparkDataFrame = Any
 
-def __as_key(k1, k2):
+PairKey = tuple[str, str]
+SparkPairRDD = Any
+
+
+def __as_key(k1: str, k2: str) -> PairKey:
     """
     Creates a key (tuple) out of the two specified. The key is always ordered.
     If k2 < k1, then (k2, k1), else, (k1, k2).
@@ -21,7 +34,7 @@ def __as_key(k1, k2):
     return keys[0], keys[1]
 
 
-def __to_abcd_counts(d):
+def __to_abcd_counts(d: Mapping[str, Any]) -> list[tuple[PairKey, BinaryCounts]]:
     """
     Maps the paired keys in the dictionary and their associated values to a form: ``(k1, k2), (a, b, c, d)``.
 
@@ -29,7 +42,7 @@ def __to_abcd_counts(d):
     :return: A list of tuples of the form: (k1, k2), (a, b, c, d).
     """
 
-    def as_count(v1, v2):
+    def as_count(v1: object, v2: object) -> BinaryCounts:
         """
         Maps the specified values to a (TP or 11), b (FN or 10), c (FP or 01) and d (TN or 00).
         Only one of these will be 1, and the others will be 0. Look below for example.
@@ -55,7 +68,7 @@ def __to_abcd_counts(d):
                 d = 1
         return a, b, c, d
 
-    def transform(k1, k2):
+    def transform(k1: str, k2: str) -> tuple[PairKey, BinaryCounts]:
         """
         Transforms the keys and associated value to the form (a tuple of tuples): (k1, k2), (a, b, c, d).
 
@@ -69,7 +82,7 @@ def __to_abcd_counts(d):
     return [transform(k1, k2) for k1, k2 in combinations(d.keys(), 2)]
 
 
-def __add_abcd_counts(x, y):
+def __add_abcd_counts(x: BinaryCounts, y: BinaryCounts) -> BinaryCounts:
     """
     Adds two tuples. For example.
 
@@ -82,7 +95,7 @@ def __add_abcd_counts(x, y):
     return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3]
 
 
-def __add_concordance_counts(x, y):
+def __add_concordance_counts(x: ConcordanceCounts, y: ConcordanceCounts) -> ConcordanceCounts:
     """
     Adds two tuples. For example.
 
@@ -95,7 +108,7 @@ def __add_concordance_counts(x, y):
     return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3], x[4] + y[4], x[5] + y[5]
 
 
-def __get_contingency_table(sdf, pseudocount=True):
+def __get_contingency_table(sdf: SparkDataFrame, pseudocount: bool = True) -> SparkPairRDD:
     """
     Gets the pairwise contingency tables. Each record in the pair-RDD returns has the following form.
 
@@ -113,7 +126,7 @@ def __get_contingency_table(sdf, pseudocount=True):
     :return: Spark pair-RDD.
     """
 
-    def to_count(d):
+    def to_count(d: Mapping[str, Any]) -> list[tuple[tuple[str, str, Any, Any], int]]:
         def count(k1, k2):
             tups = [(k1, d[k1]), (k2, d[k2])]
             tups = sorted(tups, key=lambda t: t[0])
@@ -122,14 +135,18 @@ def __get_contingency_table(sdf, pseudocount=True):
 
         return [count(k1, k2) for k1, k2 in combinations(d.keys(), 2)]
 
-    def attach_domains(tup):
+    def attach_domains(
+        tup: tuple[PairKey, dict[tuple[Any, Any], int]],
+    ) -> tuple[PairKey, tuple[dict[tuple[Any, Any], int], list[Any], list[Any]]]:
         key, d = tup
         v1 = sorted(list({k[0] for k, _ in d.items()}))
         v2 = sorted(list({k[1] for k, _ in d.items()}))
 
         return key, (d, v1, v2)
 
-    def to_contingency_table(tup):
+    def to_contingency_table(
+        tup: tuple[PairKey, tuple[dict[tuple[Any, Any], int], list[Any], list[Any]]],
+    ) -> tuple[PairKey, list[list[int]]]:
         key, (d, v1, v2) = tup
         base_count = 1 if pseudocount else 0
         table = [[d[(a, b)] if (a, b) in d else base_count for b in v2] for a in v1]
@@ -148,7 +165,7 @@ def __get_contingency_table(sdf, pseudocount=True):
     )
 
 
-def binary_binary(sdf, pseudocount=True):
+def binary_binary(sdf: SparkDataFrame, pseudocount: bool = True) -> SparkPairRDD:
     """
     Gets all the pairwise binary-binary association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
@@ -160,7 +177,7 @@ def binary_binary(sdf, pseudocount=True):
     :return: Spark pair-RDD.
     """
 
-    def to_results(counts):
+    def to_results(counts: tuple[PairKey, BinaryCounts]) -> tuple[PairKey, MeasureMap]:
         """
         Converts the result of the contingency table counts to a dictionary of association measures.
 
@@ -183,7 +200,7 @@ def binary_binary(sdf, pseudocount=True):
     )
 
 
-def confusion(sdf, pseudocount=True):
+def confusion(sdf: SparkDataFrame, pseudocount: bool = True) -> SparkPairRDD:
     """
     Gets all the pairwise confusion matrix metrics. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
@@ -196,7 +213,7 @@ def confusion(sdf, pseudocount=True):
     :return: Spark pair-RDD.
     """
 
-    def to_results(counts):
+    def to_results(counts: tuple[PairKey, BinaryCounts]) -> tuple[PairKey, MeasureMap]:
         """
         Converts the result of the contingency table counts to a dictionary of association measures.
 
@@ -223,7 +240,7 @@ def confusion(sdf, pseudocount=True):
     )
 
 
-def categorical_categorical(sdf, pseudocount=True):
+def categorical_categorical(sdf: SparkDataFrame, pseudocount: bool = True) -> SparkPairRDD:
     """
     Gets all pairwise categorical-categorical association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
@@ -235,7 +252,7 @@ def categorical_categorical(sdf, pseudocount=True):
     :return: Spark pair-RDD.
     """
 
-    def to_results(tup):
+    def to_results(tup: tuple[PairKey, list[list[int]]]) -> tuple[PairKey, MeasureMap]:
         key, table = tup
         computer = CategoricalStats(table)
         measures = compute_all_measures(computer, context=f"pair {key} in categorical_categorical")
@@ -244,7 +261,7 @@ def categorical_categorical(sdf, pseudocount=True):
     return __get_contingency_table(sdf, pseudocount=pseudocount).map(lambda tup: to_results(tup)).sortByKey()
 
 
-def agreement(sdf, pseudocount=True):
+def agreement(sdf: SparkDataFrame, pseudocount: bool = True) -> SparkPairRDD:
     """
     Gets all pairwise categorical-categorical `agreement` association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
@@ -256,7 +273,7 @@ def agreement(sdf, pseudocount=True):
     :return: Spark pair-RDD.
     """
 
-    def to_results(tup):
+    def to_results(tup: tuple[PairKey, list[list[int]]]) -> tuple[PairKey, MeasureMap]:
         key, table = tup
         computer = AgreementStats(table)
         measures = compute_all_measures(computer, context=f"pair {key} in agreement")
@@ -265,7 +282,13 @@ def agreement(sdf, pseudocount=True):
     return __get_contingency_table(sdf, pseudocount=pseudocount).map(lambda tup: to_results(tup)).sortByKey()
 
 
-def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
+def binary_continuous(
+    sdf: SparkDataFrame,
+    binary: Sequence[str],
+    continuous: Sequence[str],
+    b_0: object = 0,
+    b_1: object = 1,
+) -> SparkPairRDD:
     """
     Gets all pairwise binary-continuous association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
@@ -286,7 +309,7 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
     :return: Spark pair-RDD.
     """
 
-    def to_pair1(d):
+    def to_pair1(d: Mapping[str, Any]) -> list[tuple[tuple[str, str, Any], tuple[float, float, int]]]:
         """
         Creates a list of tuples.
 
@@ -295,7 +318,9 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
         """
         return [((b, c, d[b]), (d[c], d[c] ** 2, 1)) for b, c in product(*[binary, continuous])]
 
-    def to_pair2(tup):
+    def to_pair2(
+        tup: tuple[tuple[str, str, Any], tuple[float, float, int]],
+    ) -> tuple[PairKey, tuple[Any, float, float, int]]:
         """
         Makes a new pair.
 
@@ -305,7 +330,9 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
         (b, c, b_val), (sum_c, sum_c_sq, sum_b) = tup
         return (b, c), (b_val, sum_c, sum_c_sq, sum_b)
 
-    def compute_stats(tup):
+    def compute_stats(
+        tup: tuple[PairKey, Iterable[tuple[Any, float, float, int]]],
+    ) -> tuple[PairKey, tuple[int, float, float, float, float]]:
         """
         `Computational formula for variance and standard deviation <http://www.ablongman.com/graziano6e/text_site/MATERIAL/Stats/manvar.htm>`_.
 
@@ -335,7 +362,7 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
 
         return (b, c), (n, p, y_0, y_1, std)
 
-    def to_results(tup):
+    def to_results(tup: tuple[PairKey, tuple[int, float, float, float, float]]) -> tuple[PairKey, MeasureMap]:
         """
         Computes the results.
 
@@ -358,7 +385,11 @@ def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
     )
 
 
-def categorical_continuous(sdf, categorical, continuous):
+def categorical_continuous(
+    sdf: SparkDataFrame,
+    categorical: Sequence[str],
+    continuous: Sequence[str],
+) -> SparkPairRDD:
     """
     Gets all pairwise categorical-continuous association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
@@ -375,7 +406,7 @@ def categorical_continuous(sdf, categorical, continuous):
     :return: Spark pair-RDD.
     """
 
-    def to_pair1(d):
+    def to_pair1(d: Mapping[str, Any]) -> Iterable[tuple[tuple[str, str, Any], tuple[float, float, int]]]:
         """
         Creates a list of tuples.
 
@@ -397,7 +428,9 @@ def categorical_continuous(sdf, categorical, continuous):
 
         return chain(*(explode(cat, con) for cat, con in product(*[categorical, continuous])))
 
-    def to_pair2(tup):
+    def to_pair2(
+        tup: tuple[tuple[str, str, Any], tuple[float, float, int]],
+    ) -> tuple[PairKey, tuple[Any, float | tuple[float, int]]]:
         """
         Makes a new pair.
 
@@ -420,7 +453,9 @@ def categorical_continuous(sdf, categorical, continuous):
 
         return key, (flag, val)
 
-    def to_results(tup):
+    def to_results(
+        tup: tuple[PairKey, Iterable[tuple[Any, float | tuple[float, int]]]],
+    ) -> tuple[PairKey, dict[str, float]]:
         """
         Computes the results.
 
@@ -447,7 +482,7 @@ def categorical_continuous(sdf, categorical, continuous):
     )
 
 
-def concordance(sdf, pseudocount=True):
+def concordance(sdf: SparkDataFrame, pseudocount: bool = True) -> SparkPairRDD:
     """
     Gets all the pairwise ordinal-ordinal concordance measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
@@ -459,7 +494,7 @@ def concordance(sdf, pseudocount=True):
     :return: Spark pair-RDD.
     """
 
-    def as_pair1(n1, n2, v1, v2):
+    def as_pair1(n1: str, n2: str, v1: object, v2: object) -> tuple[PairKey, tuple[object, object]]:
         """
         Creates a pair of the form (n1, n2), (v1, v2) where the first tuple are sorted and the second
         tuple have corresponding values to the elements of the first tuple.
@@ -477,7 +512,7 @@ def concordance(sdf, pseudocount=True):
 
         return (k1, k2), (j1, j2)
 
-    def to_pair1(d):
+    def to_pair1(d: Mapping[str, Any]) -> list[tuple[PairKey, tuple[object, object]]]:
         """
         Creates a list of pairs of variables and values. Keys are names of variables and values are values of
         those variables.
@@ -487,7 +522,7 @@ def concordance(sdf, pseudocount=True):
         """
         return [as_pair1(n1, n2, d[n1], d[n2]) for n1, n2 in combinations(d.keys(), 2)]
 
-    def as_count(v1, v2):
+    def as_count(v1: object, v2: object) -> ConcordanceCounts:
         """
         Maps the specified pairs of values to concordance status. Concordance status can be the follow.
 
@@ -534,7 +569,7 @@ def concordance(sdf, pseudocount=True):
 
         return d, t_xy, t_x, t_y, c, n
 
-    def to_pair2(tup):
+    def to_pair2(tup: tuple[PairKey, Iterable[tuple[object, object]]]) -> Iterable[tuple[PairKey, ConcordanceCounts]]:
         """
         Creates concordant status counts for each pair of observations.
 
@@ -545,7 +580,7 @@ def concordance(sdf, pseudocount=True):
 
         return ((key, as_count(v1, v2)) for v1, v2 in combinations(data, 2))
 
-    def to_results(counts):
+    def to_results(counts: tuple[PairKey, ConcordanceCounts]) -> tuple[PairKey, MeasureMap]:
         """
         Converts the results of concordance to a dictionary of measures.
 
@@ -576,7 +611,7 @@ def concordance(sdf, pseudocount=True):
     )
 
 
-def continuous_continuous(sdf):
+def continuous_continuous(sdf: SparkDataFrame) -> SparkPairRDD:
     """
     Gets all the pairwise continuous-continuous association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
@@ -592,7 +627,7 @@ def continuous_continuous(sdf):
 
     CorrItem = namedtuple("CorrItem", "x y xy x_sq y_sq n")
 
-    def to_items(d):
+    def to_items(d: Mapping[str, float]) -> Iterable[tuple[PairKey, Any]]:
         """
         Converts the dictionary to (n1, n2), CorrItem.
 
@@ -605,7 +640,7 @@ def continuous_continuous(sdf):
 
         return (((n1, n2), as_item(n1, n2)) for n1, n2 in combinations(d.keys(), 2))
 
-    def add_items(a, b):
+    def add_items(a: Any, b: Any) -> Any:
         """
         Adds two CorrItems.
 
@@ -615,7 +650,7 @@ def continuous_continuous(sdf):
         """
         return CorrItem(a.x + b.x, a.y + b.y, a.xy + b.xy, a.x_sq + b.x_sq, a.y_sq + b.y_sq, a.n + b.n)
 
-    def to_results(tup):
+    def to_results(tup: tuple[PairKey, Any]) -> tuple[PairKey, dict[str, float]]:
         """
         Converts the tup to a result.
 

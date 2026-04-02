@@ -59,6 +59,19 @@ eta = categorical_continuous(a, b, measure='eta')
 pearson = continuous_continuous(a, b, measure='pearson')
 ```
 
+## Input types
+
+Local pairwise APIs accept 1D array-like inputs:
+
+- `numpy.ndarray`
+- `pandas.Series`
+- Python lists / tuples
+- Other iterables that can be consumed once
+
+Use categorical/object-like inputs for categorical metrics and numeric inputs for continuous or concordance metrics. For best runtime and lowest allocation overhead, prefer already-materialized `numpy.ndarray` or `pandas.Series` inputs with the right dtype instead of generators or mixed-object containers.
+
+The shared type aliases live in `pypair.typing`, for example `ArrayLike1D` and `NumericArrayLike1D`.
+
 ## DataFrame integration
 
 - **Pandas**: use `pypair.util.corr(df, func)` to build pairwise association matrices.
