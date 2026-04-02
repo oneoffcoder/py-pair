@@ -3,12 +3,13 @@ from functools import lru_cache, reduce
 from itertools import chain, product
 from math import sqrt, log2, pi, log, cos
 
+import numpy as np
 import pandas as pd
 from scipy import stats
 from scipy.special import binom
 
 from pypair.decorator import timeit, similarity, distance
-from pypair.util import MeasureMixin
+from pypair.util import MeasureMixin, to_numpy
 
 
 class CategoricalMixin(object):
@@ -2020,31 +2021,41 @@ class ContingencyTable(MeasureMixin, ABC):
 
     @staticmethod
     def _to_categorical_counts(a, b, a_vals=None, b_vals=None, pseudocount=True):
-        pairs = [(x, y) for x, y in zip(a, b) if x is not None and y is not None and not pd.isna(x) and not pd.isna(y)]
+        a_arr = to_numpy(a)
+        b_arr = to_numpy(b)
+        mask = (~pd.isna(a_arr)) & (~pd.isna(b_arr))
+        a_valid = a_arr[mask]
+        b_valid = b_arr[mask]
 
-        if a_vals is None:
-            a_values = sorted({x for x, _ in pairs})
-        else:
-            a_values = list(a_vals)
-
-        if b_vals is None:
-            b_values = sorted({y for _, y in pairs})
-        else:
-            b_values = list(b_vals)
-
-        if not a_values or not b_values:
+        if a_valid.size == 0 or b_valid.size == 0:
             raise ValueError("Contingency table is empty; no valid paired samples were available.")
 
-        i_map = {v: i for i, v in enumerate(a_values)}
-        j_map = {v: j for j, v in enumerate(b_values)}
         base_count = 1 if pseudocount else 0
-        table = [[base_count for _ in b_values] for _ in a_values]
 
-        for x, y in pairs:
-            if x in i_map and y in j_map:
-                table[i_map[x]][j_map[y]] += 1
+        if a_vals is None and b_vals is None:
+            a_values, a_inverse = np.unique(a_valid, return_inverse=True)
+            b_values, b_inverse = np.unique(b_valid, return_inverse=True)
+            table = np.full((a_values.size, b_values.size), base_count, dtype=int)
+            np.add.at(table, (a_inverse, b_inverse), 1)
+            return table.tolist()
 
-        return table
+        a_values = np.asarray(list(a_vals) if a_vals is not None else np.unique(a_valid))
+        b_values = np.asarray(list(b_vals) if b_vals is not None else np.unique(b_valid))
+
+        if a_values.size == 0 or b_values.size == 0:
+            raise ValueError("Contingency table is empty; no valid paired samples were available.")
+
+        i_map = {value: index for index, value in enumerate(a_values.tolist())}
+        j_map = {value: index for index, value in enumerate(b_values.tolist())}
+        table = np.full((a_values.size, b_values.size), base_count, dtype=int)
+
+        for x, y in zip(a_valid.tolist(), b_valid.tolist()):
+            i = i_map.get(x)
+            j = j_map.get(y)
+            if i is not None and j is not None:
+                table[i, j] += 1
+
+        return table.tolist()
 
 
 class CategoricalTable(CategoricalMixin, ContingencyTable):

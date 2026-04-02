@@ -1,5 +1,4 @@
-from functools import reduce, lru_cache
-from itertools import combinations
+from functools import lru_cache
 from math import sqrt
 
 import numpy as np
@@ -7,36 +6,6 @@ from scipy.stats import pearsonr, spearmanr, kendalltau, f_oneway, kruskal, linr
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
 from pypair.util import MeasureMixin, to_numpy
-
-
-class ConcordantCounts(object):
-    """
-    Stores the concordance, discordant and tie counts.
-    """
-
-    def __init__(self, d, t_xy, t_x, t_y, c):
-        """
-        ctor.
-
-        :param d: Discordant.
-        :param t_xy: Tie.
-        :param t_x: Tie on X.
-        :param t_y: Tie on Y.
-        :param c: Concordant.
-        """
-        self.d = d
-        self.t_xy = t_xy
-        self.t_x = t_x
-        self.t_y = t_y
-        self.c = c
-
-    def __add__(self, other):
-        d = self.d + other.d
-        t_xy = self.t_xy + other.t_xy
-        t_x = self.t_x + other.t_x
-        t_y = self.t_y + other.t_y
-        c = self.c + other.c
-        return ConcordantCounts(d, t_xy, t_x, t_y, c)
 
 
 class Continuous(MeasureMixin, object):
@@ -363,43 +332,46 @@ class Concordance(MeasureMixin, ConcordanceMixin, object):
         :return: Counts(D, T_XY, T_X, T_Y, C), n.
         """
 
-        def get_concordance(p1, p2):
-            x_i, y_i = p1
-            x_j, y_j = p2
-
-            d = 0
-            t_xy = 0
-            t_x = 0
-            t_y = 0
-            c = 0
-
-            r = (x_j - x_i) * (y_j - y_i)
-
-            if r > 0:
-                c = 1
-            elif r < 0:
-                d = 1
-            else:
-                if x_i == x_j and y_i == y_j:
-                    t_xy = 1
-                elif x_i == x_j:
-                    t_x = 1
-                elif y_i == y_j:
-                    t_y = 1
-
-            return ConcordantCounts(d, t_xy, t_x, t_y, c)
-
         def is_valid(a, b):
             return a is not None and b is not None
 
-        data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
-        if len(data) < 2:
+        x_vals = []
+        y_vals = []
+        for a, b in zip(x, y):
+            if is_valid(a, b):
+                x_vals.append(a)
+                y_vals.append(b)
+
+        n = len(x_vals)
+        if n < 2:
             raise ValueError("At least two valid paired samples are required to compute concordance statistics.")
-        results = combinations(data, 2)
-        results = map(lambda tup: get_concordance(tup[0], tup[1]), results)
-        c = reduce(lambda c1, c2: c1 + c2, results)
-        n = len(data)
-        return c.d, c.t_xy, c.t_x, c.t_y, c.c, n
+
+        d = 0
+        t_xy = 0
+        t_x = 0
+        t_y = 0
+        c = 0
+
+        for i in range(n - 1):
+            x_i = x_vals[i]
+            y_i = y_vals[i]
+            for j in range(i + 1, n):
+                x_j = x_vals[j]
+                y_j = y_vals[j]
+                r = (x_j - x_i) * (y_j - y_i)
+
+                if r > 0:
+                    c += 1
+                elif r < 0:
+                    d += 1
+                elif x_i == x_j and y_i == y_j:
+                    t_xy += 1
+                elif x_i == x_j:
+                    t_x += 1
+                elif y_i == y_j:
+                    t_y += 1
+
+        return d, t_xy, t_x, t_y, c, n
 
 
 class ConcordanceStats(MeasureMixin, ConcordanceMixin):

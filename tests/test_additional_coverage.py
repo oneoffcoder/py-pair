@@ -138,6 +138,8 @@ def test_contingency_helpers_cover_edge_cases():
         ContingencyTable([])
     with pytest.raises(ValueError, match="Contingency table is empty"):
         ContingencyTable._to_categorical_counts([], [], pseudocount=False)
+    with pytest.raises(ValueError, match="Contingency table is empty"):
+        ContingencyTable._to_categorical_counts(["x"], ["y"], a_vals=[], b_vals=["y"], pseudocount=False)
 
     table = ContingencyTable._to_categorical_counts(
         ["x", None, "z", "ignore"],
