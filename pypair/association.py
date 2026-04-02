@@ -3,7 +3,7 @@ from pypair.contingency import BinaryTable, CategoricalTable, ConfusionMatrix, A
 from pypair.continuous import Concordance, CorrelationRatio, Continuous
 
 
-def confusion(a, b, measure="acc", a_0=0, a_1=1, b_0=0, b_1=1):
+def confusion(a, b, measure="acc", a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
     """
     Gets the specified confusion matrix stats.
 
@@ -18,10 +18,10 @@ def confusion(a, b, measure="acc", a_0=0, a_1=1, b_0=0, b_1=1):
     """
     if measure not in ConfusionMatrix.measures():
         raise ValueError(f"{measure} is not a valid association measure.")
-    return ConfusionMatrix(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
+    return ConfusionMatrix(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1, pseudocount=pseudocount).get(measure)
 
 
-def binary_binary(a, b, measure="chisq", a_0=0, a_1=1, b_0=0, b_1=1):
+def binary_binary(a, b, measure="chisq", a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
     """
     Gets the binary-binary association.
 
@@ -36,10 +36,10 @@ def binary_binary(a, b, measure="chisq", a_0=0, a_1=1, b_0=0, b_1=1):
     """
     if measure not in BinaryTable.measures():
         raise ValueError(f"{measure} is not a valid association measure.")
-    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1).get(measure)
+    return BinaryTable(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1, pseudocount=pseudocount).get(measure)
 
 
-def categorical_categorical(a, b, measure="chisq", a_vals=None, b_vals=None):
+def categorical_categorical(a, b, measure="chisq", a_vals=None, b_vals=None, pseudocount=True):
     """
     Gets the categorical-categorical association.
 
@@ -52,10 +52,10 @@ def categorical_categorical(a, b, measure="chisq", a_vals=None, b_vals=None):
     """
     if measure not in CategoricalTable.measures():
         raise ValueError(f"{measure} is not a valid association measure.")
-    return CategoricalTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
+    return CategoricalTable(a, b, a_vals=a_vals, b_vals=b_vals, pseudocount=pseudocount).get(measure)
 
 
-def agreement(a, b, measure="chohen_k", a_vals=None, b_vals=None):
+def agreement(a, b, measure="chohen_k", a_vals=None, b_vals=None, pseudocount=True):
     """
     Gets the agreement association.
 
@@ -68,7 +68,7 @@ def agreement(a, b, measure="chohen_k", a_vals=None, b_vals=None):
     """
     if measure not in AgreementTable.measures():
         raise ValueError(f"{measure} is not a valid association measure.")
-    return AgreementTable(a, b, a_vals=a_vals, b_vals=b_vals).get(measure)
+    return AgreementTable(a, b, a_vals=a_vals, b_vals=b_vals, pseudocount=pseudocount).get(measure)
 
 
 def binary_continuous(b, c, measure="biserial", b_0=0, b_1=1):

@@ -1975,6 +1975,9 @@ class ContingencyTable(MeasureMixin, ABC):
 
         :param table: A table of counts (list of lists).
         """
+        if not table or not table[0]:
+            raise ValueError("Contingency table is empty; no valid paired samples were available.")
+
         n_rows = len(table)
         n_cols = len(table[0])
 
@@ -1986,7 +1989,7 @@ class ContingencyTable(MeasureMixin, ABC):
         self._table = table
 
     @staticmethod
-    def _to_binary_counts(a, b, a_0=0, a_1=1, b_0=0, b_1=1):
+    def _to_binary_counts(a, b, a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
         def to_count(x, y):
             _a, _b, _c, _d = 0, 0, 0, 0
 
@@ -2006,13 +2009,17 @@ class ContingencyTable(MeasureMixin, ABC):
         def is_valid(x, y):
             return x is not None and y is not None
 
-        counts = (to_count(x, y) for x, y in zip(a, b) if is_valid(x, y))
-        counts = reduce(lambda x, y: add_count(x, y), counts)
-        counts = add_count(counts, (1, 1, 1, 1))
+        counts = reduce(
+            lambda total, pair: add_count(total, to_count(pair[0], pair[1])),
+            ((x, y) for x, y in zip(a, b) if is_valid(x, y)),
+            (0, 0, 0, 0),
+        )
+        if pseudocount:
+            counts = add_count(counts, (1, 1, 1, 1))
         return counts
 
     @staticmethod
-    def _to_categorical_counts(a, b, a_vals=None, b_vals=None):
+    def _to_categorical_counts(a, b, a_vals=None, b_vals=None, pseudocount=True):
         pairs = [(x, y) for x, y in zip(a, b) if x is not None and y is not None and not pd.isna(x) and not pd.isna(y)]
 
         if a_vals is None:
@@ -2025,9 +2032,13 @@ class ContingencyTable(MeasureMixin, ABC):
         else:
             b_values = list(b_vals)
 
+        if not a_values or not b_values:
+            raise ValueError("Contingency table is empty; no valid paired samples were available.")
+
         i_map = {v: i for i, v in enumerate(a_values)}
         j_map = {v: j for j, v in enumerate(b_values)}
-        table = [[1 for _ in b_values] for _ in a_values]
+        base_count = 1 if pseudocount else 0
+        table = [[base_count for _ in b_values] for _ in a_values]
 
         for x, y in pairs:
             if x in i_map and y in j_map:
@@ -2046,7 +2057,7 @@ class CategoricalTable(CategoricalMixin, ContingencyTable):
     - `More Correlation Coefficients <https://www.andrews.edu/~calkins/math/edrm611/edrm13.htm#TETRA>`_
     """
 
-    def __init__(self, a, b, a_vals=None, b_vals=None):
+    def __init__(self, a, b, a_vals=None, b_vals=None, pseudocount=True):
         """
         ctor. If `a_vals` or `b_vals` are `None`, then the possible
         values will be determined empirically from the data.
@@ -2056,7 +2067,7 @@ class CategoricalTable(CategoricalMixin, ContingencyTable):
         :param a_vals: All possible values in a. Defaults to `None`.
         :param b_vals: All possible values in b. Defaults to `None`.
         """
-        table = ContingencyTable._to_categorical_counts(a, b, a_vals=a_vals, b_vals=b_vals)
+        table = ContingencyTable._to_categorical_counts(a, b, a_vals=a_vals, b_vals=b_vals, pseudocount=pseudocount)
         super().__init__(table)
 
 
@@ -2065,7 +2076,7 @@ class BinaryTable(CategoricalMixin, BinaryMixin, ContingencyTable):
     Represents a contingency table for binary variables.
     """
 
-    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
+    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
         """
         ctor.
 
@@ -2076,7 +2087,15 @@ class BinaryTable(CategoricalMixin, BinaryMixin, ContingencyTable):
         :param b_0: The zero value for b. Defaults to 0.
         :param b_1: The zero value for b. Defaults to 1.
         """
-        a, b, c, d = ContingencyTable._to_binary_counts(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1)
+        a, b, c, d = ContingencyTable._to_binary_counts(
+            a,
+            b,
+            a_0=a_0,
+            a_1=a_1,
+            b_0=b_0,
+            b_1=b_1,
+            pseudocount=pseudocount,
+        )
         super().__init__([[a, b], [c, d]])
         self._a = a
         self._b = b
@@ -2105,7 +2124,7 @@ class ConfusionMatrix(ConfusionMixin, ContingencyTable):
          - TP
     """
 
-    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1):
+    def __init__(self, a, b, a_0=0, a_1=1, b_0=0, b_1=1, pseudocount=True):
         """
         ctor. Note that `a` is the ground truth and `b` is the prediction.
 
@@ -2116,7 +2135,15 @@ class ConfusionMatrix(ConfusionMixin, ContingencyTable):
         :param b_0: The zero value for b. Defaults to 0.
         :param b_1: The zero value for b. Defaults to 1.
         """
-        tp, fn, fp, tn = ContingencyTable._to_binary_counts(a, b, a_0=a_0, a_1=a_1, b_0=b_0, b_1=b_1)
+        tp, fn, fp, tn = ContingencyTable._to_binary_counts(
+            a,
+            b,
+            a_0=a_0,
+            a_1=a_1,
+            b_0=b_0,
+            b_1=b_1,
+            pseudocount=pseudocount,
+        )
         super().__init__([[tp, fn], [fp, tn]])
         self._tp = tp
         self._fn = fn
@@ -2132,7 +2159,7 @@ class AgreementTable(AgreementMixin, ContingencyTable):
     where the number of rows and columns are equal.
     """
 
-    def __init__(self, a, b, a_vals=None, b_vals=None):
+    def __init__(self, a, b, a_vals=None, b_vals=None, pseudocount=True):
         """
         ctor.
 
@@ -2141,7 +2168,7 @@ class AgreementTable(AgreementMixin, ContingencyTable):
         :param a_vals: Values in `a`. Default `None`; figure out empirically.
         :param b_vals: Values in `b`. Default `None`; figure out empirically.
         """
-        table = ContingencyTable._to_categorical_counts(a, b, a_vals=a_vals, b_vals=b_vals)
+        table = ContingencyTable._to_categorical_counts(a, b, a_vals=a_vals, b_vals=b_vals, pseudocount=pseudocount)
         super().__init__(table)
 
         if self._k != self._r:

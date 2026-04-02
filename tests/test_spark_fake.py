@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 
+import pytest
+
 import pypair.spark as spark
+from pypair.util import UndefinedMeasureError
 
 
 @dataclass
@@ -134,3 +137,15 @@ def test_spark_contingency_helper_and_public_functions():
     continuous_result = spark.continuous_continuous(FakeDataFrame(continuous_rows)).collect()
     assert continuous_result
     assert "pearson" in continuous_result[0][1]
+
+
+def test_spark_pseudocount_can_be_disabled():
+    degenerate_binary = FakeDataFrame([{"x1": 1, "x2": 1}, {"x1": 1, "x2": 1}, {"x1": 1, "x2": 1}])
+    assert spark.binary_binary(degenerate_binary).count() == 1
+    with pytest.raises(UndefinedMeasureError, match=r"pair \(x1, x2\) in binary_binary"):
+        spark.binary_binary(degenerate_binary, pseudocount=False).collect()
+
+    degenerate_concordance = FakeDataFrame([{"x": 1, "y": 1}, {"x": 1, "y": 1}, {"x": 1, "y": 1}])
+    assert spark.concordance(degenerate_concordance).count() == 1
+    with pytest.raises(UndefinedMeasureError, match=r"pair \(x, y\) in concordance"):
+        spark.concordance(degenerate_concordance, pseudocount=False).collect()

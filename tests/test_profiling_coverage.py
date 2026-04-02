@@ -1,4 +1,4 @@
-import subprocess
+import runpy
 import sys
 from pathlib import Path
 
@@ -118,11 +118,11 @@ def test_parser_and_main_output(monkeypatch, capsys, tmp_path):
     assert "Internal timings" in output
 
 
-def test_module_main_guard_executes(tmp_path):
-    completed = subprocess.run(
+def test_module_main_guard_executes(monkeypatch, capsys, tmp_path):
+    monkeypatch.setattr(
+        sys,
+        "argv",
         [
-            sys.executable,
-            "-m",
             "pypair.profiling",
             "--workload",
             "corr",
@@ -139,10 +139,12 @@ def test_module_main_guard_executes(tmp_path):
             "--memory-output",
             str(Path(tmp_path / "memory.txt")),
         ],
-        check=True,
-        capture_output=True,
-        text=True,
     )
-    output = completed.stdout
+
+    with pytest.raises(SystemExit) as exc:
+        runpy.run_path(str(Path(profiling.__file__)), run_name="__main__")
+
+    assert exc.value.code == 0
+    output = capsys.readouterr().out
     assert "Wrote cProfile stats to" in output
     assert "Memory profile" in output

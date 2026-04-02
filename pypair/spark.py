@@ -5,6 +5,7 @@ from math import sqrt
 from pypair.biserial import BiserialStats
 from pypair.contingency import ConfusionStats, CategoricalStats, BinaryStats, AgreementStats
 from pypair.continuous import ConcordanceStats
+from pypair.util import compute_all_measures
 
 
 def __as_key(k1, k2):
@@ -94,7 +95,7 @@ def __add_concordance_counts(x, y):
     return x[0] + y[0], x[1] + y[1], x[2] + y[2], x[3] + y[3], x[4] + y[4], x[5] + y[5]
 
 
-def __get_contingency_table(sdf):
+def __get_contingency_table(sdf, pseudocount=True):
     """
     Gets the pairwise contingency tables. Each record in the pair-RDD returns has the following form.
 
@@ -130,7 +131,8 @@ def __get_contingency_table(sdf):
 
     def to_contingency_table(tup):
         key, (d, v1, v2) = tup
-        table = [[d[(a, b)] if (a, b) in d else 0 for b in v2] for a in v1]
+        base_count = 1 if pseudocount else 0
+        table = [[d[(a, b)] if (a, b) in d else base_count for b in v2] for a in v1]
 
         return key, table
 
@@ -146,7 +148,7 @@ def __get_contingency_table(sdf):
     )
 
 
-def binary_binary(sdf):
+def binary_binary(sdf, pseudocount=True):
     """
     Gets all the pairwise binary-binary association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
@@ -167,8 +169,10 @@ def binary_binary(sdf):
         """
         (x1, x2), (a, b, c, d) = counts
 
-        computer = BinaryStats([[a + 1, b + 1], [c + 1, d + 1]])
-        measures = {m: computer.get(m) for m in computer.measures()}
+        if pseudocount:
+            a, b, c, d = a + 1, b + 1, c + 1, d + 1
+        computer = BinaryStats([[a, b], [c, d]])
+        measures = compute_all_measures(computer, context=f"pair ({x1}, {x2}) in binary_binary")
         return (x1, x2), measures
 
     return (
@@ -179,7 +183,7 @@ def binary_binary(sdf):
     )
 
 
-def confusion(sdf):
+def confusion(sdf, pseudocount=True):
     """
     Gets all the pairwise confusion matrix metrics. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
@@ -201,13 +205,14 @@ def confusion(sdf):
         """
         (x1, x2), (tp, fn, fp, tn) = counts
 
-        tp = max(1, tp)
-        fn = max(1, fn)
-        fp = max(1, fp)
-        tn = max(1, tn)
+        if pseudocount:
+            tp = max(1, tp)
+            fn = max(1, fn)
+            fp = max(1, fp)
+            tn = max(1, tn)
 
         computer = ConfusionStats([[tp, fn], [fp, tn]])
-        measures = {m: computer.get(m) for m in computer.measures()}
+        measures = compute_all_measures(computer, context=f"pair ({x1}, {x2}) in confusion")
         return (x1, x2), measures
 
     return (
@@ -218,7 +223,7 @@ def confusion(sdf):
     )
 
 
-def categorical_categorical(sdf):
+def categorical_categorical(sdf, pseudocount=True):
     """
     Gets all pairwise categorical-categorical association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
@@ -233,13 +238,13 @@ def categorical_categorical(sdf):
     def to_results(tup):
         key, table = tup
         computer = CategoricalStats(table)
-        measures = {m: computer.get(m) for m in computer.measures()}
+        measures = compute_all_measures(computer, context=f"pair {key} in categorical_categorical")
         return key, measures
 
-    return __get_contingency_table(sdf).map(lambda tup: to_results(tup)).sortByKey()
+    return __get_contingency_table(sdf, pseudocount=pseudocount).map(lambda tup: to_results(tup)).sortByKey()
 
 
-def agreement(sdf):
+def agreement(sdf, pseudocount=True):
     """
     Gets all pairwise categorical-categorical `agreement` association measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries of
@@ -254,10 +259,10 @@ def agreement(sdf):
     def to_results(tup):
         key, table = tup
         computer = AgreementStats(table)
-        measures = {m: computer.get(m) for m in computer.measures()}
+        measures = compute_all_measures(computer, context=f"pair {key} in agreement")
         return key, measures
 
-    return __get_contingency_table(sdf).map(lambda tup: to_results(tup)).sortByKey()
+    return __get_contingency_table(sdf, pseudocount=pseudocount).map(lambda tup: to_results(tup)).sortByKey()
 
 
 def binary_continuous(sdf, binary, continuous, b_0=0, b_1=1):
@@ -442,7 +447,7 @@ def categorical_continuous(sdf, categorical, continuous):
     )
 
 
-def concordance(sdf):
+def concordance(sdf, pseudocount=True):
     """
     Gets all the pairwise ordinal-ordinal concordance measures. The result is a Spark pair-RDD,
     where the keys are tuples of variable names e.g. (k1, k2), and values are dictionaries
@@ -549,15 +554,16 @@ def concordance(sdf):
         """
         (x1, x2), (d, t_xy, t_x, t_y, c, n) = counts
 
-        d += 1
-        t_xy += 1
-        t_x += 1
-        t_y += 1
-        c += 1
-        n += 5
+        if pseudocount:
+            d += 1
+            t_xy += 1
+            t_x += 1
+            t_y += 1
+            c += 1
+            n += 5
 
         computer = ConcordanceStats(d, t_xy, t_x, t_y, c, n)
-        measures = {m: computer.get(m) for m in computer.measures()}
+        measures = compute_all_measures(computer, context=f"pair ({x1}, {x2}) in concordance")
         return (x1, x2), measures
 
     return (

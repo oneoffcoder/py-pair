@@ -114,6 +114,9 @@ class CorrelationRatio(MeasureMixin, object):
         self.__x = x_arr[mask]
         self.__y = y_arr[mask]
 
+        if self.__x.size == 0:
+            raise ValueError("No valid samples available to compute categorical-continuous statistics.")
+
     @property
     @lru_cache(maxsize=None)
     def __mean(self):
@@ -390,6 +393,8 @@ class Concordance(MeasureMixin, ConcordanceMixin, object):
             return a is not None and b is not None
 
         data = [(a, b) for a, b in zip(x, y) if is_valid(a, b)]
+        if len(data) < 2:
+            raise ValueError("At least two valid paired samples are required to compute concordance statistics.")
         results = combinations(data, 2)
         results = map(lambda tup: get_concordance(tup[0], tup[1]), results)
         c = reduce(lambda c1, c2: c1 + c2, results)

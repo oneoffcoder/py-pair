@@ -2,9 +2,50 @@ from abc import ABC
 from functools import lru_cache
 from itertools import combinations
 from typing import Any
+import warnings
 
 import numpy as np
 import pandas as pd
+
+
+class UndefinedMeasureError(ValueError):
+    """Raised when a measure is undefined for the provided data."""
+
+
+def _has_non_finite_numeric(value) -> bool:
+    if isinstance(value, (str, bytes)):
+        return False
+
+    try:
+        arr = np.asarray(value, dtype=float)
+    except (TypeError, ValueError):
+        return False
+
+    return arr.size > 0 and not np.all(np.isfinite(arr))
+
+
+def _measure_error_message(measure: str, owner: object | str, detail: str, context: str | None = None) -> str:
+    owner_name = owner if isinstance(owner, str) else owner.__class__.__name__
+    message = f"Measure '{measure}' is undefined for {owner_name}: {detail}"
+    if context is not None:
+        message = f"{message} ({context})"
+    return message
+
+
+def raise_undefined_measure(measure: str, owner: object | str, detail: str, context: str | None = None) -> None:
+    raise UndefinedMeasureError(_measure_error_message(measure, owner, detail, context=context))
+
+
+def compute_all_measures(computer, context: str | None = None):
+    measures = {}
+    for measure in computer.measures():
+        try:
+            measures[measure] = computer.get(measure)
+        except UndefinedMeasureError as exc:
+            if context is None:
+                raise
+            raise UndefinedMeasureError(f"{exc} ({context})") from exc
+    return measures
 
 
 class MeasureMixin(ABC):
@@ -21,7 +62,29 @@ class MeasureMixin(ABC):
     @lru_cache(maxsize=None)
     def get(self, measure):
         """Gets the specified measure."""
-        return getattr(self, measure)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("error", RuntimeWarning)
+                value = getattr(self, measure)
+        except UndefinedMeasureError:
+            raise
+        except ZeroDivisionError as exc:
+            raise UndefinedMeasureError(_measure_error_message(measure, self, "division by zero")) from exc
+        except FloatingPointError as exc:
+            detail = str(exc) or exc.__class__.__name__
+            raise UndefinedMeasureError(_measure_error_message(measure, self, detail)) from exc
+        except RuntimeWarning as exc:
+            detail = str(exc) or exc.__class__.__name__
+            raise UndefinedMeasureError(_measure_error_message(measure, self, detail)) from exc
+        except ValueError as exc:
+            if "math domain error" in str(exc):
+                raise UndefinedMeasureError(_measure_error_message(measure, self, "math domain error")) from exc
+            raise
+
+        if _has_non_finite_numeric(value):
+            raise UndefinedMeasureError(_measure_error_message(measure, self, "non-finite result"))
+
+        return value
 
     @lru_cache(maxsize=None)
     def get_measures(self):
