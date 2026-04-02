@@ -141,11 +141,12 @@ def format_timing_stats(sort_by: str = "total_seconds", limit: int = 20) -> str:
 
 def _format_bytes(num_bytes: int) -> str:
     value = float(num_bytes)
+    unit = "B"
     for unit in ("B", "KiB", "MiB", "GiB", "TiB"):
         if value < 1024.0 or unit == "TiB":
-            return f"{value:.2f} {unit}"
+            break
         value /= 1024.0
-    return f"{value:.2f} TiB"
+    return f"{value:.2f} {unit}"
 
 
 def _get_process_peak_rss_bytes() -> int | None:

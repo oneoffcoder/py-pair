@@ -1513,7 +1513,7 @@ class BinaryMixin(object):
         :param phi: Weight :math:`[0,1]` of how important match on column variable is. Default 0.
         :return: Tversky's Index.
         """
-        a, b, c, _ = self.__abcd
+        a, b, c, _, _ = self.__abcdn
         return a / (a + theta * b + phi * c)
 
 
