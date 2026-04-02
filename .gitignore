@@ -13,6 +13,7 @@ build/
 joblib_memmap/
 .pytest_cache/
 .ruff_cache/
+.profiles/
 .venv/
 .DS_store
 .vscode

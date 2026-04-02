@@ -19,6 +19,23 @@ Build wheel/sdist:
 uv build
 ```
 
+## Profiling
+
+Run the built-in profiling workload:
+
+```bash
+make profile
+```
+
+This writes `cProfile` stats to `.profiles/pypair.prof`, prints the hottest frames, and can also emit
+internal timings for the decorated contingency measures. It also writes a memory report with
+`tracemalloc` allocation hotspots and process peak RSS to `.profiles/pypair.memory.txt`. Override the
+default workload or scale with `PROFILE_FLAGS` when needed:
+
+```bash
+make profile PROFILE_FLAGS="--workload corr --size 8000 --width 20 --limit 40 --output .profiles/corr.prof --memory-output .profiles/corr.memory.txt"
+```
+
 ## Quick usage
 
 ```python

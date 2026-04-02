@@ -2,10 +2,11 @@ UV ?= uv
 PYTHON ?= 3.13
 VENV ?= .venv
 UV_ENV = UV_PROJECT_ENVIRONMENT=$(VENV)
+PROFILE_FLAGS ?= --instrument --output .profiles/pypair.prof --memory-output .profiles/pypair.memory.txt
 
 .DEFAULT_GOAL := help
 
-.PHONY: help venv format lint test check build docs compile clean clean-venv
+.PHONY: help venv format lint test check profile build docs compile clean clean-venv
 
 help:
 	@printf '%s\n' \
@@ -14,6 +15,7 @@ help:
 		'make lint       Run ruff check' \
 		'make test       Run pytest' \
 		'make check      Run lint and tests' \
+		'make profile    Run the built-in cProfile workload (override with PROFILE_FLAGS=...)' \
 		'make build      Build wheel and sdist with uv' \
 		'make docs       Build Sphinx docs' \
 		'make compile    Compile Python sources' \
@@ -36,6 +38,10 @@ test: $(VENV)
 	$(UV_ENV) $(UV) run pytest
 
 check: lint test
+
+profile: $(VENV)
+	@mkdir -p .profiles
+	$(UV_ENV) $(UV) run python -m pypair.profiling $(PROFILE_FLAGS)
 
 build: $(VENV)
 	$(UV_ENV) $(UV) build
@@ -60,6 +66,7 @@ clean:
 	rm -rf docs/build/
 	rm -rf .pytest_cache/
 	rm -rf .ruff_cache/
+	rm -rf .profiles/
 	rm -f .coverage
 	rm -f .noseids
 

@@ -1,20 +1,21 @@
-import time
+from time import perf_counter
 from functools import wraps
+
+from pypair.profiling import record_timing
 
 
 def timeit(f):
     """
-    Benchmarks the time it takes (seconds) to execute.
+    Records execution time when profiling is enabled.
     """
 
     @wraps(f)
     def wrapper(*args, **kwargs):
-        start = time.time()
-        output = f(*args, **kwargs)
-        # diff = time.time() - start
-        time.time() - start
-        # print(f'{f.__name__}: {diff}')
-        return output
+        start = perf_counter()
+        try:
+            return f(*args, **kwargs)
+        finally:
+            record_timing(f"{f.__module__}.{f.__qualname__}", perf_counter() - start)
 
     return wrapper
 
