@@ -4,11 +4,13 @@ Quickstart
 Installation
 ------------
 
-Use PyPi to install the `package <https://pypi.org/project/pypair>`_.
+Use ``uv`` with Python 3.13 to create a reproducible development environment.
 
 .. code:: bash
 
-    pip install pypair
+    uv venv --python 3.13
+    source .venv/bin/activate
+    uv sync
 
 Confusion Matrix
 ----------------

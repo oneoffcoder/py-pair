@@ -1,0 +1,60 @@
+[project]
+name = "pypair"
+version = "0.1.0"
+description = "Pairwise association measures for categorical and continuous variables"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Jee Vang" }]
+dependencies = [
+  "numpy>=2.2",
+  "scipy>=1.15",
+  "scikit-learn>=1.6",
+  "pandas>=2.2",
+  "pyspark>=3.5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+  "pytest-cov>=6.0",
+  "ruff>=0.12",
+]
+docs = [
+  "sphinx>=8.1",
+  "sphinx-rtd-theme>=3.0",
+  "sphinxcontrib-bibtex>=2.6",
+  "sphinxcontrib-blockdiag>=3.0",
+  "sphinx-sitemap>=2.8",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-cov>=6.0",
+  "ruff>=0.12",
+]
+docs = [
+  "sphinx>=8.1",
+  "sphinx-rtd-theme>=3.0",
+  "sphinxcontrib-bibtex>=2.6",
+  "sphinxcontrib-blockdiag>=3.0",
+  "sphinx-sitemap>=2.8",
+]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.hatch.build.targets.wheel]
+packages = ["pypair"]
